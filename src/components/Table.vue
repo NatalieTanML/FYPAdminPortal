@@ -14,7 +14,7 @@
               ></b-form-input>
               <b-input-group-append class="input-group-append">
                 <b-button variant="primary">
-                  <i class="fa fa-search fa-sm"></i>
+                  <i class="fas fa-search fa-sm"></i>
                 </b-button>
               </b-input-group-append>
             </b-input-group>

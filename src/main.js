@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.css";
 require("./assets/styles/sb-admin-2.css");
 import Vuelidate from "vuelidate";
 import VueSnackbar from "vue-snack";
-import "font-awesome/css/font-awesome.css";
+import "@fortawesome/fontawesome-free/css/all.css";
 
 require("vue-snack/dist/vue-snack.min.css");
 

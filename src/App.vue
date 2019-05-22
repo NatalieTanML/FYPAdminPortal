@@ -1,23 +1,20 @@
 <template>
   <div>
-    
     <Navigation/>
     <router-view/>
   </div>
 </template>
 
 <script>
-import Navigation from './components/Navigation.vue'
+import Navigation from "./components/Navigation.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     Navigation
   }
-
-}
+};
 </script>
 
 <style>
-
 </style>
