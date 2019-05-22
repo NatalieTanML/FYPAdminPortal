@@ -28,27 +28,16 @@
                     <div class="form-group">
                       <select class="custom-select custom-select-sm form-control form-control-user">
                       <option value="" selected disabled>Please select</option>                        
-<<<<<<< HEAD
                       <option>Admin</option>
                       <option>Super Admin</option>
                       <option>Delivery</option>
                       
-=======
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
->>>>>>> 57e96555d3d2900e88e43862a07c176f36081d96
     
                       </select>
                     </div>
                 
                     <a href="index.html" class="btn btn-primary btn-user btn-block">
-<<<<<<< HEAD
                       Add User
-=======
-                      Login
->>>>>>> 57e96555d3d2900e88e43862a07c176f36081d96
                     </a>
                   
                   </form>
@@ -136,7 +125,7 @@ console.log("username: "+username + "  password: "+password)
 <style scoped>
 body{
   height:100%
-  height:100vh
+  
 }
 
 </style>

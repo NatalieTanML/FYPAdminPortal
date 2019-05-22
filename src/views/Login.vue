@@ -18,11 +18,7 @@
               <div class="col-lg-9">
                 <div class="p-5">
                   <div class="text-center">
-<<<<<<< HEAD
                     <h1 class="h4 text-gray-900 mb-4">Welcome Back</h1>
-=======
-                    <h1 class="h4 text-gray-900 mb-4">Login</h1>
->>>>>>> 57e96555d3d2900e88e43862a07c176f36081d96
                   </div>
                   <form class="user">
                     <div class="form-group">
@@ -37,7 +33,6 @@
                         <label class="custom-control-label" for="customCheck">Remember Me</label>
                       </div>
                     </div>
-<<<<<<< HEAD
                     <router-link to="dashboard"><a class="btn btn-primary btn-user btn-block">
                      <span>Login</span>
                     </a>
@@ -48,17 +43,6 @@
                     </a>
                     <a class="btn btn-facebook btn-user btn-block">
                       <i class="fab fa-facebook-f fa-fw"></i> <span>Login with Facebook</span>
-=======
-                    <a href="index.html" class="btn btn-primary btn-user btn-block">
-                      Login
-                    </a>
-                    <hr>
-                    <a href="index.html" class="btn btn-google btn-user btn-block">
-                      <i class="fab fa-google fa-fw"></i> Login with Google
-                    </a>
-                    <a href="index.html" class="btn btn-facebook btn-user btn-block">
-                      <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
->>>>>>> 57e96555d3d2900e88e43862a07c176f36081d96
                     </a>
                   </form>
                   <hr>

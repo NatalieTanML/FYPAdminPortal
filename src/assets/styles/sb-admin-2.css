@@ -10580,8 +10580,7 @@
   
   #wrapper #content-wrapper #content {
     -webkit-box-flex: 1;
-    -ms-flex: 1 0 auto;
-    flex: 1 0 auto;
+    
   }
   
   .container,

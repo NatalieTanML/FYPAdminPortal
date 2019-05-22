@@ -1,14 +1,14 @@
 <template>
-    <div style="font-size: 1.5em">
-      {{title}}
-    </div>
+  <div class="ml-2">
+    <h4>{{title}}</h4>
+  </div>
 </template>
 
 <script>
 export default {
-    name: "DashboardHeader",
-    props:{
-        title: String
-    }
-}
+  name: "DashboardHeader",
+  props: {
+    title: String
+  }
+};
 </script>
