@@ -8,6 +8,7 @@ import AddUser from './views/AddUser'
 import ManageUser from './views/ManageUser'
 import ChangePassword from './views/ChangePassword'
 import Dashboard from './views/Dashboard'
+import Deliveries from './views/Deliveries'
 
 Vue.use(Router)
 
@@ -81,6 +82,14 @@ data(){
       path: '/Dashboard',
       name: 'Dashboard',
       component: Dashboard,
+      meta: { 
+     
+      }
+    },
+    {
+      path: '/Deliveries',
+      name: 'Deliveries',
+      component: Deliveries,
       meta: { 
      
       }
