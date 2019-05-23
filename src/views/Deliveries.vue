@@ -119,60 +119,43 @@ export default {
     return {
       noOfTabs: 0,
       selectedTab: 0,
-      Tabs: [
-        { title: "Orders", id: 0, isDark: false },
-        { title: "Awaiting Printing", id: 1, isDark: false },
-        { title: "Printed", id: 2, isDark: false },
-        { title: "On Delivery", id: 3, isDark: false },
-        { title: "Completed", id: 4, isDark: false },
-        { title: "Cancelled", id: 5, isDark: false }
-      ],
+      
 
       items: [
         {
           refNo: "123456",
           date: "22/04/19",
           item: "A5 Photo",
-          image: "image",
-          quantity: "2",
-          status: "Awaiting Print",
-          actions: "Print"
+          hotel: "Resorts World Sentosa",
+          actions: "Delivered"
         },
         {
           refNo: "123457",
           date: "24/04/19",
           item: "Keychain",
-          image: "image",
-          quantity: "1",
-          status: "Printed",
-          actions: "Deliver"
+          hotel: "Siloso Beach Resort",
+          actions: "Delivered"
         },
         {
           refNo: "123458",
           date: "25/04/19",
           item: "ID Card",
-          image: "image",
-          quantity: "2",
-          status: "Out for Delivery",
-          actions: "Completed"
+          hotel: "ONE°15 Marina Sentosa Cove",
+          actions: "Delivered"
         },
         {
           refNo: "123459",
           date: "05/05/19",
           item: "A5 Photo + Frame",
-          image: "image",
-          quantity: "2",
-          status: "Delivered",
-          actions: "Archive"
+          hotel: "Le Méridien Singapore",
+          actions: "Delivered"
         }
       ],
       fields: [
         { key: "refNo", label: "Ref. No", sortable: true },
         { key: "date", label: "Date", sortable: true },
         { key: "item", label: "Item", sortable: true },
-        { key: "image", label: "Image" },
-        { key: "quantity", label: "Qty", sortable: true },
-        { key: "status", label: "Status", sortable: true },
+        { key: "hotel", label: "Hotel", sortable: true },
         { key: "actions", label: "Actions" }
       ]
     };
