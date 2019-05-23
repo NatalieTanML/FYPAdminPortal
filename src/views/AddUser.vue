@@ -23,21 +23,19 @@
                   </div>
                   <form class="user">
                     <div class="form-group">
-                      <input type="email" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address...">
+                      <input type="email" v-model="username" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter Email Address...">
                     </div>
                     <div class="form-group">
-                      <select class="custom-select custom-select-sm form-control form-control-user">
+                        <select  class="custom-select">
                       <option value="" selected disabled>Please select</option>                        
-                      <option>Admin</option>
+                      <option value="Admin">Admin</option>
                       <option>Super Admin</option>
-                      <option>Delivery</option>
-                      
-    
+                      <option>Delivery</option>   
                       </select>
                     </div>
                 
-                    <a href="index.html" class="btn btn-primary btn-user btn-block">
-                      Add User
+                    <a v-on:click="addUser" class="btn btn-primary btn-user btn-block">
+                      <span>Add User</span>
                     </a>
                   
                   </form>
@@ -68,7 +66,7 @@ export default {
     return {
       selected : 1,
       username: "",
-      password: "p@ssw0rd",
+    
       options: [
           { value: '1', text: 'Admin' },
           { value: '2', text: 'Delivery' },
@@ -100,8 +98,8 @@ export default {
      const {username, password } = this;
      const formData = new FormData();
     formData.append('username', username);
-    formData.append('password', password);
-console.log("username: "+username + "  password: "+password)
+  
+console.log("username: "+username )
      this.$store
     .dispatch(ADD_USER, formData)
     .then(() => {
@@ -124,8 +122,15 @@ console.log("username: "+username + "  password: "+password)
 
 <style scoped>
 body{
-  height:100%
+  height:100vh
   
 }
-
+.custom-select{
+  border-radius: 10rem;
+  height:3rem;
+  font-size:0.8rem
+}
+span{
+   color : white
+}
 </style>
