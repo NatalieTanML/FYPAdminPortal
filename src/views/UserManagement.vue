@@ -68,7 +68,7 @@
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table topRightButtonText="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table v-bind:headerButtonClick="this.headerButtonClick" headerButton="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -92,6 +92,7 @@ import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
+import { eventBus } from '@/eventBus';
 
 export default {
   components: {
@@ -102,7 +103,7 @@ export default {
   },
   data() {
     return {
-
+      headerButtonClick: "Add One User",
       items: [
         {
           id: "1",
@@ -154,9 +155,16 @@ export default {
   },
 
   methods: {
-  
-  }
-};
+
+  },
+  created(){
+ eventBus.$on(this.headerButtonClick, () => {
+ this.$router.replace({name:'AddUser'});
+
+  })
+}
+}
+
 </script>
 
 <style>

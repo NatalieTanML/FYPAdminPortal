@@ -21,7 +21,7 @@
               </b-input-group>
             </b-col>
             <b-col>
-              <b-button variant="primary" class="float-right" v-if="headerButton">{{headerButton}}</b-button>
+              <b-button v-on:click="onHeaderButtonClick"  variant="primary" class="float-right" v-if="headerButton">{{headerButton}}</b-button>
             </b-col>
           </b-row>
         </div>
@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import { eventBus } from '@/eventBus';
+
 export default {
   data() {
     return {
@@ -92,7 +94,10 @@ export default {
   props: {
     fields: Array,
     items: Array,
-    headerButton: String
+    headerButton: String,
+    headerButtonClick: String,
+    actionButtonClick: String,
+    
   },
   mounted() {
     this.totalRows = this.items.length;
@@ -114,6 +119,9 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    onHeaderButtonClick(){
+eventBus.$emit(this.headerButtonClick);
     }
   }
 };
