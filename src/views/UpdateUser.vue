@@ -61,14 +61,14 @@
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
                       <b-form-group label-cols-sm="3" label="User Name" label-for="input-horizontal">
-                        <b-form-input></b-form-input>
+                        <b-form-input v-model="this.username"></b-form-input>
                       </b-form-group>
 
                       <b-form-group label-cols-sm="3" label="Role" label-for="input-horizontal">
                         <select class="custom-select form-control">
                           <option value="" selected disabled>Please select</option>
                           <option value="Admin">Admin</option>
-                          <option>Super Admin</option>
+                          <option selected>Super Admin</option>
                           <option>Delivery</option>
                         </select>
                       </b-form-group>
@@ -141,6 +141,12 @@
   import DashboardHeader from "@/components/DashboardHeader";
 
   export default {
+
+    data(){
+      return{
+      username: "kidzania@hotmail.com"
+      }
+    },
     components: {
       SideBar,
       DashboardHeader

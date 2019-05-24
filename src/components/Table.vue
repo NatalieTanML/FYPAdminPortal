@@ -47,7 +47,7 @@
             </template>-->
 
             <template slot="actions" slot-scope="row">
-              <b-button type="button" lg="4" class="w-75" variant="primary" size="sm">{{row.value}}</b-button>
+              <b-button v-on:click="onEditButtonClick" type="button" lg="4" class="w-75" variant="primary" size="sm">{{row.value}}</b-button>
             </template>
 
             <template slot="row-details" slot-scope="row">
@@ -84,7 +84,7 @@ export default {
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
-      pageOptions: [5, 10, 15],
+      pageOptions: [5, 10, 15, 20, 25],
       sortBy: null,
       sortDesc: false,
       sortDirection: "asc",
@@ -101,6 +101,7 @@ export default {
   },
   mounted() {
     this.totalRows = this.items.length;
+   
   },
 
   computed: {
@@ -122,6 +123,9 @@ export default {
     },
     onHeaderButtonClick(){
 eventBus.$emit(this.headerButtonClick);
+    },
+    onEditButtonClick(){
+eventBus.$emit(this.actionButtonClick);
     }
   }
 };

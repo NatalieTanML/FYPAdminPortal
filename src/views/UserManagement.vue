@@ -68,7 +68,7 @@
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table v-bind:headerButtonClick="this.headerButtonClick" headerButton="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table v-bind:actionButtonClick="this.actionButtonClick" v-bind:headerButtonClick="this.headerButtonClick" headerButton="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -104,6 +104,7 @@ export default {
   data() {
     return {
       headerButtonClick: "Add One User",
+      actionButtonClick: "Edit One User",
       items: [
         {
           id: "1",
@@ -160,6 +161,10 @@ export default {
   created(){
  eventBus.$on(this.headerButtonClick, () => {
  this.$router.replace({name:'AddUser'});
+  })
+
+  eventBus.$on(this.actionButtonClick, () => {
+ this.$router.replace({name:'UpdateUser'});
 
   })
 }
