@@ -109,11 +109,12 @@
                 
                  
 </template>
+
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { ADD_USER } from "@/store/actions/user";
-import { required } from 'vuelidate/lib/validators';
+import { required } from "vuelidate/lib/validators";
 export default {
 
   components:{
@@ -123,56 +124,51 @@ export default {
   
   data() {
     return {
-      selected : 1,
+      selected: 1,
       username: "",
-    
+
       options: [
-          { value: '1', text: 'Admin' },
-          { value: '2', text: 'Delivery' },
-          { value: '3', text: 'Super Admin'},
-      ],
-  }
+        { value: "1", text: "Admin" },
+        { value: "2", text: "Delivery" },
+        { value: "3", text: "Super Admin" }
+      ]
+    };
   },
 
- validations: {
-   username: {
-      required,
+  validations: {
+    username: {
+      required
     },
     password: {
-      required,
+      required
     }
-    
   },
 
   methods: {
-     message (method,messageText) {
-    	let config = {
-      	text: messageText,
-        button: 'ok'
-      }
-      this.$snack[method](config)
-  
-    },  
-  addUser(){
-     const {username, password } = this;
-     const formData = new FormData();
-    formData.append('username', username);
-  
-console.log("username: "+username )
-     this.$store
-    .dispatch(ADD_USER, formData)
-    .then(() => {
-      
-           this.message('success','You have added a new user!')
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+    },
+    addUser() {
+      const { username, password } = this;
+      const formData = new FormData();
+      formData.append("username", username);
+
+      console.log("username: " + username);
+      this.$store
+        .dispatch(ADD_USER, formData)
+        .then(() => {
+          this.message("success", "You have added a new user!");
         })
         .catch(error => {
-          console.dir(error)
-          this.message('danger',error.response.data.message)
-     //this.$router.replace({name:'SummaryOfOrders'});
-  });
-  }
-    
-  
+          console.dir(error);
+          this.message("danger", error.response.data.message);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
+    }
   },
 
   mounted() {}
@@ -180,5 +176,4 @@ console.log("username: "+username )
 </script>
 
 <style scoped>
-
 </style>
