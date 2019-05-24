@@ -12,8 +12,9 @@
             <i class="fa fa-bars"></i>
           </button>
 
-          <DashboardHeader title="Deliveries"></DashboardHeader>
           <!-- Topbar Navbar -->
+          <DashboardHeader title="Delivery Routes"></DashboardHeader>
+
           <ul class="navbar-nav ml-auto">
             <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -64,27 +65,19 @@
 
         <!-- Begin Page Content -->
 
-        <div class="container-fluid">
-          <!-- Main Content -->
-          <div id="content">
-            <div class="row mb-4">
-              <ul class="nav" ref="tabs">
-                <DashboardTabs
-                  v-for="tab in this.Tabs"
-                  v-bind:key="tab.id"
-                  v-bind:title="tab.title"
-                  v-bind:isDark="tab.isDark"
-                  @click.native="changeBackgroundColor(tab.id)"
-                ></DashboardTabs>
-              </ul>
-            </div>
+        <!-- Main Content -->
+        <div id="content">
+          <div cols="4">
+            <Table
+              v-bind:fields="this.fields"
+              v-bind:items="this.items"
+              v-bind:headerButton="this.headerButton"
+            ></Table>
           </div>
         </div>
+
         <!-- /.container-fluid -->
 
-        <div cols="4">
-          <Table v-bind:fields="this.fields" v-bind:items="this.items"></Table>
-        </div>
         <!-- End of Main Content -->
       </div>
       <!-- Footer -->
@@ -117,47 +110,44 @@ export default {
   },
   data() {
     return {
-      noOfTabs: 0,
-      selectedTab: 0,
-      
-
       items: [
         {
-          refNo: "123456",
-          date: "22/04/19",
-          item: "A5 Photo",
-          hotel: "Resorts World Sentosa",
-          actions: "Delivered"
+          refNo: "87654321",
+          region: "Sentosa",
+          postcode: "234567",
+          deliveryman: "",
+          actions: "Assign Deliveryman"
         },
         {
-          refNo: "123457",
-          date: "24/04/19",
-          item: "Keychain",
-          hotel: "Siloso Beach Resort",
-          actions: "Delivered"
+          refNo: "34567890",
+          region: "East",
+          postcode: "871234",
+          deliveryman: "",
+          actions: "Assign Deliveryman"
         },
         {
-          refNo: "123458",
-          date: "25/04/19",
-          item: "ID Card",
-          hotel: "ONE°15 Marina Sentosa Cove",
-          actions: "Delivered"
+          refNo: "12345678",
+          region: "Central",
+          postcode: "321456",
+          deliveryman: "ben@kidzania.sg",
+          actions: "Change Deliveryman"
         },
         {
-          refNo: "123459",
-          date: "05/05/19",
-          item: "A5 Photo + Frame",
-          hotel: "Le Méridien Singapore",
-          actions: "Delivered"
+          refNo: "23456789",
+          region: "Central",
+          postcode: "321234",
+          deliveryman: "ben@kidzania.sg",
+          actions: "Change Deliveryman"
         }
       ],
       fields: [
         { key: "refNo", label: "Ref. No", sortable: true },
-        { key: "date", label: "Date", sortable: true },
-        { key: "item", label: "Item", sortable: true },
-        { key: "hotel", label: "Hotel", sortable: true },
+        { key: "region", label: "Region", sortable: true },
+        { key: "postcode", label: "Postcode", sortable: true },
+        { key: "deliveryman", label: "Deliveryman", sortable: true },
         { key: "actions", label: "Actions" }
-      ]
+      ],
+      headerButton: "Assign Selected to Deliveryman"
     };
   },
 
