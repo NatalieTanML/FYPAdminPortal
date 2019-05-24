@@ -63,25 +63,6 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-
-        <div class="container-fluid">
-          <!-- Main Content -->
-          <div id="content">
-            <div class="row mb-4">
-              <ul class="nav" ref="tabs">
-                <DashboardTabs
-                  v-for="tab in this.Tabs"
-                  v-bind:key="tab.id"
-                  v-bind:title="tab.title"
-                  v-bind:isDark="tab.isDark"
-                  @click.native="changeBackgroundColor(tab.id)"
-                ></DashboardTabs>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <!-- /.container-fluid -->
-
         <div cols="4">
           <Table v-bind:fields="this.fields" v-bind:items="this.items"></Table>
         </div>
@@ -119,7 +100,6 @@ export default {
     return {
       noOfTabs: 0,
       selectedTab: 0,
-      
 
       items: [
         {

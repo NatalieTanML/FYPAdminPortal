@@ -1,6 +1,6 @@
 <template>
   <div id="wrapper">
-    <SideBar ></SideBar>
+    <SideBar></SideBar>
     <!-- Content Wrapper -->
     <div id="content-wrapper">
       <!-- Main Content -->
@@ -64,11 +64,15 @@
 
         <!-- Begin Page Content -->
 
-        
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table v-bind:headerButtonClick="this.headerButtonClick" headerButton="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table
+            v-bind:headerButtonClick="this.headerButtonClick"
+            headerButton="Add User"
+            v-bind:fields="this.fields"
+            v-bind:items="this.items"
+          ></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -90,15 +94,13 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
-import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
-import { eventBus } from '@/eventBus';
+import { eventBus } from "@/eventBus";
 
 export default {
   components: {
     SideBar,
     DashboardHeader,
-    DashboardTabs,
     Table
   },
   data() {
@@ -147,24 +149,20 @@ export default {
         { key: "username", label: "Username", sortable: true },
         { key: "role", label: "Role", sortable: true },
         { key: "createdAt", label: "Created At" },
-        { key: "createdBy", label: "Created By",},
-        { key: "isEnabled" , label: 'Is Enabled'},
+        { key: "createdBy", label: "Created By" },
+        { key: "isEnabled", label: "Is Enabled" },
         { key: "actions", label: "Actions" }
       ]
     };
   },
 
-  methods: {
-
-  },
-  created(){
- eventBus.$on(this.headerButtonClick, () => {
- this.$router.replace({name:'AddUser'});
-
-  })
-}
-}
-
+  methods: {},
+  created() {
+    eventBus.$on(this.headerButtonClick, () => {
+      this.$router.replace({ name: "AddUser" });
+    });
+  }
+};
 </script>
 
 <style>

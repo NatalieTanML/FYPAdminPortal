@@ -21,7 +21,12 @@
               </b-input-group>
             </b-col>
             <b-col>
-              <b-button v-on:click="onHeaderButtonClick"  variant="primary" class="float-right" v-if="headerButton">{{headerButton}}</b-button>
+              <b-button
+                v-on:click="onHeaderButtonClick"
+                variant="primary"
+                class="float-right"
+                v-if="headerButton"
+              >{{headerButton}}</b-button>
             </b-col>
           </b-row>
         </div>
@@ -47,7 +52,14 @@
             </template>-->
 
             <template slot="actions" slot-scope="row">
-              <b-button type="button" lg="4" class="w-75" variant="primary" size="sm">{{row.value}}</b-button>
+              <b-button
+                type="button"
+                v-on:click="onActionButtonClick"
+                lg="4"
+                class="w-75"
+                variant="primary"
+                size="sm"
+              >{{row.value}}</b-button>
             </template>
 
             <template slot="row-details" slot-scope="row">
@@ -76,7 +88,7 @@
 </template>
 
 <script>
-import { eventBus } from '@/eventBus';
+import { eventBus } from "@/eventBus";
 
 export default {
   data() {
@@ -96,8 +108,7 @@ export default {
     items: Array,
     headerButton: String,
     headerButtonClick: String,
-    actionButtonClick: String,
-    
+    actionButtonClick: String
   },
   mounted() {
     this.totalRows = this.items.length;
@@ -113,15 +124,17 @@ export default {
         });
     }
   },
-
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    onHeaderButtonClick(){
-eventBus.$emit(this.headerButtonClick);
+    onHeaderButtonClick() {
+      eventBus.$emit(this.headerButtonClick);
+    },
+    onActionButtonClick() {
+      eventBus.$emit(this.actionButtonClick);
     }
   }
 };
