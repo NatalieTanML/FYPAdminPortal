@@ -8,6 +8,9 @@ import AddUser from './views/AddUser'
 import ManageUser from './views/ManageUser'
 import ChangePassword from './views/ChangePassword'
 import Dashboard from './views/Dashboard'
+import ViewResource from './views/ViewResource'
+import AddResource from './views/AddResource'
+import UpdateResource from './views/UpdateResource'
 
 Vue.use(Router)
 
@@ -15,11 +18,11 @@ Vue.use(Router)
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
 let router = new Router({
-data(){
-  return{
-  break: true
-  }
-},
+  data() {
+    return {
+      break: true
+    }
+  },
 
   routes: [
 
@@ -27,17 +30,17 @@ data(){
       path: '/',
       name: 'Login',
       component: Login,
-      meta: { 
-       //haveNotChangePassword refers to pages which user can access even though he have not changed
+      meta: {
+        //haveNotChangePassword refers to pages which user can access even though he have not changed
         //his/her password.
         haveNotChangePassword: true,
       }
-    },{
+    }, {
       path: '/Login',
       name: 'Login',
       component: Login,
-      meta: { 
-       //haveNotChangePassword refers to pages which user can access even though he have not changed
+      meta: {
+        //haveNotChangePassword refers to pages which user can access even though he have not changed
         //his/her password.
         haveNotChangePassword: true,
       }
@@ -46,32 +49,32 @@ data(){
       path: '/SummaryOfOrders',
       name: 'SummaryOfOrders',
       component: SummaryOfOrders,
-      meta: { 
-        requiresAuth: true 
+      meta: {
+        requiresAuth: true
       }
     },
     {
       path: '/AddUser',
       name: 'AddUser',
       component: AddUser,
-      meta: { 
-        requiresAuth: true 
+      meta: {
+        requiresAuth: true
       }
     },
     {
       path: '/ManageUser',
       name: 'ManageUser',
       component: ManageUser,
-      meta: { 
-        requiresAuth: true 
+      meta: {
+        requiresAuth: true
       }
     },
     {
       path: '/ChangePassword',
       name: 'ChangePassword',
       component: ChangePassword,
-      meta: { 
-        requiresAuth: true ,
+      meta: {
+        requiresAuth: true,
         //haveNotChangePassword refers to pages which user can access even though he have not changed
         //his/her password.
         haveNotChangePassword: true,
@@ -81,8 +84,32 @@ data(){
       path: '/Dashboard',
       name: 'Dashboard',
       component: Dashboard,
-      meta: { 
-     
+      meta: {
+
+      }
+    },
+    {
+      path: '/AddResource',
+      name: 'AddResource',
+      component: AddResource,
+      meta: {
+
+      }
+    },
+    {
+      path: '/ViewResource',
+      name: 'ViewResource',
+      component: ViewResource,
+      meta: {
+
+      }
+    },
+    {
+      path: '/UpdateResource',
+      name: 'UpdateResource',
+      component: UpdateResource,
+      meta: {
+
       }
     }
   ]
@@ -111,15 +138,15 @@ data(){
 //   }
 //   else{   
 //     console.log("authenticated")
-  
+
 //     if(store.getters.changePassword || to.matched.some(record => record.meta.haveNotChangePassword))
 //     next()
-  
+
 //     else if(!to.matched.some(record => record.meta.haveNotChangePassword) && !store.getters.changePassword)
 //     {
 //       console.log("second if statement") 
 //       next({ path: '/ChangePassword'})
-     
+
 //     }
 //     else{
 //       console.log("third selse statement")
