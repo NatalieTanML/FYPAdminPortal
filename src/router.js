@@ -10,24 +10,7 @@ import Dashboard from "./views/Dashboard";
 import Deliveries from "./views/Deliveries";
 import DeliveryRoutes from "./views/DeliveryRoutes";
 
-<<<<<<< HEAD
-import Vue from 'vue'
-import Router from 'vue-router'
-import store from './store';
-import Login from './views/Login';
-import SummaryOfOrders from './views/SummaryOfOrders'
-import AddUser from './views/AddUser'
-import ManageUser from './views/ManageUser'
-import ChangePassword from './views/ChangePassword'
-import Deliveries from './views/Deliveries'
-import UserManagement from './views/UserManagement'
-import UpdateUser from './views/UpdateUser'
-
-Vue.use(Router)
-
-=======
 Vue.use(Router);
->>>>>>> 07f3c018f5c771284d352cc2f81f0203e1f463bf
 
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
@@ -94,35 +77,16 @@ let router = new Router({
         haveNotChangePassword: true
       }
     },
-<<<<<<< HEAD
-  
-=======
     {
       path: "/Dashboard",
       name: "Dashboard",
       component: Dashboard,
       meta: {}
     },
->>>>>>> 07f3c018f5c771284d352cc2f81f0203e1f463bf
     {
       path: "/Deliveries",
       name: "Deliveries",
       component: Deliveries,
-<<<<<<< HEAD
-      meta: { 
-     
-      }
-    },
-    {
-      path: '/UserManagement',
-      name: 'UserManagement',
-      component: UserManagement
-    },
-    {
-      path: '/UpdateUser',
-      name: 'UpdateUser',
-      component: UpdateUser
-=======
       meta: {}
     },
     {
@@ -130,7 +94,6 @@ let router = new Router({
       name: "DeliveryRoutes",
       component: DeliveryRoutes,
       meta: {}
->>>>>>> 07f3c018f5c771284d352cc2f81f0203e1f463bf
     }
   ]
 });

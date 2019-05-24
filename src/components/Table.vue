@@ -4,33 +4,6 @@
       <div class="card shadow mb-4">
         <!-- User Interface controls -->
         <div class="card-header py-3">
-<<<<<<< HEAD
-          
-          <b-row>
-          <b-col >
-            <b-input-group class="input-group">
-              <b-form-input
-                type="text"
-                class="form-control border-0"
-                v-model="filter"
-                placeholder="Type to Search"
-              ></b-form-input>
-              <b-input-group-append class="input-group-append">
-                <b-button variant="primary">
-                  <i class="fas fa-search fa-sm"></i>
-                </b-button>
-              </b-input-group-append>
-            </b-input-group>
-          </b-col>
-          <!-- <b-col cols="5" ></b-col> -->
-           <b-col class="text-right">
-            <b-button variant="primary">
-                {{topRightButtonText}}
-            </b-button>
-          </b-col>
-          </b-row>
-          
-=======
           <b-row>
             <b-col class="col-12 col-md-4">
               <b-input-group class="input-group">
@@ -51,7 +24,6 @@
               <b-button variant="primary" class="float-right" v-if="headerButton">{{headerButton}}</b-button>
             </b-col>
           </b-row>
->>>>>>> 07f3c018f5c771284d352cc2f81f0203e1f463bf
         </div>
 
         <!-- Main table element -->
@@ -120,11 +92,7 @@ export default {
   props: {
     fields: Array,
     items: Array,
-<<<<<<< HEAD
-    topRightButtonText: String
-=======
     headerButton: String
->>>>>>> 07f3c018f5c771284d352cc2f81f0203e1f463bf
   },
   mounted() {
     this.totalRows = this.items.length;
