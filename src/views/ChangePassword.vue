@@ -86,6 +86,7 @@ export default {
            .dispatch(UPDATE_ONE_USER, formData)
            .then((response) =>{
             this.message('success',"Your password has been updated!")
+              this.$router.replace({ name: "Login" });
             })
             .catch(error =>{
           this.message('danger',error)

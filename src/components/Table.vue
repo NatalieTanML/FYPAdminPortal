@@ -4,7 +4,9 @@
       <div class="card shadow mb-4">
         <!-- User Interface controls -->
         <div class="card-header py-3">
-          <b-col md="4">
+          
+          <b-row>
+          <b-col >
             <b-input-group class="input-group">
               <b-form-input
                 type="text"
@@ -19,6 +21,14 @@
               </b-input-group-append>
             </b-input-group>
           </b-col>
+          <!-- <b-col cols="5" ></b-col> -->
+           <b-col class="text-right">
+            <b-button variant="primary">
+                {{topRightButtonText}}
+            </b-button>
+          </b-col>
+          </b-row>
+          
         </div>
 
         <!-- Main table element -->
@@ -86,7 +96,8 @@ export default {
   },
   props: {
     fields: Array,
-    items: Array
+    items: Array,
+    topRightButtonText: String
   },
   mounted() {
     this.totalRows = this.items.length;
@@ -104,15 +115,6 @@ export default {
   },
 
   methods: {
-    info(item, index, button) {
-      this.infoModal.title = `Row index: ${index}`;
-      this.infoModal.content = JSON.stringify(item, null, 2);
-      this.$root.$emit("bv::show::modal", this.infoModal.id, button);
-    },
-    resetInfoModal() {
-      this.infoModal.title = "";
-      this.infoModal.content = "";
-    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;

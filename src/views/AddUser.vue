@@ -26,7 +26,7 @@
                       <input type="email" v-model="username" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter Email Address...">
                     </div>
                     <div class="form-group">
-                        <select  class="custom-select">
+                      <select  class="custom-select">
                       <option value="" selected disabled>Please select</option>                        
                       <option value="Admin">Admin</option>
                       <option>Super Admin</option>

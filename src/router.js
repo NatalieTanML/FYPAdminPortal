@@ -7,8 +7,9 @@ import SummaryOfOrders from './views/SummaryOfOrders'
 import AddUser from './views/AddUser'
 import ManageUser from './views/ManageUser'
 import ChangePassword from './views/ChangePassword'
-import Dashboard from './views/Dashboard'
 import Deliveries from './views/Deliveries'
+import UserManagement from './views/UserManagement'
+import UpdateUser from './views/UpdateUser'
 
 Vue.use(Router)
 
@@ -78,14 +79,7 @@ data(){
         haveNotChangePassword: true,
       }
     },
-    {
-      path: '/Dashboard',
-      name: 'Dashboard',
-      component: Dashboard,
-      meta: { 
-     
-      }
-    },
+  
     {
       path: '/Deliveries',
       name: 'Deliveries',
@@ -93,6 +87,16 @@ data(){
       meta: { 
      
       }
+    },
+    {
+      path: '/UserManagement',
+      name: 'UserManagement',
+      component: UserManagement
+    },
+    {
+      path: '/UpdateUser',
+      name: 'UpdateUser',
+      component: UpdateUser
     }
   ]
 })
