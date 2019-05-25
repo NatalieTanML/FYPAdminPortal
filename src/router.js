@@ -8,6 +8,9 @@ import UserManagement from "./views/UserManagement";
 import ChangePassword from "./views/ChangePassword";
 import Deliveries from "./views/Deliveries";
 import DeliveryRoutes from "./views/DeliveryRoutes";
+import ViewResource from "./views/ViewResource";
+import AddResource from "./views/AddResource";
+import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
 
 Vue.use(Router);
@@ -60,7 +63,7 @@ let router = new Router({
     },
     {
       path: "/UserManagement",
-      name: "UserManagement",
+      name: "ManageUser",
       component: UserManagement,
       meta: {
         requiresAuth: true
@@ -82,6 +85,24 @@ let router = new Router({
       path: "/Deliveries",
       name: "Deliveries",
       component: Deliveries,
+      meta: {}
+    },
+    {
+      path: "/ViewResource",
+      name: "ViewResource",
+      component: ViewResource,
+      meta: {}
+    },
+    {
+      path: "/AddResource",
+      name: "AddResource",
+      component: AddResource,
+      meta: {}
+    },
+    {
+      path: "/UpdateResource",
+      name: "UpdateResource",
+      component: UpdateResource,
       meta: {}
     },
     {
