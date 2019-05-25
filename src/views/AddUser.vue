@@ -74,10 +74,6 @@
                       </b-form-group>
 
 
-          <b-form-group label-cols-sm="3" label="Password" label-for="input-horizontal">
-                         <input type="password" v-model="username" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter Email Address...">
-                      </b-form-group>
-
                       <b-form-group label-cols-sm="3" label-for="input-horizontal">
                         <b-button class="w-25"  v-on:click="addUser" variant="primary">Add User</b-button>
                       </b-form-group>

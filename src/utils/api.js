@@ -2,37 +2,37 @@ import axios from 'axios';
 
 export const api_routes = {
 
-    user:{
-        sign_in: 'api/users/signin',
-        sign_up: 'api/users/signup',
-        get_all: 'api/users/getall',
-        get_one: 'api/users/getuserbyid/',
-        update_one: 'api/users/Update/'
-    }
- 
+  user: {
+    sign_in: 'api/users/signin',
+    sign_up: 'api/users/signup',
+    get_all: 'api/users/',
+    get_one: 'api/users/',
+    update_one: 'api/users/'
+  }
+
 };
 
-export const apiCall = ({ url, method, ...args}) =>
-new Promise ((resolve, reject) => {
+export const apiCall = ({ url, method, ...args }) =>
+  new Promise((resolve, reject) => {
     let token = localStorage.getItem('token') || '';
-    console.log(url +" "+method)
+    console.log(url + " " + method)
     if (token)
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
 
-      try {
-        axios({
-          method: method || 'get',
-          url: url,
-          ...args
+    try {
+      axios({
+        method: method || 'get',
+        url: url,
+        ...args
+      })
+        .then(resp => {
+          resolve(resp.data);
         })
-          .then(resp => {
-            resolve(resp.data);
-          })
-          .catch(error => {
-            reject(error);
-          });
-      } catch (err) {
-        reject(new Error(err));
-      }
+        .catch(error => {
+          reject(error);
+        });
+    } catch (err) {
+      reject(new Error(err));
+    }
 
-});
+  });
