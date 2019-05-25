@@ -74,7 +74,7 @@
                   v-bind:key="tab.id"
                   v-bind:title="tab.title"
                   v-bind:isDark="tab.isDark"
-                  @click.native="changeBackgroundColor(tab.id)"
+                  @click.native="onTabChange(tab.id)"
                 ></DashboardTabs>
               </ul>
             </div>
@@ -83,7 +83,7 @@
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table :key="this.forceRender" v-bind:fields="this.fields" v-bind:items="this.sortItems"></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -117,19 +117,43 @@ export default {
   },
   data() {
     return {
+      forceRender : true,
       noOfTabs: 0,
       selectedTab: 0,
-      Tabs: [
-        { title: "Orders", id: 0, isDark: false },
-        { title: "Awaiting Printing", id: 1, isDark: false },
-        { title: "Printed", id: 2, isDark: false },
-        { title: "On Delivery", id: 3, isDark: false },
-        { title: "Completed", id: 4, isDark: false },
-        { title: "Cancelled", id: 5, isDark: false }
-      ],
+      typesOfTabs:["All","Ordered","Awaiting Print","Printed","Delivering","Completed","Cancelled"],
+      Tabs: null,
 
-      items: [
-        {
+      sortItems:[],
+
+      items: [],
+      fields: [
+        { key: "refNo", label: "Ref. No", sortable: true },
+        { key: "date", label: "Date", sortable: true },
+        { key: "item", label: "Item", sortable: true },
+        { key: "image", label: "Image" },
+        { key: "quantity", label: "Qty", sortable: true },
+        { key: "status", label: "Status", sortable: true },
+        { key: "actions", label: "Actions" }
+      ]
+    };
+  },
+
+  computed:{
+
+  },
+
+  mounted(){
+   const {typesOfTabs} = this 
+      this.Tabs = [
+        { title: typesOfTabs[0], id: 0, isDark: false },
+        { title: typesOfTabs[1], id: 1, isDark: false },
+        { title: typesOfTabs[2], id: 2, isDark: false },
+        { title: typesOfTabs[3], id: 3, isDark: false },
+        { title: typesOfTabs[4], id: 4, isDark: false },
+        { title: typesOfTabs[5], id: 5, isDark: false }
+      ],
+    this.items = [
+       {
           refNo: "123456",
           date: "22/04/19",
           item: "A5 Photo",
@@ -144,8 +168,8 @@ export default {
           item: "Keychain",
           image: "image",
           quantity: "1",
-          status: "Printed",
-          actions: "Deliver"
+          status: "Delivering",
+          actions: "Completed"
         },
         {
           refNo: "123458",
@@ -153,7 +177,7 @@ export default {
           item: "ID Card",
           image: "image",
           quantity: "2",
-          status: "Out for Delivery",
+          status: "Delivering",
           actions: "Completed"
         },
         {
@@ -164,33 +188,136 @@ export default {
           quantity: "2",
           status: "Delivered",
           actions: "Archive"
-        }
-      ],
-      fields: [
-        { key: "refNo", label: "Ref. No", sortable: true },
-        { key: "date", label: "Date", sortable: true },
-        { key: "item", label: "Item", sortable: true },
-        { key: "image", label: "Image" },
-        { key: "quantity", label: "Qty", sortable: true },
-        { key: "status", label: "Status", sortable: true },
-        { key: "actions", label: "Actions" }
-      ]
-    };
+        },
+        {
+          refNo: "123458",
+          date: "28/04/19",
+          item: "A5 Photo + Black Frame",
+          image: "image",
+          quantity: "1",
+          status: "Printed",
+          actions: "Deliver"
+        },
+        {
+          refNo: "123459",
+          date: "14/05/19",
+          item: "Keychain (Black)",
+          image: "image",
+          quantity: "2",
+          status: "Cancelled",
+          actions: "Archive"
+        },
+         {
+          refNo: "123460",
+          date: "30/05/19",
+          item: "Name Tag (Black)",
+          image: "image",
+          quantity: "1",
+          status: "Cancelled",
+          actions: "Archive"
+        },
+        {
+          refNo: "123461",
+          date: "30/05/19",
+          item: "Name Tag (Red)",
+          image: "image",
+          quantity: "1",
+          status: "Awaiting Print",
+          actions: "Print"
+        },
+        {
+          refNo: "123462",
+          date: "13/05/19",
+          item: "A4 Photo + Red Frame",
+          image: "image",
+          quantity: "3",
+          status: "Ordered",
+          actions: "Accept"
+        },
+        {
+          refNo: "123463",
+          date: "14/05/19",
+          item: "Keychain",
+          image: "image",
+          quantity: "2",
+          status: "Ordered",
+          actions: "Accept"
+        },
+        {
+          refNo: "123464",
+          date: "23/04/19",
+          item: "Keychain + A5 Photo",
+          image: "image",
+          quantity: "2",
+          status: "Completed",
+          actions: "Archive"
+        },
+         {
+          refNo: "123465",
+          date: "26/04/19",
+          item: "A5 Photo",
+          image: "image",
+          quantity: "1",
+          status: "Ordered",
+          actions: "Accept"
+        },
+         {
+          refNo: "123466",
+          date: "16/04/19",
+          item: "A3 Photo",
+          image: "image",
+          quantity: "2",
+          status: "Delivering",
+          actions: "Completed"
+        },
+    ]
+    
+    this.sortItems = this.items
+
+    this.onTabChange(0);
   },
 
   methods: {
-    changeBackgroundColor(id) {
-      this.noOfTabs = this.$refs.tabs.childElementCount;
+    onTabChange(id) {
+      //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
+      //reason why i don't use const ^ is because when the data is displayed,
+      //it will become read-only.
 
-      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
 
-      this.selectedTab = id;
+      this.sortItems= []
+      //change background color for the tab
+       this.noOfTabs = this.$refs.tabs.childElementCount;
+
+      if (! this.Tabs[id].isDark)  
+      this.Tabs[id].isDark = true;
+
+       this.selectedTab = id;
       var index;
 
-      for (index = 0; index < this.Tabs.length; index++) {
-        if (id != this.Tabs[index].id)
-          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
+      for (index = 0; index <  this.Tabs.length; index++) {
+        if (id !=  this.Tabs[index].id)
+          if ( this.Tabs[index].isDark)  
+          this.Tabs[index].isDark = false;
       }
+      //manipulate table data after changing tab color
+
+      let sortBy =  this.typesOfTabs[id]
+
+     
+      for(index = 0; index <  this.items.length; index++)
+      if( sortBy ===  this.items[index].status)
+       this.sortItems.push( this.items[index])
+      
+      if(sortBy === "All")
+      this.sortItems = this.items
+     
+     if(this.forceRender)
+      this.forceRender = false;
+      else
+      this.forceRender = true
+
+  
+
     }
   }
 };

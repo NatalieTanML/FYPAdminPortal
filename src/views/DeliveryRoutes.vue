@@ -64,15 +64,24 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-
         <!-- Main Content -->
         <div id="content">
-          <div cols="4">
+          <div>
             <Table
+              headerButton="Assign Selected to Deliveryman"
+              v-bind:headerButtonClick="this.headerButtonClick"
+              v-bind:actionButtonClick="this.actionButtonClick"
               v-bind:fields="this.fields"
               v-bind:items="this.items"
-              v-bind:headerButton="this.headerButton"
             ></Table>
+            <b-modal id="delivery-routes-modal" title="Assign to Deliveryman" ok-title="Save">
+              <b-row align-v="center">
+                <b-col cols="4">Deliveryman</b-col>
+                <b-col>
+                  <b-form-select v-model="selected" :options="options"></b-form-select>
+                </b-col>
+              </b-row>
+            </b-modal>
           </div>
         </div>
 
@@ -98,18 +107,19 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
-import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
+import { eventBus } from "@/eventBus";
 
 export default {
   components: {
     SideBar,
     DashboardHeader,
-    DashboardTabs,
     Table
   },
   data() {
     return {
+      actionButtonClick: "Assign One to Deliveryman",
+      headerButtonClick: "Assign Many to Deliveryman",
       items: [
         {
           refNo: "87654321",
@@ -147,24 +157,24 @@ export default {
         { key: "deliveryman", label: "Deliveryman", sortable: true },
         { key: "actions", label: "Actions" }
       ],
-      headerButton: "Assign Selected to Deliveryman"
+      selected: null,
+      options: [
+        { value: null, text: "Please select an option" },
+        { value: "robert@kidzania.sg", text: "robert@kidzania.sg" },
+        { value: "ben@kidzania.sg", text: "ben@kidzania.sg" }
+      ]
     };
   },
 
-  methods: {
-    changeBackgroundColor(id) {
-      this.noOfTabs = this.$refs.tabs.childElementCount;
-
-      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
-
-      this.selectedTab = id;
-      var index;
-
-      for (index = 0; index < this.Tabs.length; index++) {
-        if (id != this.Tabs[index].id)
-          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
-      }
-    }
+  methods: {},
+  mounted() {
+    eventBus.$on(this.actionButtonClick, () => {
+      console.log("Action button clicked");
+      this.$bvModal.show("delivery-routes-modal");
+    });
+    eventBus.$on(this.headerButtonClick, () => {
+      console.log("Header button clicked");
+    });
   }
 };
 </script>

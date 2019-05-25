@@ -4,13 +4,14 @@ import store from "./store";
 import Login from "./views/Login";
 import SummaryOfOrders from "./views/SummaryOfOrders";
 import AddUser from "./views/AddUser";
-import ManageUser from "./views/ManageUser";
+import UserManagement from "./views/UserManagement";
 import ChangePassword from "./views/ChangePassword";
 import Deliveries from "./views/Deliveries";
 import DeliveryRoutes from "./views/DeliveryRoutes";
 import ViewResource from "./views/ViewResource";
 import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
+import UpdateUser from "./views/UpdateUser"
 
 Vue.use(Router);
 
@@ -61,9 +62,9 @@ let router = new Router({
       }
     },
     {
-      path: "/ManageUser",
+      path: "/UserManagement",
       name: "ManageUser",
-      component: ManageUser,
+      component: UserManagement,
       meta: {
         requiresAuth: true
       }
@@ -79,6 +80,7 @@ let router = new Router({
         haveNotChangePassword: true
       }
     },
+
     {
       path: "/Deliveries",
       name: "Deliveries",
@@ -107,6 +109,12 @@ let router = new Router({
       path: "/DeliveryRoutes",
       name: "DeliveryRoutes",
       component: DeliveryRoutes,
+      meta: {}
+    },
+    {
+      path: "/UpdateUser",
+      name: "UpdateUser",
+      component: UpdateUser,
       meta: {}
     }
   ]
