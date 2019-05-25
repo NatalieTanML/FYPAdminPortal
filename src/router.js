@@ -11,7 +11,7 @@ import DeliveryRoutes from "./views/DeliveryRoutes";
 import ViewResource from "./views/ViewResource";
 import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
-import UpdateUser from "./views/UpdateUser"
+import UpdateUser from "./views/UpdateUser";
 
 Vue.use(Router);
 

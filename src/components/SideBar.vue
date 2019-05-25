@@ -1,81 +1,84 @@
 <template>
-     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+  <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+      <div class="sidebar-brand-icon rotate-n-15">
+        <i class="fas fa-laugh-wink"></i>
+      </div>
+      <div class="sidebar-brand-text mx-3">Admin</div>
+    </a>
 
-      <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-        <div class="sidebar-brand-icon rotate-n-15">
-          <i class="fas fa-laugh-wink"></i>
-        </div>
-        <div class="sidebar-brand-text mx-3">Admin</div>
-      </a>
+    <!-- Divider -->
+    <hr class="sidebar-divider">
 
-      <!-- Divider -->
-      <hr class="sidebar-divider">
-
-      
-      <li class="nav-item">
-         <router-link to="SummaryOfOrders">
-        <a class="nav-link collapsed"  >
+    <li class="nav-item">
+      <router-link to="SummaryOfOrders">
+        <a class="nav-link">
           <!-- icon -->
-          <i class="fas fa-fw fa-cog"></i>
+          <i class="mr-2 fas fa-tachometer-alt"></i>
           <span>Orders</span>
         </a>
-         </router-link>
-      </li>
+      </router-link>
+    </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed"  >
+    <li class="nav-item">
+      <router-link to="DeliveryRoutes">
+        <a class="nav-link">
           <!-- icon -->
-          <i class="fas fa-fw fa-cog"></i>
+          <i class="mr-2 fas fa-map-marked-alt"></i>
           <span>Delivery Routes</span>
         </a>
-      </li>
+      </router-link>
+    </li>
 
-      <li class="nav-item">
-         <router-link to="deliveries">
-        <a class="nav-link collapsed"  >
+    <li class="nav-item">
+      <router-link to="Deliveries">
+        <a class="nav-link">
           <!-- icon -->
-          <i class="fas fa-fw fa-cog"></i>
+          <i class="mr-2 fas fa-truck"></i>
           <span>Deliveries</span>
         </a>
-        </router-link>
-      </li>
-      
+      </router-link>
+    </li>
 
-       <li class="nav-item">
-          <router-link to="UserManagement">
-        <a class="nav-link collapsed"  >
+    <li class="nav-item">
+      <router-link to="UserManagement">
+        <a class="nav-link">
           <!-- icon -->
-          <i class="fas fa-fw fa-cog"></i>
+          <i class="mr-2 fas fa-users"></i>
           <span>User Management</span>
         </a>
-          </router-link>
-      </li>
+      </router-link>
+    </li>
 
-       <li class="nav-item">
-        <a class="nav-link collapsed"  >
+    <li class="nav-item">
+      <router-link to="ResourceManagement">
+        <a class="nav-link">
           <!-- icon -->
-          <i class="fas fa-fw fa-cog"></i>
+          <i class="mr-2 fas fa-cubes"></i>
           <span>Resource Management</span>
         </a>
-      </li>
+      </router-link>
+    </li>
 
-
-      <!-- Divider -->
-      <hr class="sidebar-divider d-none d-md-block">
-
-     
-    </ul>
-    <!-- End of Sidebar -->
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+  </ul>
+  <!-- End of Sidebar -->
 </template>
 
 <script>
-
 export default {
-name: 'SideBar'
-}
+  name: "SideBar"
+};
 </script>
 
-<style>
-
+<style scoped>
+li a:hover {
+  text-decoration: none !important;
+}
+li a.router-link-active a.router-link-exact-active {
+  font-weight: 700 !important;
+  color: (255, 255, 255, 1);
+}
 </style>

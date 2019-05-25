@@ -67,8 +67,8 @@
         <!-- Main Content -->
         <div id="content">
           <div>
+            <!-- headerButton="Assign Selected to Deliveryman" -->
             <Table
-              headerButton="Assign Selected to Deliveryman"
               v-bind:headerButtonClick="this.headerButtonClick"
               v-bind:actionButtonClick="this.actionButtonClick"
               v-bind:fields="this.fields"
