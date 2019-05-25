@@ -12,7 +12,7 @@
             <i class="fa fa-bars"></i>
           </button>
 
-          <DashboardHeader title="Orders"></DashboardHeader>
+          <DashboardHeader title="User Management"></DashboardHeader>
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
             <div class="topbar-divider d-none d-sm-block"></div>
@@ -64,26 +64,11 @@
 
         <!-- Begin Page Content -->
 
-        <div class="container-fluid">
-          <!-- Main Content -->
-          <div id="content">
-            <div class="row mb-4">
-              <ul class="nav" ref="tabs">
-                <DashboardTabs
-                  v-for="tab in this.Tabs"
-                  v-bind:key="tab.id"
-                  v-bind:title="tab.title"
-                  v-bind:isDark="tab.isDark"
-                  @click.native="changeBackgroundColor(tab.id)"
-                ></DashboardTabs>
-              </ul>
-            </div>
-          </div>
-        </div>
+        
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table topRightButtonText="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -117,81 +102,59 @@ export default {
   },
   data() {
     return {
-      noOfTabs: 0,
-      selectedTab: 0,
-      Tabs: [
-        { title: "Orders", id: 0, isDark: false },
-        { title: "Awaiting Printing", id: 1, isDark: false },
-        { title: "Printed", id: 2, isDark: false },
-        { title: "On Delivery", id: 3, isDark: false },
-        { title: "Completed", id: 4, isDark: false },
-        { title: "Cancelled", id: 5, isDark: false }
-      ],
 
       items: [
         {
-          refNo: "123456",
-          date: "22/04/19",
-          item: "A5 Photo",
-          image: "image",
-          quantity: "2",
-          status: "Awaiting Print",
-          actions: "Print"
+          id: "1",
+          username: "kidzania@hotmail.com",
+          role: "Super Admin",
+          createdAt: "08/02/19 08:12",
+          createdBy: "kidzania@hotmail.com",
+          isEnabled: "Yes",
+          actions: "Edit"
         },
         {
-          refNo: "123457",
-          date: "24/04/19",
-          item: "Keychain",
-          image: "image",
-          quantity: "1",
-          status: "Printed",
-          actions: "Deliver"
+          id: "2",
+          username: "superman@hotmail.com",
+          role: "Admin",
+          createdAt: "09/02/19 09:20",
+          createdBy: "kidzania@hotmail.com",
+          isEnabled: "Yes",
+          actions: "Edit"
         },
         {
-          refNo: "123458",
-          date: "25/04/19",
-          item: "ID Card",
-          image: "image",
-          quantity: "2",
-          status: "Out for Delivery",
-          actions: "Completed"
+          id: "3",
+          username: "deliveryman@hotmail.com",
+          role: "Delivery",
+          createdAt: "09/02/19 10:05",
+          createdBy: "kidzania@hotmail.com",
+          isEnabled: "Yes",
+          actions: "Edit"
         },
         {
-          refNo: "123459",
-          date: "05/05/19",
-          item: "A5 Photo + Frame",
-          image: "image",
-          quantity: "2",
-          status: "Delivered",
-          actions: "Archive"
+          id: "4",
+          username: "deliveryman2@hotmail.com",
+          role: "Delivery",
+          createdAt: "10/02/19 12:16",
+          createdBy: "kidzania@hotmail.com",
+          isEnabled: "No",
+          actions: "Edit"
         }
       ],
       fields: [
-        { key: "refNo", label: "Ref. No", sortable: true },
-        { key: "date", label: "Date", sortable: true },
-        { key: "item", label: "Item", sortable: true },
-        { key: "image", label: "Image" },
-        { key: "quantity", label: "Qty", sortable: true },
-        { key: "status", label: "Status", sortable: true },
+        { key: "id", label: "", sortable: true },
+        { key: "username", label: "Username", sortable: true },
+        { key: "role", label: "Role", sortable: true },
+        { key: "createdAt", label: "Created At" },
+        { key: "createdBy", label: "Created By",},
+        { key: "isEnabled" , label: 'Is Enabled'},
         { key: "actions", label: "Actions" }
       ]
     };
   },
 
   methods: {
-    changeBackgroundColor(id) {
-      this.noOfTabs = this.$refs.tabs.childElementCount;
-
-      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
-
-      this.selectedTab = id;
-      var index;
-
-      for (index = 0; index < this.Tabs.length; index++) {
-        if (id != this.Tabs[index].id)
-          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
-      }
-    }
+  
   }
 };
 </script>

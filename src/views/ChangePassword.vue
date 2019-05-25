@@ -1,32 +1,50 @@
  <template>
+ 
+<body class="bg-gradient-primary">
 
-    <form>
-    <div class="d-block text-center">
-      <h3 >Please enter a new Password</h3>
-      <p></p>
-      <p>Username: {{this.username}}</p>
-      
-      <p class="">New Password:</p>
-      <b-row class="w-150">
-      <b-col></b-col>
-      <b-col><input type="password" class="form-control" v-model="newPassword" required></b-col>
-      <b-col></b-col>
-      </b-row>
-      <p></p>
-      <p class="">Confirm Password:</p>
-      <b-row class="w-150">
-      <b-col></b-col>
-      <b-col><input type="password" class="form-control" v-model="newConfirmPassword" required></b-col>
-      <b-col></b-col>
-      </b-row>
-      <p></p>
-      <p v-if="newPasswordNotSame">Please ensure that the password are the same!</p>
-      <b-button align-v="end"   @click="changePassword">Confirm</b-button>
+  <div class="container">
 
-    
+    <div class="row justify-content-center">
+
+      <div class="col-md-7">
+
+        <div class="card o-hidden border-0 shadow-lg my-5">
+          <div class="card-body p-0">
+
+            <div class="row justify-content-center text-center">
+ 
+              <div class="col-lg-9">
+                <div class="p-5">
+                  <div class="text-center">
+                    <h1 class="h4 text-gray-900 mb-4">Change Password</h1>
+                  </div>
+                  <form class="user">
+                    <div class="form-group">
+                      <input type="password" v-model="newPassword" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter New Password...">
+                    </div>
+                    <div class="form-group">
+                      <input type="password" v-model="newConfirmPassword" class="form-control form-control-user" placeholder="Confirm Password...">
+                    </div>
+                    
+                    <a v-on:click="changePassword" class="btn btn-primary btn-user btn-block">
+                     <span>Change Password</span>
+                    </a>
+                   
+                 
+                  </form>
+                
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
-    </form>
 
+  </div>
+  </body>
 </template>
 <script>
 import { GET_ONE_USER, UPDATE_ONE_USER } from "@/store/actions/user";
@@ -68,6 +86,7 @@ export default {
            .dispatch(UPDATE_ONE_USER, formData)
            .then((response) =>{
             this.message('success',"Your password has been updated!")
+              this.$router.replace({ name: "Login" });
             })
             .catch(error =>{
           this.message('danger',error)
@@ -101,6 +120,15 @@ export default {
  }
 
 </script>
+<style scoped>
 
+
+body{
+  height:100vh
+}
+span{
+  color : white
+}
+</style>
 
    

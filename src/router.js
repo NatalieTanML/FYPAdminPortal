@@ -1,19 +1,18 @@
+import Vue from "vue";
+import Router from "vue-router";
+import store from "./store";
+import Login from "./views/Login";
+import SummaryOfOrders from "./views/SummaryOfOrders";
+import AddUser from "./views/AddUser";
+import ManageUser from "./views/ManageUser";
+import ChangePassword from "./views/ChangePassword";
+import Deliveries from "./views/Deliveries";
+import DeliveryRoutes from "./views/DeliveryRoutes";
+import ViewResource from "./views/ViewResource";
+import AddResource from "./views/AddResource";
+import UpdateResource from "./views/UpdateResource";
 
-import Vue from 'vue'
-import Router from 'vue-router'
-import store from './store';
-import Login from './views/Login';
-import SummaryOfOrders from './views/SummaryOfOrders'
-import AddUser from './views/AddUser'
-import ManageUser from './views/ManageUser'
-import ChangePassword from './views/ChangePassword'
-import Dashboard from './views/Dashboard'
-import ViewResource from './views/ViewResource'
-import AddResource from './views/AddResource'
-import UpdateResource from './views/UpdateResource'
-
-Vue.use(Router)
-
+Vue.use(Router);
 
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
@@ -21,99 +20,97 @@ let router = new Router({
   data() {
     return {
       break: true
-    }
+    };
   },
 
   routes: [
-
     {
-      path: '/',
-      name: 'Login',
+      path: "/",
+      name: "Login",
       component: Login,
       meta: {
         //haveNotChangePassword refers to pages which user can access even though he have not changed
         //his/her password.
-        haveNotChangePassword: true,
-      }
-    }, {
-      path: '/Login',
-      name: 'Login',
-      component: Login,
-      meta: {
-        //haveNotChangePassword refers to pages which user can access even though he have not changed
-        //his/her password.
-        haveNotChangePassword: true,
+        haveNotChangePassword: true
       }
     },
     {
-      path: '/SummaryOfOrders',
-      name: 'SummaryOfOrders',
+      path: "/Login",
+      name: "Login",
+      component: Login,
+      meta: {
+        //haveNotChangePassword refers to pages which user can access even though he have not changed
+        //his/her password.
+        haveNotChangePassword: true
+      }
+    },
+    {
+      path: "/SummaryOfOrders",
+      name: "SummaryOfOrders",
       component: SummaryOfOrders,
       meta: {
         requiresAuth: true
       }
     },
     {
-      path: '/AddUser',
-      name: 'AddUser',
+      path: "/AddUser",
+      name: "AddUser",
       component: AddUser,
       meta: {
         requiresAuth: true
       }
     },
     {
-      path: '/ManageUser',
-      name: 'ManageUser',
+      path: "/ManageUser",
+      name: "ManageUser",
       component: ManageUser,
       meta: {
         requiresAuth: true
       }
     },
     {
-      path: '/ChangePassword',
-      name: 'ChangePassword',
+      path: "/ChangePassword",
+      name: "ChangePassword",
       component: ChangePassword,
       meta: {
         requiresAuth: true,
         //haveNotChangePassword refers to pages which user can access even though he have not changed
         //his/her password.
-        haveNotChangePassword: true,
+        haveNotChangePassword: true
       }
     },
     {
-      path: '/Dashboard',
-      name: 'Dashboard',
-      component: Dashboard,
-      meta: {
-
-      }
+      path: "/Deliveries",
+      name: "Deliveries",
+      component: Deliveries,
+      meta: {}
     },
     {
-      path: '/AddResource',
-      name: 'AddResource',
-      component: AddResource,
-      meta: {
-
-      }
-    },
-    {
-      path: '/ViewResource',
-      name: 'ViewResource',
+      path: "/ViewResource",
+      name: "ViewResource",
       component: ViewResource,
-      meta: {
-
-      }
+      meta: {}
     },
     {
-      path: '/UpdateResource',
-      name: 'UpdateResource',
+      path: "/AddResource",
+      name: "AddResource",
+      component: AddResource,
+      meta: {}
+    },
+    {
+      path: "/UpdateResource",
+      name: "UpdateResource",
       component: UpdateResource,
-      meta: {
-
-      }
+      meta: {}
+    },
+    {
+      path: "/DeliveryRoutes",
+      name: "DeliveryRoutes",
+      component: DeliveryRoutes,
+      meta: {}
     }
   ]
-})
+});
 
 //router.beforeEach will help in checking whether
 //user has logged in or not.
@@ -136,7 +133,7 @@ let router = new Router({
 //           //params: { nextUrl: to.fullPath }
 //       })
 //   }
-//   else{   
+//   else{
 //     console.log("authenticated")
 
 //     if(store.getters.changePassword || to.matched.some(record => record.meta.haveNotChangePassword))
@@ -144,7 +141,7 @@ let router = new Router({
 
 //     else if(!to.matched.some(record => record.meta.haveNotChangePassword) && !store.getters.changePassword)
 //     {
-//       console.log("second if statement") 
+//       console.log("second if statement")
 //       next({ path: '/ChangePassword'})
 
 //     }
@@ -160,5 +157,4 @@ let router = new Router({
 
 // })
 
-
-export default router
+export default router;

@@ -61,6 +61,9 @@
         <b-container fluid>
           <b-row class="bg-white text-left" align-h="center">
             <b-col cols="8" class="my-5">
+              <h4 class="text-uppercase">General</h4>
+              <hr class="mb-5">
+
               <b-form class="resource-form">
                 <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
                 <b-form-group
@@ -117,58 +120,75 @@
                   <b-form-input id="minimumQuantity"></b-form-input>
                 </b-form-group>
 
-                <b-form-group
-                  id="variantName"
-                  label-cols-sm="3"
-                  label="Variant Name"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input id="variantName"></b-form-input>
-                </b-form-group>
+                <h4 class="text-uppercase mt-5">Discount</h4>
+                <hr class="mb-5">
 
-                <b-form-group
-                  id="variantCategory"
-                  label-cols-sm="3"
-                  label="Variant Category"
-                  label-for="input-horizontal"
-                >
-                  <!-- 
-                    1) label is used to display the option value
-                    2) trackby is used to uniquely identify the option values
-                    3) name property is unique across all options, so it can be used as track-by value
-                    4) add the label and trackby
-                  -->
-                  <multiselect
-                    v-model="form.category"
-                    deselect-label="Can't remove this value"
-                    placeholder="Select one"
-                    @select="onSelect"
-                    :options="categoryOptions"
-                    :searchable="false"
-                    :allow-empty="false"
-                  ></multiselect>
+                <b-container class="px-0">
+                  <div class="table-wrapper">
+                    <div class="table-title">
+                      <b-row class="mx-auto">
+                        <b-col col-sm="5" class="text-left">
+                          <h5>Discounts</h5>
+                        </b-col>
+                        <b-col col-sm="7">
+                          <b-button
+                            size="sm"
+                            id="add-discount"
+                            class="px-4 float-right"
+                            variant="primary"
+                            v-b-modal.addDiscount
+                          >Add</b-button>
+                        </b-col>
+                      </b-row>
+                    </div>
 
-                  <multiselect
-                    deselect-label="Can't remove this value"
-                    placeholder="Select one"
-                    :options="oneVariant"
-                    :searchable="false"
-                    :allow-empty="false"
-                  ></multiselect>
-
-                  <b-button class="mt-4" v-b-modal.modal-prevent-closing>Add Category</b-button>
-                </b-form-group>
+                    <b-table responsive striped :items="items" :fields="fields">
+                      <template slot="actions">
+                        <b-button
+                          v-b-modal.addDiscount
+                          size="sm"
+                          class="px-4"
+                          variant="primary"
+                        >Edit</b-button>
+                        <b-button
+                          v-b-modal.addDiscount
+                          size="sm"
+                          class="px-3 ml-3"
+                          variant="danger"
+                        >Delete</b-button>
+                      </template>
+                    </b-table>
+                  </div>
+                </b-container>
 
                 <!-- modal dialog -->
-                <b-modal id="modal-prevent-closing" title="Add Category" @ok="handleDiscount">
+                <b-modal id="addDiscount" title="Add Discount" @ok="handleDiscount">
                   <form @submit.stop.prevent="submitDiscount">
+                    <div class="radio-button">
+                      <b-form-group
+                        id="discountType"
+                        label-cols-sm="3"
+                        label="Type"
+                        label-for="input-horizontal"
+                      >
+                        <b-form-radio-group
+                          id="discountType"
+                          class="individual-button"
+                          buttons
+                          button-variant="outline-secondary"
+                          v-model="form.discount"
+                          :options="discountOptions"
+                        ></b-form-radio-group>
+                      </b-form-group>
+                    </div>
+
                     <b-form-group
-                      id="newCategory"
+                      id="discountValue"
                       label-cols-sm="3"
-                      label="Name"
+                      label="Value"
                       label-for="input-horizontal"
                     >
-                      <b-form-input id="newCategory"></b-form-input>
+                      <b-form-input id="discountValue"></b-form-input>
                     </b-form-group>
 
                     <b-form-group
@@ -177,13 +197,14 @@
                       label="Start Date"
                       label-for="input-horizontal"
                     >
-                      <!-- <multiselect
-                        v-model="form.category"
-                        :options="categoryOptions"
-                        :searchable="false"
-                        :show-labels="false"
-                        placeholder
-                      ></multiselect>-->
+                      <datepicker
+                        id="discountStartDate"
+                        :value="datePicker.date"
+                        :bootstrap-styling="datePicker.style"
+                        :format="datePicker.format"
+                        :placeholder="datePicker.placeHolder"
+                        required
+                      ></datepicker>
                     </b-form-group>
 
                     <b-form-group
@@ -197,8 +218,104 @@
                         :value="datePicker.date"
                         :bootstrap-styling="datePicker.style"
                         :format="datePicker.format"
+                        :placeholder="datePicker.placeHolder"
                         required
                       ></datepicker>
+                    </b-form-group>
+                  </form>
+                </b-modal>
+
+                <h4 class="text-uppercase mt-5">Variant</h4>
+                <hr class="mb-5">
+
+                <b-form-group
+                  id="variantName"
+                  label-cols-sm="3"
+                  label="Name"
+                  label-for="input-horizontal"
+                >
+                  <b-form-input id="variantName"></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                  id="variantCategory"
+                  label-cols-sm="3"
+                  label="Category"
+                  label-for="input-horizontal"
+                >
+                  <!-- 
+                    1) label is used to display the option value
+                    2) trackby is used to uniquely identify the option values
+                    3) name property is unique across all options, so it can be used as track-by value
+                    4) add the label and trackby
+                  -->
+                  <multiselect
+                    id="variantCategory"
+                    v-model="form.category"
+                    deselect-label="Can't remove this value"
+                    placeholder
+                    :options="existingCategory"
+                    label="label"
+                    track-by="label"
+                    @select="selectCategory"
+                    :searchable="false"
+                    :allow-empty="false"
+                  ></multiselect>
+
+                  <b-button class="mt-4" v-b-modal.categoryModal>Add Category</b-button>
+                </b-form-group>
+
+                <b-form-group
+                  id="variantOption"
+                  label-cols-sm="3"
+                  label="Option"
+                  label-for="input-horizontal"
+                >
+                  <multiselect
+                    id="variantOption"
+                    v-model="form.option"
+                    placeholder
+                    :options="existingOptions"
+                    :taggable="true"
+                    tag-placeholder="Press enter to create a new option"
+                    @tag="addOptionToExistingCategory"
+                    :allow-empty="false"
+                  ></multiselect>
+                </b-form-group>
+
+                <!-- modal dialog -->
+                <b-modal id="categoryModal" title="Add Category" @ok="handleCategory">
+                  <form @submit.stop.prevent="submitNewCategory">
+                    <b-form-group
+                      id="newCategory"
+                      label-cols-sm="3"
+                      label="Name"
+                      label-for="input-horizontal"
+                    >
+                      <b-form-input id="newCategory" v-model="newCategoryValue"></b-form-input>
+                    </b-form-group>
+
+                    <b-form-group
+                      id="newOption"
+                      label-cols-sm="3"
+                      label="Option"
+                      label-for="input-horizontal"
+                    >
+                      <multiselect
+                        id="newOption"
+                        v-model="newOptionValues"
+                        placeholder
+                        :options="newOptions"
+                        :multiple="true"
+                        :searchable="true"
+                        :preserve-search="true"
+                        :close-on-select="false"
+                        :clear-on-select="false"
+                        :taggable="true"
+                        tag-placeholder="Press enter to create a new option"
+                        @tag="addOptionToNewCategory"
+                        :allow-empty="false"
+                      ></multiselect>
                     </b-form-group>
                   </form>
                 </b-modal>
@@ -227,109 +344,11 @@
                   </vue-dropzone>
                 </b-form-group>
               </b-form>
-
-              <b-container class="px-0">
-                <div class="table-wrapper">
-                  <div class="table-title">
-                    <b-row class="mx-auto">
-                      <b-col col-sm="5" class="text-left">
-                        <h5>Discounts</h5>
-                      </b-col>
-                      <b-col col-sm="7">
-                        <b-button
-                          size="sm"
-                          id="add-discount"
-                          class="px-4 float-right"
-                          variant="success"
-                        >Add</b-button>
-                      </b-col>
-                    </b-row>
-                  </div>
-
-                  <b-table responsive striped :items="items" :fields="fields">
-                    <template slot="actions">
-                      <b-button
-                        v-b-modal.modal-prevent-closing
-                        size="sm"
-                        class="px-4"
-                        variant="primary"
-                      >Edit</b-button>
-                      <b-button
-                        v-b-modal.modal-prevent-closing
-                        size="sm"
-                        class="px-3 ml-3"
-                        variant="danger"
-                      >Delete</b-button>
-                    </template>
-                  </b-table>
-                </div>
-              </b-container>
-
-              <!-- modal dialog -->
-              <b-modal id="modal-prevent-closing" title="Add Discount" @ok="handleDiscount">
-                <form @submit.stop.prevent="submitDiscount">
-                  <div class="radio-button">
-                    <b-form-group
-                      id="discountType"
-                      label-cols-sm="3"
-                      label="Type"
-                      label-for="input-horizontal"
-                    >
-                      <b-form-radio-group
-                        id="discountType"
-                        class="individual-button"
-                        buttons
-                        button-variant="outline-secondary"
-                        v-model="form.discount"
-                        :options="discountOptions"
-                      ></b-form-radio-group>
-                    </b-form-group>
-                  </div>
-
-                  <b-form-group
-                    id="discountValue"
-                    label-cols-sm="3"
-                    label="Value"
-                    label-for="input-horizontal"
-                  >
-                    <b-form-input id="discountValue"></b-form-input>
-                  </b-form-group>
-
-                  <b-form-group
-                    id="discountStartDate"
-                    label-cols-sm="3"
-                    label="Start Date"
-                    label-for="input-horizontal"
-                  >
-                    <datepicker
-                      id="discountStartDate"
-                      :value="datePicker.date"
-                      :bootstrap-styling="datePicker.style"
-                      :format="datePicker.format"
-                      required
-                    ></datepicker>
-                  </b-form-group>
-
-                  <b-form-group
-                    id="discountEndDate"
-                    label-cols-sm="3"
-                    label="End Date"
-                    label-for="input-horizontal"
-                  >
-                    <datepicker
-                      id="discountEndDate"
-                      :value="datePicker.date"
-                      :bootstrap-styling="datePicker.style"
-                      :format="datePicker.format"
-                      required
-                    ></datepicker>
-                  </b-form-group>
-                </form>
-              </b-modal>
-
-              <notifications/>
-
-              <b-button @click="submit">Submit</b-button>
+              <!-- <notifications/> -->
+              <div class="text-right">
+                <b-button @click="submit" variant="primary" class="mr-3 px-4">Save</b-button>
+                <b-button class="px-4" to="/ViewResource">Cancel</b-button>
+              </div>
             </b-col>
           </b-row>
         </b-container>
@@ -350,7 +369,8 @@ import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import vueDropzone from "vue2-dropzone";
 import Multiselect from "vue-multiselect";
-import Datepicker from "vuejs-datepicker/dist/vuejs-datepicker.esm.js";
+import Datepicker from "vuejs-datepicker";
+// import Datepicker from "vuejs-datepicker/dist/vuejs-datepicker.esm.js";
 
 export default {
   components: {
@@ -364,7 +384,8 @@ export default {
     return {
       datePicker: {
         style: true,
-        format: "dd/MM/yyyy"
+        format: "dd/MM/yyyy",
+        placeHolder: "dd/mm/yyyy"
       },
 
       fields: [
@@ -380,9 +401,27 @@ export default {
         { Discount: "89%", Start: "05/01/2020", End: "10/01/2020" }
       ],
 
-      categoryOptions: ["Frame", "Stand"],
-      allVariants: [{ Frame: ["White", "Black"] }],
-      oneVariant: [],
+      existingCategory: [
+        {
+          label: "Frame",
+          options: ["Metal", "Wood", "Padded"]
+        },
+        {
+          label: "Color",
+          options: ["Red", "Blue", "Green"]
+        }
+      ],
+
+      existingOptions: [],
+
+      /*
+       * newOptions --> Display a list of new options if user decides to create *
+       * newOptionValues --> Display a list of options that user selected in the dropdown
+       * newCategoryValue --> New category name that the user entered
+       */
+      newOptions: [],
+      newOptionValues: [],
+      newCategoryValue: "",
 
       discountOptions: ["Percentage", "Fixed"],
 
@@ -400,35 +439,45 @@ export default {
       form: {
         email: "",
         name: "",
-        category: [],
+        category: "",
+        option: "",
         discount: ""
       }
     };
   },
 
   methods: {
-    onSelect(option) {
-      var keys = Object.keys(this.allVariants);
-      console.log(keys);
-      if (option === "Frame") {
-        // Object.keys(this.allVariants).forEach(function(key) {
-        //   console.log("key:" + key + " values: " + this.allVariants[key]);
-        // });
-        // console.log(this.allVariants[0].);
-        // for (index = 0; index < this.allVariants.length; index++)
-        //   if (this.allVariants[index] === option)
-        //     // this.oneVariant = this.allVariants[index];
-        //     console.log(this.allVariants);
-      }
+    // https://www.raymondcamden.com/2017/12/05/building-related-selects-with-vuejs
+    selectCategory(selectedCategory) {
+      // Once you select a new category, reset the previous options
+      this.form.option = "";
+      this.existingOptions = selectedCategory.options;
+      console.log(this.existingOptions);
     },
 
-    addTag(newTag) {
-      const tag = {
-        name: newTag
+    addOptionToExistingCategory(newOptions) {
+      this.existingOptions.push(newOptions);
+      this.form.option = newOptions;
+      console.log(this.form.option);
+    },
+
+    addOptionToNewCategory(newOptions) {
+      this.newOptions.push(newOptions);
+      this.newOptionValues.push(newOptions);
+    },
+
+    handleCategory() {
+      const newCategoryAndOptions = {
+        label: this.newCategoryValue,
+        options: this.newOptionValues
       };
-      this.categoryOptions.push(tag);
-      console.dir(this.options);
-      this.form.category.push(tag);
+      this.existingCategory.push(newCategoryAndOptions);
+      console.log(this.existingCategory);
+
+      // Once everything is done, I will reset the category and options
+      this.newCategoryValue = "";
+      this.newOptions = [];
+      this.newOptionValues = [];
     },
 
     afterComplete(file) {
@@ -437,7 +486,6 @@ export default {
 
     handleMoreThumbnail() {
       this.addImageIndicator = true;
-
       /*
        * this.$nextTick() will execute the following code after the next DOM update cycle
        * I use this because, once the addImageIndicator has been set to true, the div
@@ -445,8 +493,6 @@ export default {
        * Once the update has been done, I will append this div to the dropzone element
        */
       this.$nextTick(() => {
-        console.log("add resource ");
-        console.log(this.addImageIndicator);
         if (this.addImageIndicator) {
           let dropzone = this.$refs.myVueDropzone.dropzone;
           dropzone.files.length > 0
@@ -458,18 +504,11 @@ export default {
 
     handleDiscount() {
       alert("hi");
-      this.$notify({
-        title: "Important message",
-        text: "Hello user! This is a notification!"
-      });
-    },
-
-    handleSubmit() {
-      alert("success");
     },
 
     submit() {
-      console.dir(this.form.category);
+      console.dir(this.form.category.label);
+      console.dir(this.form.option);
     }
   },
   destroyed() {
@@ -479,6 +518,10 @@ export default {
 </script>
 
 <style>
+h4 {
+  color: #6a6c78;
+}
+
 .table-wrapper {
   border: 1px solid #d1d3e2;
   margin: 30px 0;

@@ -14,11 +14,13 @@
 
       
       <li class="nav-item">
+         <router-link to="SummaryOfOrders">
         <a class="nav-link collapsed"  >
           <!-- icon -->
           <i class="fas fa-fw fa-cog"></i>
           <span>Orders</span>
         </a>
+         </router-link>
       </li>
 
       <li class="nav-item">
@@ -29,20 +31,25 @@
         </a>
       </li>
 
-       <li class="nav-item">
+      <li class="nav-item">
+         <router-link to="deliveries">
         <a class="nav-link collapsed"  >
           <!-- icon -->
           <i class="fas fa-fw fa-cog"></i>
           <span>Deliveries</span>
         </a>
+        </router-link>
       </li>
+      
 
        <li class="nav-item">
+          <router-link to="UserManagement">
         <a class="nav-link collapsed"  >
           <!-- icon -->
           <i class="fas fa-fw fa-cog"></i>
           <span>User Management</span>
         </a>
+          </router-link>
       </li>
 
        <li class="nav-item">

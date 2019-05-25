@@ -7,17 +7,16 @@ import "bootstrap/dist/css/bootstrap.css";
 require("./assets/styles/sb-admin-2.css");
 import Vuelidate from "vuelidate";
 import VueSnackbar from "vue-snack";
-import '@fortawesome/fontawesome-free/css/all.css'
+import "@fortawesome/fontawesome-free/css/all.css";
+import "vue-multiselect/dist/vue-multiselect.min.css"
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
-import 'vue-multiselect/dist/vue-multiselect.min.css'
-import Notifications from 'vue-notification'
 
 require("vue-snack/dist/vue-snack.min.css");
 
 Vue.use(BootstrapVue);
 Vue.use(Vuelidate);
 Vue.use(VueSnackbar);
-Vue.use(Notifications)
+// Vue.use(Notifications)
 
 Vue.config.productionTip = false;
 
