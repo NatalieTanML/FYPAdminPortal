@@ -351,7 +351,7 @@
               <!-- <notifications/> -->
               <div class="text-right">
                 <b-button @click="submit" variant="primary" class="mr-3 px-4">Save</b-button>
-                <b-button class="px-4" to="/ViewResource">Cancel</b-button>
+                <b-button class="px-4" to="/ResourceManagement">Cancel</b-button>
               </div>
             </b-col>
           </b-row>

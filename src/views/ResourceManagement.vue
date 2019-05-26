@@ -60,13 +60,25 @@
             </li>
           </ul>
         </nav>
-        <b-container>
-          <b-row>
-            <b-col>
-              <Table v-bind:fields="this.fields" v-bind:items="this.items"></Table>
-            </b-col>
-          </b-row>
-        </b-container>
+
+        <div>
+          <Table
+            v-bind:actionButtonClick="this.actionButtonClick"
+            v-bind:headerButtonClick="this.headerButtonClick"
+            headerButton="Add Resource"
+            v-bind:fields="this.fields"
+            v-bind:items="this.items"
+          ></Table>
+        </div>
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; Your Website 2019</span>
+            </div>
+          </div>
+        </footer>
+        <!-- End of Footer -->
       </div>
     </div>
   </div>
@@ -76,6 +88,7 @@
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
+import { eventBus } from "@/eventBus";
 
 export default {
   components: {
@@ -85,6 +98,8 @@ export default {
   },
   data() {
     return {
+      headerButtonClick: "Add One Resource",
+      actionButtonClick: "Edit One Resource",
       items: [
         {
           id: "SKU_123",
@@ -117,11 +132,20 @@ export default {
         { key: "id", label: "ID", sortable: true },
         { key: "name", label: "Name", sortable: true },
         { key: "qtyLeft", label: "Qty Left", sortable: true },
-        { key: "originalPrice", label: "Original Price" },
+        { key: "originalPrice", label: "Original Price", sortable: true },
         { key: "activeDiscount", label: "Active Discount", sortable: true },
         { key: "actions", label: "Actions" }
       ]
     };
+  },
+  mounted() {
+    eventBus.$on(this.headerButtonClick, () => {
+      this.$router.replace({ name: "AddResource" });
+    });
+
+    eventBus.$on(this.actionButtonClick, () => {
+      this.$router.replace({ name: "UpdateResource" });
+    });
   }
 };
 </script>

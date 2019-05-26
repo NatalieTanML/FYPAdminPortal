@@ -1,6 +1,6 @@
 <template>
   <div id="wrapper">
-    <SideBar ></SideBar>
+    <SideBar></SideBar>
     <!-- Content Wrapper -->
     <div id="content-wrapper">
       <!-- Main Content -->
@@ -117,13 +117,21 @@ export default {
   },
   data() {
     return {
-      forceRender : true,
+      forceRender: true,
       noOfTabs: 0,
       selectedTab: 0,
-      typesOfTabs:["All","Ordered","Awaiting Print","Printed","Delivering","Completed","Cancelled"],
+      typesOfTabs: [
+        "All",
+        "Ordered",
+        "Awaiting Print",
+        "Printed",
+        "Delivering",
+        "Completed",
+        "Cancelled"
+      ],
       Tabs: null,
 
-      sortItems:[],
+      sortItems: [],
 
       items: [],
       fields: [
@@ -138,22 +146,20 @@ export default {
     };
   },
 
-  computed:{
+  computed: {},
 
-  },
-
-  mounted(){
-   const {typesOfTabs} = this 
-      this.Tabs = [
-        { title: typesOfTabs[0], id: 0, isDark: false },
-        { title: typesOfTabs[1], id: 1, isDark: false },
-        { title: typesOfTabs[2], id: 2, isDark: false },
-        { title: typesOfTabs[3], id: 3, isDark: false },
-        { title: typesOfTabs[4], id: 4, isDark: false },
-        { title: typesOfTabs[5], id: 5, isDark: false }
-      ],
-    this.items = [
-       {
+  mounted() {
+    const { typesOfTabs } = this;
+    (this.Tabs = [
+      { title: typesOfTabs[0], id: 0, isDark: false },
+      { title: typesOfTabs[1], id: 1, isDark: false },
+      { title: typesOfTabs[2], id: 2, isDark: false },
+      { title: typesOfTabs[3], id: 3, isDark: false },
+      { title: typesOfTabs[4], id: 4, isDark: false },
+      { title: typesOfTabs[5], id: 5, isDark: false }
+    ]),
+      (this.items = [
+        {
           refNo: "123456",
           date: "22/04/19",
           item: "A5 Photo",
@@ -207,7 +213,7 @@ export default {
           status: "Cancelled",
           actions: "Archive"
         },
-         {
+        {
           refNo: "123460",
           date: "30/05/19",
           item: "Name Tag (Black)",
@@ -252,7 +258,7 @@ export default {
           status: "Completed",
           actions: "Archive"
         },
-         {
+        {
           refNo: "123465",
           date: "26/04/19",
           item: "A5 Photo",
@@ -261,7 +267,7 @@ export default {
           status: "Ordered",
           actions: "Accept"
         },
-         {
+        {
           refNo: "123466",
           date: "16/04/19",
           item: "A3 Photo",
@@ -269,10 +275,10 @@ export default {
           quantity: "2",
           status: "Delivering",
           actions: "Completed"
-        },
-    ]
-    
-    this.sortItems = this.items
+        }
+      ]);
+
+    this.sortItems = this.items;
 
     this.onTabChange(0);
   },
@@ -283,41 +289,31 @@ export default {
       //reason why i don't use const ^ is because when the data is displayed,
       //it will become read-only.
 
-
-      this.sortItems= []
+      this.sortItems = [];
       //change background color for the tab
-       this.noOfTabs = this.$refs.tabs.childElementCount;
+      this.noOfTabs = this.$refs.tabs.childElementCount;
 
-      if (! this.Tabs[id].isDark)  
-      this.Tabs[id].isDark = true;
+      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
 
-       this.selectedTab = id;
+      this.selectedTab = id;
       var index;
 
-      for (index = 0; index <  this.Tabs.length; index++) {
-        if (id !=  this.Tabs[index].id)
-          if ( this.Tabs[index].isDark)  
-          this.Tabs[index].isDark = false;
+      for (index = 0; index < this.Tabs.length; index++) {
+        if (id != this.Tabs[index].id)
+          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
       }
       //manipulate table data after changing tab color
 
-      let sortBy =  this.typesOfTabs[id]
+      let sortBy = this.typesOfTabs[id];
 
-     
-      for(index = 0; index <  this.items.length; index++)
-      if( sortBy ===  this.items[index].status)
-       this.sortItems.push( this.items[index])
-      
-      if(sortBy === "All")
-      this.sortItems = this.items
-     
-     if(this.forceRender)
-      this.forceRender = false;
-      else
-      this.forceRender = true
+      for (index = 0; index < this.items.length; index++)
+        if (sortBy === this.items[index].status)
+          this.sortItems.push(this.items[index]);
 
-  
+      if (sortBy === "All") this.sortItems = this.items;
 
+      if (this.forceRender) this.forceRender = false;
+      else this.forceRender = true;
     }
   }
 };

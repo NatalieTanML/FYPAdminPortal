@@ -347,7 +347,7 @@
               <!-- <notifications/> -->
               <div class="text-right">
                 <b-button @click="submit" variant="primary" class="mr-3 px-4">Save</b-button>
-                <b-button class="px-4" to="/ViewResource">Cancel</b-button>
+                <b-button class="px-4" to="/ResourceManagement">Cancel</b-button>
               </div>
             </b-col>
           </b-row>
@@ -503,7 +503,7 @@ export default {
     },
 
     handleDiscount() {
-      alert("hi");
+      // alert("hi");
     },
 
     submit() {
@@ -563,10 +563,10 @@ h4 {
 }
 
 /* https://stackoverflow.com/questions/19960162/bootstrap-3-modal-fires-and-causes-page-to-shift-to-the-left-momentarily-brows */
-.modal-open .navbar-fixed-top,
+/* .modal-open .navbar-fixed-top,
 .modal-open .navbar-fixed-bottom {
   padding-right: 17px;
-}
+} */
 
 /* https://github.com/charliekassel/vuejs-datepicker/issues/693 */
 .vdp-datepicker .input-group .form-control[readonly] {

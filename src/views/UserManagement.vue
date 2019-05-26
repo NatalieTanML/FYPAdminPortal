@@ -67,7 +67,13 @@
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table v-bind:actionButtonClick="this.actionButtonClick" v-bind:headerButtonClick="this.headerButtonClick" headerButton="Add User" v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table
+            v-bind:actionButtonClick="this.actionButtonClick"
+            v-bind:headerButtonClick="this.headerButtonClick"
+            headerButton="Add User"
+            v-bind:fields="this.fields"
+            v-bind:items="this.items"
+          ></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -152,21 +158,17 @@ export default {
     };
   },
 
-  methods: {
+  methods: {},
+  mounted() {
+    eventBus.$on(this.headerButtonClick, () => {
+      this.$router.replace({ name: "AddUser" });
+    });
 
-  },
-  created(){
- eventBus.$on(this.headerButtonClick, () => {
- this.$router.replace({name:'AddUser'});
-  })
-
-  eventBus.$on(this.actionButtonClick, () => {
- this.$router.replace({name:'UpdateUser'});
-
-  })
-}
-}
-
+    eventBus.$on(this.actionButtonClick, () => {
+      this.$router.replace({ name: "UpdateUser" });
+    });
+  }
+};
 </script>
 
 <style>

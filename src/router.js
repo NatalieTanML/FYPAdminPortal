@@ -8,7 +8,7 @@ import UserManagement from "./views/UserManagement";
 import ChangePassword from "./views/ChangePassword";
 import Deliveries from "./views/Deliveries";
 import DeliveryRoutes from "./views/DeliveryRoutes";
-import ViewResource from "./views/ViewResource";
+import ResourceManagement from "./views/ResourceManagement";
 import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
@@ -18,23 +18,10 @@ Vue.use(Router);
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
 let router = new Router({
-  data() {
-    return {
-      break: true
-    };
-  },
+
 
   routes: [
-    {
-      path: "/",
-      name: "Login",
-      component: Login,
-      meta: {
-        //haveNotChangePassword refers to pages which user can access even though he have not changed
-        //his/her password.
-        haveNotChangePassword: true
-      }
-    },
+
     {
       path: "/Login",
       name: "Login",
@@ -88,9 +75,9 @@ let router = new Router({
       meta: {}
     },
     {
-      path: "/ViewResource",
-      name: "ViewResource",
-      component: ViewResource,
+      path: "/ResourceManagement",
+      name: "ResourceManagement",
+      component: ResourceManagement,
       meta: {}
     },
     {

@@ -64,7 +64,11 @@
 
         <!-- Begin Page Content -->
         <div cols="4">
-          <Table v-bind:fields="this.fields" v-bind:items="this.items"></Table>
+          <Table
+            v-bind:actionButtonClick="this.actionButtonClick"
+            v-bind:fields="this.fields"
+            v-bind:items="this.items"
+          ></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -78,6 +82,18 @@
       </footer>
       <!-- End of Footer -->
     </div>
+    <b-modal
+      ref="showSignatureDialog"
+      id="showSignatureDialog"
+      title="Confirm Delivery - Order 12345"
+    >
+      <b-form-group label="Received By">
+        <b-form-input></b-form-input>
+      </b-form-group>
+      <b-form-group label="Receipient's Signature">
+        <VueSignaturePad class="pad" width="100%" height="200px" ref="signaturePad"/>
+      </b-form-group>
+    </b-modal>
   </div>
 
   <!-- End of Content Wrapper -->
@@ -88,6 +104,7 @@ import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
+import { eventBus } from "@/eventBus";
 
 export default {
   components: {
@@ -100,6 +117,9 @@ export default {
     return {
       noOfTabs: 0,
       selectedTab: 0,
+      pad: null,
+
+      actionButtonClick: "Delivery Signature",
 
       items: [
         {
@@ -155,9 +175,23 @@ export default {
           if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
       }
     }
+  },
+  mounted() {
+    eventBus.$on(this.actionButtonClick, () => {
+      this.$bvModal.show("showSignatureDialog");
+
+      // https://stackoverflow.com/questions/37465289/how-to-set-timeout-in-a-vuejs-method
+      setTimeout(() => {
+        this.$refs.signaturePad.resizeCanvas();
+      }, 1);
+    });
   }
 };
 </script>
 
 <style>
+.pad {
+  border: 2px solid #cbc9c6;
+  border-radius: 5px;
+}
 </style>
