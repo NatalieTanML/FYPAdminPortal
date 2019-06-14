@@ -14,6 +14,7 @@
     "core-js": "^2.6.5",
     "install": "^0.12.2",
     "jquery": "^3.4.1",
+    "mdbvue": "^5.5.0",
     "signature_pad": "^3.0.0-beta.3",
     "vendor": "^1.7.0",
     "vue": "^2.6.10",

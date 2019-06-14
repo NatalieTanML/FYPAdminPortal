@@ -12,6 +12,7 @@ import ResourceManagement from "./views/ResourceManagement";
 import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
+import OrderDetails from "./views/OrderDetails";
 
 Vue.use(Router);
 
@@ -102,6 +103,12 @@ let router = new Router({
       path: "/UpdateUser",
       name: "UpdateUser",
       component: UpdateUser,
+      meta: {}
+    },
+    {
+      path: "/OrderDetails",
+      name: "OrderDetails",
+      component: OrderDetails,
       meta: {}
     }
   ]
