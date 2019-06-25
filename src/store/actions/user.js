@@ -16,3 +16,7 @@ export const UPDATE_ONE_USER = "UPDATE_ONE_USER";
 export const UPDATE_ONE_USER_SUCCESS = "UPDATE_ONE_USER_SUCCESS";
 export const UPDATE_ONE_USER_ERROR = "UPDATE_ONE_USER_ERROR";
 export const SET_GETONEUSERID = "SET_GETONEUSERID";
+export const GET_ALL_ROLES = "GET_ALL_ROLES";
+export const GET_ALL_ROLES_ERROR = "GET_ALL_ROLES_ERROR";
+export const BYPASSLOGIN = "BYPASSLOGIN";
+//the bypasslogin method lets you become the admin if you are creating your account for the first time.

@@ -7,7 +7,8 @@ export const api_routes = {
     sign_up: 'api/users/signup',
     get_all: 'api/users/',
     get_one: 'api/users/',
-    update_one: 'api/users/'
+    update_one: 'api/users/',
+    get_all_roles: 'api/users/getRoles',
   }
 
 };
@@ -19,6 +20,7 @@ export const apiCall = ({ url, method, ...args }) =>
     if (token)
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
 
+    
     try {
       axios({
         method: method || 'get',

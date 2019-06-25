@@ -12,8 +12,7 @@ import "@fortawesome/fontawesome-free/css/all.css";
 import "vue-multiselect/dist/vue-multiselect.min.css"
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import VueSignaturePad from 'vue-signature-pad';
-import 'bootstrap-css-only/css/bootstrap.min.css'; 
-import 'mdbvue/build/css/mdb.css';
+
 
 require("vue-snack/dist/vue-snack.min.css");
 

@@ -45,7 +45,7 @@
 </body>
 </template>
 <script>
-import { GET_ONE_USER, UPDATE_ONE_USER } from "@/store/actions/user";
+import { GET_ONE_USER, UPDATE_ONE_USER,USER_LOGOUT } from "@/store/actions/user";
 
 export default {
   data() {
@@ -84,6 +84,8 @@ export default {
           .catch(error => {
             this.message("danger", error);
           });
+
+          this.$store.dispatch(USER_LOGOUT);
       }
     },
     getUserInformation() {
@@ -93,6 +95,9 @@ export default {
           this.username = response.username;
         })
         .catch(error => {
+
+          this.$store.dispatch(USER_LOGOUT);
+
           console.dir(error);
           this.message("danger", error);
           //this.$router.replace({name:'SummaryOfOrders'});

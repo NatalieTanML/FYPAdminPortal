@@ -13,6 +13,15 @@ import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
 import OrderDetails from "./views/OrderDetails";
+import ErrorPage from "./views/Error";
+
+
+
+//3 roles: Admin, Store, Delivery
+//Admin -> Every Page
+//Store -> Nav Bar: Orders, Resource Management.   
+//Delivery -> Delivery Routes, Deliveries.
+
 
 Vue.use(Router);
 
@@ -28,9 +37,15 @@ let router = new Router({
       name: "Login",
       component: Login,
       meta: {
-        //haveNotChangePassword refers to pages which user can access even though he have not changed
-        //his/her password.
-        haveNotChangePassword: true
+        needAuthentication: false,
+      }
+    },
+    {
+      path: "/",
+      name: "",
+      component: Login,
+      meta: {
+        needAuthentication: false,
       }
     },
     {
@@ -38,7 +53,8 @@ let router = new Router({
       name: "SummaryOfOrders",
       component: SummaryOfOrders,
       meta: {
-        requiresAuth: true
+        needAuthentication: true,
+        needNewPassword: true
       }
     },
     {
@@ -46,7 +62,8 @@ let router = new Router({
       name: "AddUser",
       component: AddUser,
       meta: {
-        requiresAuth: true
+        needAuthentication: true,
+        needNewPassword: true
       }
     },
     {
@@ -54,7 +71,8 @@ let router = new Router({
       name: "ManageUser",
       component: UserManagement,
       meta: {
-        requiresAuth: true
+        needAuthentication: true,
+        needNewPassword: true
       }
     },
     {
@@ -62,10 +80,8 @@ let router = new Router({
       name: "ChangePassword",
       component: ChangePassword,
       meta: {
-        requiresAuth: true,
-        //haveNotChangePassword refers to pages which user can access even though he have not changed
-        //his/her password.
-        haveNotChangePassword: true
+        needAuthentication: true,
+        needNewPassword: true
       }
     },
 
@@ -73,44 +89,79 @@ let router = new Router({
       path: "/Deliveries",
       name: "Deliveries",
       component: Deliveries,
-      meta: {}
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
     },
     {
       path: "/ResourceManagement",
       name: "ResourceManagement",
       component: ResourceManagement,
-      meta: {}
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
     },
     {
       path: "/AddResource",
       name: "AddResource",
       component: AddResource,
-      meta: {}
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
     },
     {
       path: "/UpdateResource",
       name: "UpdateResource",
       component: UpdateResource,
-      meta: {}
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
     },
     {
       path: "/DeliveryRoutes",
       name: "DeliveryRoutes",
       component: DeliveryRoutes,
-      meta: {}
+      meta: 
+      {
+        needAuthentication: true,
+        needNewPassword: true
+      }
     },
     {
       path: "/UpdateUser",
       name: "UpdateUser",
       component: UpdateUser,
-      meta: {}
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
     },
     {
       path: "/OrderDetails",
       name: "OrderDetails",
       component: OrderDetails,
-      meta: {}
-    }
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
+      path: "/Error",
+      name: "Error",
+      component: ErrorPage,
+      meta: {
+      }
+    },
+    {
+      path: '*',
+      name:'404', 
+      component: ErrorPage
+  }
+    
   ]
 });
 
@@ -118,45 +169,96 @@ let router = new Router({
 //user has logged in or not.
 //reference : https://router.vuejs.org/guide/advanced/meta.html
 
-// router.beforeEach((to, from, next) => {
-//   console.log("store getter change password"+store.getters.changePassword)
+ router.beforeEach((to, from, next) => {
 
-//  if(to.matched.some(record => record.meta.requiresAuth)) {
-//    console.log("requiresAuth")
-//     //to check if user is authenticated.
+console.log("token: "+store.getters.isAuthenticated)
 
-//     //if user needs to change password,
-//     //they will be redirected to the changepassword page.
+// let resolved = router.resolve(to.path)
+//  if(resolved.route.name != '404')
+// console.log("resolve")
 
-//     if (!store.getters.isAuthenticated) {
-//       console.log("not authenticated")
-//       next({
-//           path: '/Login',
-//           //params: { nextUrl: to.fullPath }
-//       })
-//   }
-//   else{
-//     console.log("authenticated")
+console.log("change password: "+store.getters.changePassword)
 
-//     if(store.getters.changePassword || to.matched.some(record => record.meta.haveNotChangePassword))
-//     next()
+console.log(to.path)
 
-//     else if(!to.matched.some(record => record.meta.haveNotChangePassword) && !store.getters.changePassword)
-//     {
-//       console.log("second if statement")
-//       next({ path: '/ChangePassword'})
+console.log(to.path == '/ChangePassword')
 
-//     }
-//     else{
-//       console.log("third selse statement")
-//     next()
-//     }
+//if people try to go to the login page after they logged in,
+//they will be redirected to summaryoforders
+ if(store.getters.isAuthenticated && to.path == '/Login' && store.getters.changePassword){
+  console.log("first if")
+  next({
+    path: '/SummaryOfOrders',
+  })
+}
+
+
+// //if they are logged in already, and have changed their password,
+// //they cant access the changepassword page again.
+// else if(store.getters.isAuthenticated && to.path == '/ChangePassword' && store.getters.changePassword){
+//   console.log("second if")
+//   next({
+//     path: '/SummaryOfOrders',
+//   })
 // }
+ 
 
-//  }
-//  else
-//   next()
+//start of validation pages that needs authentication.
+else if( to.matched.some(record => record.meta.needAuthentication) && store.getters.isAuthenticated ){
+ 
+  if(to.matched.some(record => record.meta.needNewPassword)){
+  if( !store.getters.changePassword && to.path != '/ChangePassword'){
+       next({
+          path: '/ChangePassword',
+          //params: { nextUrl: to.fullPath }
+      })
+  }
+  else
+  next()
+}
 
-// })
+else if(store.getters.userRole != null){ //check for roles.
+
+if(store.getters.userRole == "Admin")
+  next()
+else if(store.getters.userRole == "Store"){
+  if(to.path == '/SummaryOfOrders' || to.path == '/ResourceManagement' || to.path == '/Login')
+  next()
+  else
+  next({
+    path: '/SummaryOfOrders',
+  })
+}
+else if(store.getters.userRole == "Delivery"){
+   if(to.path == '/SummaryOfOrders' || to.path == '/Deliveries' || to.path == '/DeliveryRoutes' || to.path == '/Login')
+  next()
+  else
+  { 
+  next({
+  path: '/SummaryOfOrders'
+  })
+}
+}
+else
+next()
+}
+  
+else
+next()
+}
+else{
+  if(to.path != '/Login'){
+  next({
+    path: '/Login'
+    })
+  }
+  else{
+    console.log("last next()")
+  next()
+  }
+}
+
+
+ })
 
 export default router;
