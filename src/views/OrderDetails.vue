@@ -1,15 +1,40 @@
 <template>
   <div id="wrapper">
     <SideBar></SideBar>
-        <b-container>
-
+    <!-- Content Wrapper -->
     <div id="content-wrapper">
+      <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-        <DashboardHeader title="Order Details"></DashboardHeader>
+          
+          <DashboardHeader title="Orders"></DashboardHeader>
           <!-- Topbar Navbar -->
-       
+         
+        
         <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+
+        <div class="container-fluid">
+          <!-- Main Content -->
+          <div id="content">
+            <div class="row mb-4">
+              <ul class="nav" ref="tabs">
+                <DashboardTabs
+                  v-for="tab in this.Tabs"
+                  v-bind:key="tab.id"
+                  v-bind:title="tab.title"
+                  v-bind:isDark="tab.isDark"
+                  @click.native="onTabChange(tab.id)"
+                ></DashboardTabs>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+      <b-container fluid class="bg-white text-left" align-h="center">
+      <div class="card shadow">
+        <div class="card-header py-3">
 
           <h4 class="mb-3">Order Information</h4>
           
@@ -113,7 +138,9 @@
         </div>
       </footer>
         </div>
-   
+     </div>
+     
+     </div>
      
 </template>
 
