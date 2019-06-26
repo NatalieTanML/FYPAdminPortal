@@ -10,6 +10,9 @@ export const api_routes = {
     update_one: 'api/users/',
     get_all_roles: 'api/users/getRoles',
     change_password: 'api/users/changepassword'
+  },
+  order: {
+    get:'api/orders/1'
   }
 
 };
