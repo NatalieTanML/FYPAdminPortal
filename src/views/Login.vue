@@ -117,6 +117,7 @@ export default {
 
     },
     
+    
 
   
   }
@@ -130,4 +131,5 @@ body {
 span {
   color: white;
 }
+
 </style>

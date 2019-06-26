@@ -23,17 +23,28 @@
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="User Name" label-for="input-horizontal">
-                        <b-form-input v-model="this.username"></b-form-input>
+                      <b-form-group label-cols-sm="3" label="User Name" >
+                         <input type="text" v-model="name" class="form-control form-control-user" placeholder="Enter A Name...">
                       </b-form-group>
 
-                      <b-form-group label-cols-sm="3" label="Role" label-for="input-horizontal">
-                        <select class="custom-select form-control">
-                          <option value selected disabled>Please select</option>
-                          <option value="Admin">Admin</option>
-                          <option selected>Super Admin</option>
-                          <option>Delivery</option>
-                        </select>
+                    
+
+                          <b-form-group label-cols-sm="3" label="Email" >
+                         <input type="email" v-model="email" class="form-control form-control-user" placeholder="Enter An Email Address...">
+
+                      </b-form-group>
+
+                       <b-form-group label-cols-sm="3" label="Role" >
+                    
+                        <select class="custom-select form-control" name="role" @change="onSelectChange($event)">
+                        <option v-for="role in roles"
+                        v-bind:key="role.roleName"
+                        :selected="role.roleName == selectedRole"
+                        :value="role.roleId">
+                        {{ role.roleName}}
+                        </option>
+                        </select> 
+
                       </b-form-group>
 
                       <b-form-group
@@ -46,22 +57,17 @@
 
                       <b-form-group
                         label-cols-sm="3"
-                        label="Disable User"
+                        label="Is Enabled"
                         label-for="input-horizontal"
                       >
-                        <b-button v-b-modal.disableUser class="w-25" variant="danger">Disable</b-button>
+                      <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch>
+
+                      </b-form-checkbox>
                       </b-form-group>
 
-                      <b-form-group
-                        label-cols-sm="3"
-                        label="Delete User"
-                        label-for="input-horizontal"
-                      >
-                        <b-button v-b-modal.deleteUser class="w-25" variant="danger">Delete</b-button>
-                      </b-form-group>
-
+                 
                       <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                        <b-button class="w-25" variant="primary">Save</b-button>
+                        <b-button class="w-25" v-on:click="saveUser()" variant="primary">Save</b-button>
                         <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
                       </b-form-group>
                     </b-form>
@@ -78,10 +84,7 @@
                 <p class="my-4">You are about to disable this user's account</p>
               </b-modal>
 
-              <b-modal id="deleteUser" title="Delete User">
-                <p class="my-4">You are about to delete this account PERMANENTLY!</p>
-                <p class="my-4">This action cannot be undone.</p>
-              </b-modal>
+             
             </div>
           </div>
         </div>
@@ -107,12 +110,23 @@
 <script>
   import SideBar from "@/components/SideBar";
   import DashboardHeader from "@/components/DashboardHeader";
+  import { GET_ONE_USER, GET_ALL_ROLES,UPDATE_ONE_USER, RESETUSERPASSWORD} from "@/store/actions/user";
+  
 
   export default {
 
     data(){
       return{
-      username: "kidzania@hotmail.com"
+        userId: null,
+      name: "",
+      roleName: "",
+      roles : null,
+      selectedRole: null,
+      email: null,
+      isEnabled: null,
+      checked: null,
+      updatedRole: null,
+      userRoleId : null,
       }
     },
     components: {
@@ -120,9 +134,97 @@
       DashboardHeader
     },
     methods:{
-      handleok(){
-        console.log("hi")
-      }
+       message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+    },
+       getUserInformation() {
+        
+
+      this.$store
+        .dispatch(GET_ONE_USER)
+        .then(response => {
+          console.log(response)
+          this.name = response.name;
+          this.selectedRole = response.roleName;
+          this.email = response.email;
+          this.isEnabled = response.isEnabled;
+          this.userId = response.id;
+          console.log(response)
+          //i have to use updatedRole because for some reason, there is a bug in doing a v-model in select,
+          //so i did a @onchange instead, which uses updatedRole
+          this.updatedRole = response.roleId;
+          console.log(this.selectedRole)
+     
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
+    },
+    getRoles(){
+        this.$store
+      .dispatch(GET_ALL_ROLES)
+      .then(response => {
+        this.roles = response;
+        console.log(this.roles)
+      })
+      .catch(error => {
+          console.dir(error);
+          this.message("danger", error.response.data.message);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
+    },
+       onSelectChange(event) {
+         this.updatedRole = event.target.value
+         console.log(this.updatedRole)
+        },
+        saveUser(){
+         console.log(this.updatedRole)
+         let idInt = parseInt(this.updatedRole); 
+
+              const userStr = {
+          "userId" : this.userId,
+          "Email" : this.email,
+          "Name" : this.name,
+          "IsEnabled": this.isEnabled,
+          "RoleId": idInt
+    };
+    console.log(userStr)
+         this.$store
+          .dispatch(UPDATE_ONE_USER, userStr)
+          .then(response => {
+            this.message("success", "User is updated!");
+     
+
+          })
+          .catch(error => {
+            this.message("danger", error);
+          });
+
+
+      //  this.$store
+      // .dispatch(RESETUSERPASSWORD, userStr)
+      // .then(response => {
+      //  this.message("success", "This user has been updated!");
+
+      // })
+      // .catch(error => {
+      //     console.dir(error);
+      //     this.message("danger", error.response.data.message);
+      //     //this.$router.replace({name:'SummaryOfOrders'});
+      //   });
+
+        }
+    },
+    mounted(){
+            this.getRoles();
+
+      this.getUserInformation();
     }
   
 };

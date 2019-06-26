@@ -68,7 +68,7 @@ let router = new Router({
     },
     {
       path: "/UserManagement",
-      name: "ManageUser",
+      name: "UserManagement",
       component: UserManagement,
       meta: {
         needAuthentication: true,
@@ -179,7 +179,12 @@ console.log("token: "+store.getters.isAuthenticated)
 
 console.log("change password: "+store.getters.changePassword)
 
-console.log(to.path)
+console.log("To : "+to.path)
+
+console.log("From : "+from.name)
+
+localStorage.setItem("previousPathName", from.name);
+
 
 console.log(to.path == '/ChangePassword')
 

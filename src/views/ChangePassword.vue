@@ -1,5 +1,7 @@
 <template>
 <body class="bg-gradient-primary">
+     <i v-on:click="goBack()" class="fas fa-lg fa-arrow-left arrow"></i>
+
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-7">
@@ -9,6 +11,7 @@
               <div class="col-lg-9">
                 <div class="p-5">
                   <div class="text-center">
+                  
                     <h1 class="h4 text-gray-900 mb-4">Change Password</h1>
                   </div>
                   <form class="user">
@@ -45,12 +48,13 @@
 </body>
 </template>
 <script>
-import { GET_ONE_USER, UPDATE_ONE_USER,USER_LOGOUT } from "@/store/actions/user";
+import { GET_ONE_USER, CHANGEOWNPASSWORD,USER_LOGOUT } from "@/store/actions/user";
+import store from "@/store";
 
 export default {
   data() {
     return {
-      username: "",
+      name: "",
       newPassword: "",
       newConfirmPassword: "",
       newPasswordNotSame: false
@@ -71,28 +75,29 @@ export default {
       else {
         this.newPasswordNotSame = false;
 
-        let formData = new FormData();
-        formData.append("password", newPassword);
-        formData.append("username", this.username);
+         const userStr = {
+      "password" : newPassword
+    };
 
         this.$store
-          .dispatch(UPDATE_ONE_USER, formData)
+          .dispatch(CHANGEOWNPASSWORD, userStr)
           .then(response => {
             this.message("success", "Your password has been updated!");
             this.$router.replace({ name: "Login" });
+                      this.$store.dispatch(USER_LOGOUT);
+
           })
           .catch(error => {
             this.message("danger", error);
           });
 
-          this.$store.dispatch(USER_LOGOUT);
       }
     },
     getUserInformation() {
       this.$store
         .dispatch(GET_ONE_USER)
         .then(response => {
-          this.username = response.username;
+          this.name = response.name;
         })
         .catch(error => {
 
@@ -102,11 +107,22 @@ export default {
           this.message("danger", error);
           //this.$router.replace({name:'SummaryOfOrders'});
         });
+    },
+    goBack(){
+    let previousPathName = localStorage.getItem("previousPathName")
+      console.log(previousPathName)
+        if(store.getters.isAuthenticated && store.getters.changePassword)
+        this.$router.replace({ name: previousPathName });
+        else
+        this.$router.replace({ name: "Login" });
+
+
     }
   },
 
   mounted() {
     this.getUserInformation();
+    console.log()
   }
 };
 </script>
@@ -117,6 +133,13 @@ body {
 span {
   color: white;
 }
+.arrow{
+  margin-left: 2em;
+  margin-top : 2em;
+  cursor: pointer;
+  color: white;
+}
+
 </style>
 
    

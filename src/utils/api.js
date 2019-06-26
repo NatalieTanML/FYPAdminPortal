@@ -9,6 +9,7 @@ export const api_routes = {
     get_one: 'api/users/',
     update_one: 'api/users/',
     get_all_roles: 'api/users/getRoles',
+    change_password: 'api/users/changepassword'
   }
 
 };

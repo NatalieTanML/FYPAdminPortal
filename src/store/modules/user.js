@@ -20,7 +20,10 @@ import {
   GET_ALL_ROLES,
   GET_ALL_ROLES_ERROR,
   BYPASSLOGIN,
-  CHANGED_PASSWORD
+  RESETUSERPASSWORD,
+  CHANGEOWNPASSWORD_ERROR,
+  CHANGEOWNPASSWORD,
+  
 } from "@/store/actions/user"
 
 import { apiCall, api_routes } from "@/utils/api";
@@ -122,16 +125,47 @@ const actions = {
 
     });
   },
-  [UPDATE_ONE_USER]:({commit, dispatch}, formData) =>{
+  [UPDATE_ONE_USER]:({commit, dispatch}, jsonData) =>{
     return new Promise((resolve, reject) => {
       commit(UPDATE_ONE_USER);
-      apiCall({ url: api_routes.user.update_one + store.getters.userId, data:formData , method: 'put' })
+      apiCall({ url: api_routes.user.update_one + jsonData.userId, data:jsonData , method: 'put' })
       .then(resp => {
         commit(UPDATE_ONE_USER_SUCCESS, resp);
         resolve(resp);
       })
       .catch(err => {
         commit(UPDATE_ONE_USER_ERROR, err);
+        reject(err);
+      });
+
+    });
+  },
+  [CHANGEOWNPASSWORD]:({commit, dispatch}, formData) =>{
+    return new Promise((resolve, reject) => {
+      commit(UPDATE_ONE_USER);
+      apiCall({ url: api_routes.user.update_one + store.getters.userId, data:formData , method: 'put' })
+      .then(resp => {
+        commit(CHANGEOWNPASSWORD, resp);
+        resolve(resp);
+      })
+      .catch(err => {
+       
+        reject(err);
+      });
+
+    });
+  },
+
+  [RESETUSERPASSWORD]:({commit, dispatch}, formData) =>{
+    return new Promise((resolve, reject) => {
+      commit(UPDATE_ONE_USER);
+      apiCall({ url: api_routes.user.update_one + store.getters.userId, data:formData , method: 'put' })
+      .then(resp => {
+        commit(RESETUSERPASSWORD);
+        resolve(resp);
+      })
+      .catch(err => {
+      
         reject(err);
       });
 
@@ -155,7 +189,7 @@ const actions = {
   },
   [GET_ALL_ROLES]:({commit, dispatch})=>{
       return new Promise((resolve, reject)=>{
-        apiCall({ url: api_routes.user.get_all_roles , method: 'get' })
+        apiCall({ url: api_routes.user.get_all_roles  , method: 'get' })
         .then(resp => {
           commit(GET_ALL_ROLES, resp);
           resolve(resp)
@@ -166,6 +200,19 @@ const actions = {
         });
       });
   },
+  [RESETUSERPASSWORD]:({commit, dispatch}, jsonData)=>{
+    return new Promise((resolve, reject)=>{
+      apiCall({ url: api_routes.user.change_password ,data: jsonData, method: 'post' })
+      .then(resp => {
+        commit(RESETUSERPASSWORD);
+        resolve(resp)
+      })
+      .catch(err => {
+        commit(CHANGEOWNPASSWORD_ERROR, err);
+        reject(err);
+      });
+    });
+},
 
 }
 
@@ -244,7 +291,9 @@ state.status = "updated one user"
 [UPDATE_ONE_USER_ERROR]: state =>{
 state.status = "failed to update one user"
 },
-
+[CHANGEOWNPASSWORD]: state =>{
+  state.status = "changing own password"
+},
 [SET_GETONEUSERID]: (state, id) =>{
 state.getOneId = id
 },
@@ -253,6 +302,12 @@ state.roles = roles;
 },
 [GET_ALL_ROLES_ERROR] : (state)=>{
 state.status = "get all roles failed."
+},
+[RESETUSERPASSWORD] : (state)=>{
+  state.status = "changing user password"
+},
+[CHANGEOWNPASSWORD_ERROR]: (state)=>{
+  state.status = "change user password failed."
 }
 }
 
