@@ -64,7 +64,7 @@ const actions = {
 
               localStorage.setItem("token", resp.token);
               axios.defaults.headers.common['Authorization'] = 'Bearer ' + resp.token
-              
+            
               commit(SIGN_IN_SUCCESS, resp);
               //dispatch(USER_REQUEST);
               resolve(resp);
@@ -156,10 +156,9 @@ const actions = {
     });
   },
 
-  [RESETUSERPASSWORD]:({commit, dispatch}, formData) =>{
+  [RESETUSERPASSWORD]:({commit, dispatch}, id) =>{
     return new Promise((resolve, reject) => {
-      commit(UPDATE_ONE_USER);
-      apiCall({ url: api_routes.user.update_one + store.getters.userId, data:formData , method: 'put' })
+      apiCall({ url: api_routes.user.change_password +"/"+ id, method: 'put' })
       .then(resp => {
         commit(RESETUSERPASSWORD);
         resolve(resp);
@@ -172,10 +171,10 @@ const actions = {
     });
   },
   
-  [GET_ONE_USER]:({commit, dispatch}) =>{
+  [GET_ONE_USER]:({commit, dispatch}, id) =>{
     return new Promise((resolve, reject) => {
       commit(GET_ONE_USER);
-      apiCall({ url: api_routes.user.get_one + store.getters.userId, method: 'get' })
+      apiCall({ url: api_routes.user.get_one + id, method: 'get' })
       .then(resp => {
         commit(GET_ONE_USER_SUCCESS, resp);
         resolve(resp)
@@ -200,19 +199,8 @@ const actions = {
         });
       });
   },
-  [RESETUSERPASSWORD]:({commit, dispatch}, jsonData)=>{
-    return new Promise((resolve, reject)=>{
-      apiCall({ url: api_routes.user.change_password ,data: jsonData, method: 'post' })
-      .then(resp => {
-        commit(RESETUSERPASSWORD);
-        resolve(resp)
-      })
-      .catch(err => {
-        commit(CHANGEOWNPASSWORD_ERROR, err);
-        reject(err);
-      });
-    });
-},
+  
+
 
 }
 

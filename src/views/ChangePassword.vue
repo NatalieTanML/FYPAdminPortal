@@ -54,7 +54,6 @@ import store from "@/store";
 export default {
   data() {
     return {
-      name: "",
       newPassword: "",
       newConfirmPassword: "",
       newPasswordNotSame: false
@@ -93,21 +92,7 @@ export default {
 
       }
     },
-    getUserInformation() {
-      this.$store
-        .dispatch(GET_ONE_USER)
-        .then(response => {
-          this.name = response.name;
-        })
-        .catch(error => {
-
-          this.$store.dispatch(USER_LOGOUT);
-
-          console.dir(error);
-          this.message("danger", error);
-          //this.$router.replace({name:'SummaryOfOrders'});
-        });
-    },
+    
     goBack(){
     let previousPathName = localStorage.getItem("previousPathName")
       console.log(previousPathName)
@@ -121,8 +106,7 @@ export default {
   },
 
   mounted() {
-    this.getUserInformation();
-    console.log()
+
   }
 };
 </script>

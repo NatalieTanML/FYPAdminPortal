@@ -142,10 +142,10 @@
       this.$snack[method](config);
     },
        getUserInformation() {
-        
+       let id = localStorage.getItem("updateUserId");
 
       this.$store
-        .dispatch(GET_ONE_USER)
+        .dispatch(GET_ONE_USER, id)
         .then(response => {
           console.log(response)
           this.name = response.name;
@@ -206,20 +206,22 @@
             this.message("danger", error);
           });
 
+        },
+    handleok(){
 
-      //  this.$store
-      // .dispatch(RESETUSERPASSWORD, userStr)
-      // .then(response => {
-      //  this.message("success", "This user has been updated!");
+       this.$store
+      .dispatch(RESETUSERPASSWORD, this.userId)
+      .then(response => {
+       this.message("success", response.message);
 
-      // })
-      // .catch(error => {
-      //     console.dir(error);
-      //     this.message("danger", error.response.data.message);
-      //     //this.$router.replace({name:'SummaryOfOrders'});
-      //   });
-
-        }
+      })
+      .catch(error => {
+          console.dir(error);
+          this.message("danger", error.response.data.message);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
+    }
+        
     },
     mounted(){
             this.getRoles();
