@@ -69,11 +69,15 @@
           <div id="content">
             <div class="row mb-4">
               <b-container fluid>
-                <b-row class="bg-white text-left" align-h="center">
+                <b-row class="bg-white text-left" align-h="center" align-v="center">
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="User Name" label-for="input-horizontal">
+                      <b-form-group
+                        label-cols-sm="3"
+                        label="User Name"
+                        label-for="input-horizontal"
+                      >
                         <b-form-input v-model="this.username"></b-form-input>
                       </b-form-group>
 
@@ -96,19 +100,25 @@
 
                       <b-form-group
                         label-cols-sm="3"
-                        label="Disable User"
+                        label="Is Enabled"
                         label-for="input-horizontal"
                       >
-                        <b-button v-b-modal.disableUser class="w-25" variant="danger">Disable</b-button>
+                        <b-form-checkbox
+                          v-b-model.disableUser
+                          name="check-button"
+                          class="mt-2"
+                          switch
+                          size="md"
+                        ></b-form-checkbox>
                       </b-form-group>
 
-                      <b-form-group
+                      <!-- <b-form-group
                         label-cols-sm="3"
                         label="Delete User"
                         label-for="input-horizontal"
                       >
                         <b-button v-b-modal.deleteUser class="w-25" variant="danger">Delete</b-button>
-                      </b-form-group>
+                      </b-form-group>-->
 
                       <b-form-group label-cols-sm="3" label-for="input-horizontal">
                         <b-button class="w-25" variant="primary">Save</b-button>
@@ -155,26 +165,24 @@
 </template>
 
 <script>
-  import SideBar from "@/components/SideBar";
-  import DashboardHeader from "@/components/DashboardHeader";
+import SideBar from "@/components/SideBar";
+import DashboardHeader from "@/components/DashboardHeader";
 
-  export default {
-
-    data(){
-      return{
+export default {
+  data() {
+    return {
       username: "kidzania@hotmail.com"
-      }
-    },
-    components: {
-      SideBar,
-      DashboardHeader
-    },
-    methods:{
-      handleok(){
-        console.log("hi")
-      }
+    };
+  },
+  components: {
+    SideBar,
+    DashboardHeader
+  },
+  methods: {
+    handleok() {
+      console.log("hi");
     }
-  
+  }
 };
 </script>
 

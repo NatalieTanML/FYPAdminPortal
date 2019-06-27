@@ -447,6 +447,14 @@ export default {
   },
 
   methods: {
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+      // this.$snack[method](config)
+    },
     // https://www.raymondcamden.com/2017/12/05/building-related-selects-with-vuejs
     selectCategory(selectedCategory) {
       // Once you select a new category, reset the previous options
@@ -507,8 +515,10 @@ export default {
     },
 
     submit() {
-      console.dir(this.form.category.label);
-      console.dir(this.form.option);
+      // console.dir(this.form.category.label);
+      // console.dir(this.form.option);
+      this.message("success", "You have successfully added a new product!");
+      this.$router.push("/ResourceManagement");
     }
   },
   destroyed() {
