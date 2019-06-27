@@ -50,13 +50,14 @@
             <!-- <template slot="name" slot-scope="row">
         {{ row.value }} {{ row.value }}
             </template>-->
-        <template slot="HEAD_checkbox">
-         <b-form-checkbox 
+        <template v-if="enableCheckbox" slot="HEAD_checkbox">
+         <b-form-checkbox  
            @change="checkAllCheckBox()" 
            v-model="checkAll"
            > </b-form-checkbox>
         </template>
-         <template slot="checkbox" slot-scope="row">
+
+         <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
              <b-form-checkbox
       :checked="checkedCheckBox.includes(row.item.id)"
       @change="onCheckBoxCheck(row.item.id)" >
@@ -124,12 +125,14 @@ export default {
     headerButton: String,
     headerButtonClick: String,
     actionButtonClick: String,
+    enableCheckbox: Boolean,
+
   
 
   },
   mounted() {
     this.totalRows = this.items.length;
-   
+  
   },
 
   computed: {
@@ -180,7 +183,7 @@ export default {
     let rowsPerPage = this.perPage
 
     let shownItems = (this.currentPage - 1) * rowsPerPage
-    console.log(shownItems)
+    // console.log(shownItems)
 
   //if the last page has less than 5 stuff.
     if(((this.items.length - shownItems) <rowsPerPage) && this.currentPage != 1 )
@@ -191,8 +194,8 @@ export default {
     if(this.currentPage == 1 && this.items.length < rowsPerPage)
     rowsPerPage = this.items.length 
     
-    console.log(this.currentPage)
-    console.log(rowsPerPage)
+    // console.log(this.currentPage)
+    // console.log(rowsPerPage)
 
     if(!this.checkAll)
     this.checkAll = true;

@@ -25,6 +25,7 @@
                   v-bind:key="tab.id"
                   v-bind:title="tab.title"
                   v-bind:isDark="tab.isDark"
+                  v-bind:noOfRows="arrayOfNumberOfRows[tab.id]"
                   @click.native="onTabChange(tab.id)"
                 ></DashboardTabs>
               </ul>
@@ -39,7 +40,8 @@
             v-bind:items="this.sortItems"
             v-bind:headerButtonClick="this.headerButtonClick"
             v-bind:actionButtonClick="this.actionButtonClick"
-            headerButton="Select All Orders"
+            v-bind:enableCheckbox="this.enableCheckbox"
+            headerButton="Update Order Status"
           >
           
           </Table>
@@ -81,7 +83,9 @@ export default {
        actionButtonClick: "Edit One Order",
       forceRender: true,
       noOfTabs: 0,
+      enableCheckbox: true,
       selectedTab: 0,
+      arrayOfNumberOfRows: [],
       typesOfTabs: [
         "All",
         "Ordered",
@@ -253,14 +257,7 @@ export default {
 
     this.onTabChange(0);
 
-    
-       eventBus.$on(this.headerButtonClick, () => {
-    console.log("select all orders")
-    });
-
-    eventBus.$on(this.actionButtonClick,  (id) => {
-      console.log(id)
-    });
+ 
   },
 
   methods: {
@@ -290,7 +287,31 @@ export default {
         if (sortBy === this.items[index].status)
           this.sortItems.push(this.items[index]);
 
+      //for counting the amount of rows in each tab.
+      let numberOfRows = 0;
+      let x;
+      //index is 1 so as to skip the All tab. then i push a 0 on the first
+      //number of the arrayofNumberOfRows.
+      this.arrayOfNumberOfRows.push(null)
+      for(index = 1; index < this.typesOfTabs.length; index++){
+        numberOfRows = 0;
+        for(x = 0; x< this.items.length; x++)
+        {
+         if(this.items[x].status == this.typesOfTabs[index])
+          numberOfRows++;
+
+        }
+          this.arrayOfNumberOfRows.push(numberOfRows)
+      }
+     
+
       if (sortBy === "All") this.sortItems = this.items;
+
+      //to disable checkbox is All tabs are selected
+      if (sortBy == "All") 
+      this.enableCheckbox = false
+      else
+      this.enableCheckbox = true
 
       if (this.forceRender) this.forceRender = false;
       else this.forceRender = true;

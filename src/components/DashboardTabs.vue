@@ -3,7 +3,7 @@
     <div class="card shadow align-items-center">
       <li :class="[ isDark ? 'background-dark' : 'background-light' ]" class="nav-item">
         <a class="nav-link" href="#">
-          <span :class="[ isDark ? 'font-dark' : 'font-light' ]">{{title}}</span>
+          <span :class="[ isDark ? 'font-dark' : 'font-light' ]">{{title}}{{noOfRowsString}}</span>
         </a>
       </li>
     </div>
@@ -16,7 +16,17 @@ export default {
   props: {
     title: String,
     isDark: Boolean,
-    tabId: String
+    tabId: String,
+    noOfRows:  Number,
+  },
+  data(){
+    return{
+     noOfRowsString: "",
+    }
+  },
+  created(){
+  if(this.noOfRows != null)
+  this.noOfRowsString = " ("+this.noOfRows+")"
   }
 };
 </script>
