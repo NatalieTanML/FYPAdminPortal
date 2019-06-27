@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { SIGN_IN, USER_LOGOUT } from "@/store/actions/user";
+import { SIGN_IN, USER_LOGOUT,BYPASSLOGIN } from "@/store/actions/user";
 
 export default {
   data() {
@@ -86,37 +86,41 @@ export default {
     },
     validate() {
       const { email, password } = this;
-      const formData = new FormData();
-      formData.append("username", email);
-      formData.append("password", password);
 
-      this.$store
-        .dispatch(SIGN_IN, formData)
-        .then(response => {
-          if (!response.user.changePassword) {
-            this.$router.replace({ name: "ChangePassword" });
-          } else {
-            this.message("success", "You have logged in");
-            this.$router.replace({ name: "SummaryOfOrders" });
-          }
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error);
-        });
+     const userStr = {
+
+      "email" : email,
+      "password" : password
+    };
+     
+
+        this.$store
+          .dispatch(SIGN_IN, userStr)
+          .then(response => {
+            console.log(response)
+            if (!response.user.changePassword) {
+              this.$router.replace({ name: "ChangePassword" });
+            } else {
+              this.message("success", "You have logged in");
+              this.$router.replace({ name: "SummaryOfOrders" });
+            }
+          })
+          .catch(error => {
+            this.$store
+          .dispatch(USER_LOGOUT)
+            console.dir(error);
+            this.message("danger", error);
+          });
+
+        // this.$store.dispatch(BYPASSLOGIN)
+        // this.$router.replace({ name: "SummaryOfOrders" });
+
+
     },
+    
+    
 
-    logout() {
-      this.$store
-        .dispatch(USER_LOGOUT)
-        .then(() => {
-          this.message("success", "You have signed out");
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error.response.data.message);
-        });
-    }
+  
   }
 };
 </script>
@@ -128,4 +132,5 @@ body {
 span {
   color: white;
 }
+
 </style>

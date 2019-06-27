@@ -54,7 +54,7 @@
             <template slot="actions" slot-scope="row">
               <b-button
                 type="button"
-                v-on:click="onActionButtonClick"
+                v-on:click="onActionButtonClick(row.item.id)"
                 lg="4"
                 class="w-75"
                 variant="primary"
@@ -108,7 +108,9 @@ export default {
     items: Array,
     headerButton: String,
     headerButtonClick: String,
-    actionButtonClick: String
+    actionButtonClick: String,
+  
+
   },
   mounted() {
     this.totalRows = this.items.length;
@@ -134,8 +136,8 @@ export default {
     onHeaderButtonClick() {
       eventBus.$emit(this.headerButtonClick);
     },
-    onActionButtonClick() {
-      eventBus.$emit(this.actionButtonClick);
+    onActionButtonClick(id) {
+      eventBus.$emit(this.actionButtonClick, id);
     }
   }
 };

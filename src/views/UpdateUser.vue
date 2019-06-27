@@ -6,60 +6,10 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-          <!-- Sidebar Toggle (Topbar) -->
-          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-          </button>
 
-          <DashboardHeader title="Update User"></DashboardHeader>
-          <!-- Topbar Navbar -->
-          <ul class="navbar-nav ml-auto">
-            <div class="topbar-divider d-none d-sm-block"></div>
+        <DashboardHeader title="Update User"></DashboardHeader>
+        <!-- Topbar Navbar -->
 
-            <!-- Nav Item - User Information -->
-            <li class="nav-item dropdown no-arrow">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="userDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
-                <img
-                  class="img-profile rounded-circle"
-                  src="https://source.unsplash.com/QAB-WJcbgJk/60x60"
-                >
-              </a>
-              <!-- Dropdown - User Information -->
-              <div
-                class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="userDropdown"
-              >
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Profile
-                </a>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Settings
-                </a>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Activity Log
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
-                </a>
-              </div>
-            </li>
-          </ul>
-        </nav>
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -73,20 +23,36 @@
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group
-                        label-cols-sm="3"
-                        label="User Name"
-                        label-for="input-horizontal"
-                      >
-                        <b-form-input v-model="this.username"></b-form-input>
+                      <b-form-group label-cols-sm="3" label="User Name">
+                        <input
+                          type="text"
+                          v-model="name"
+                          class="form-control form-control-user"
+                          placeholder="Enter A Name..."
+                        >
                       </b-form-group>
 
-                      <b-form-group label-cols-sm="3" label="Role" label-for="input-horizontal">
-                        <select class="custom-select form-control">
-                          <option value selected disabled>Please select</option>
-                          <option value="Admin">Admin</option>
-                          <option selected>Super Admin</option>
-                          <option>Delivery</option>
+                      <b-form-group label-cols-sm="3" label="Email">
+                        <input
+                          type="email"
+                          v-model="email"
+                          class="form-control form-control-user"
+                          placeholder="Enter An Email Address..."
+                        >
+                      </b-form-group>
+
+                      <b-form-group label-cols-sm="3" label="Role">
+                        <select
+                          class="custom-select form-control"
+                          name="role"
+                          @change="onSelectChange($event)"
+                        >
+                          <option
+                            v-for="role in roles"
+                            v-bind:key="role.roleName"
+                            :selected="role.roleName == selectedRole"
+                            :value="role.roleId"
+                          >{{ role.roleName}}</option>
                         </select>
                       </b-form-group>
 
@@ -103,25 +69,11 @@
                         label="Is Enabled"
                         label-for="input-horizontal"
                       >
-                        <b-form-checkbox
-                          v-b-model.disableUser
-                          name="check-button"
-                          class="mt-2"
-                          switch
-                          size="md"
-                        ></b-form-checkbox>
+                        <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch></b-form-checkbox>
                       </b-form-group>
 
-                      <!-- <b-form-group
-                        label-cols-sm="3"
-                        label="Delete User"
-                        label-for="input-horizontal"
-                      >
-                        <b-button v-b-modal.deleteUser class="w-25" variant="danger">Delete</b-button>
-                      </b-form-group>-->
-
                       <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                        <b-button class="w-25" variant="primary">Save</b-button>
+                        <b-button class="w-25" v-on:click="saveUser()" variant="primary">Save</b-button>
                         <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
                       </b-form-group>
                     </b-form>
@@ -136,11 +88,6 @@
 
               <b-modal id="disableUser" title="Disable User">
                 <p class="my-4">You are about to disable this user's account</p>
-              </b-modal>
-
-              <b-modal id="deleteUser" title="Delete User">
-                <p class="my-4">You are about to delete this account PERMANENTLY!</p>
-                <p class="my-4">This action cannot be undone.</p>
               </b-modal>
             </div>
           </div>
@@ -167,11 +114,26 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
+import {
+  GET_ONE_USER,
+  GET_ALL_ROLES,
+  UPDATE_ONE_USER,
+  RESETUSERPASSWORD
+} from "@/store/actions/user";
 
 export default {
   data() {
     return {
-      username: "kidzania@hotmail.com"
+      userId: null,
+      name: "",
+      roleName: "",
+      roles: null,
+      selectedRole: null,
+      email: null,
+      isEnabled: null,
+      checked: null,
+      updatedRole: null,
+      userRoleId: null
     };
   },
   components: {
@@ -179,9 +141,92 @@ export default {
     DashboardHeader
   },
   methods: {
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+    },
+    getUserInformation() {
+      let id = localStorage.getItem("updateUserId");
+
+      this.$store
+        .dispatch(GET_ONE_USER, id)
+        .then(response => {
+          console.log(response);
+          this.name = response.name;
+          this.selectedRole = response.roleName;
+          this.email = response.email;
+          this.isEnabled = response.isEnabled;
+          this.userId = response.id;
+          console.log(response);
+          //i have to use updatedRole because for some reason, there is a bug in doing a v-model in select,
+          //so i did a @onchange instead, which uses updatedRole
+          this.updatedRole = response.roleId;
+          console.log(this.selectedRole);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
+    },
+    getRoles() {
+      this.$store
+        .dispatch(GET_ALL_ROLES)
+        .then(response => {
+          this.roles = response;
+          console.log(this.roles);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error.response.data.message);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
+    },
+    onSelectChange(event) {
+      this.updatedRole = event.target.value;
+      console.log(this.updatedRole);
+    },
+    saveUser() {
+      console.log(this.updatedRole);
+      let idInt = parseInt(this.updatedRole);
+
+      const userStr = {
+        userId: this.userId,
+        Email: this.email,
+        Name: this.name,
+        IsEnabled: this.isEnabled,
+        RoleId: idInt
+      };
+      console.log(userStr);
+      this.$store
+        .dispatch(UPDATE_ONE_USER, userStr)
+        .then(response => {
+          this.message("success", "User is updated!");
+        })
+        .catch(error => {
+          this.message("danger", error);
+        });
+    },
     handleok() {
-      console.log("hi");
+      this.$store
+        .dispatch(RESETUSERPASSWORD, this.userId)
+        .then(response => {
+          this.message("success", response.message);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error.response.data.message);
+          //this.$router.replace({name:'SummaryOfOrders'});
+        });
     }
+  },
+  mounted() {
+    this.getRoles();
+
+    this.getUserInformation();
   }
 };
 </script>
