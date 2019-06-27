@@ -34,7 +34,15 @@
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table :key="this.forceRender" v-bind:fields="this.fields" v-bind:items="this.sortItems"></Table>
+          <Table :key="this.forceRender" 
+            v-bind:fields="this.fields" 
+            v-bind:items="this.sortItems"
+            v-bind:headerButtonClick="this.headerButtonClick"
+            v-bind:actionButtonClick="this.actionButtonClick"
+            headerButton="Select All Orders"
+          >
+          
+          </Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -58,6 +66,7 @@ import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
+import { eventBus } from "@/eventBus";
 
 export default {
   components: {
@@ -68,6 +77,8 @@ export default {
   },
   data() {
     return {
+      headerButtonClick: "Check All Orders",
+       actionButtonClick: "Edit One Order",
       forceRender: true,
       noOfTabs: 0,
       selectedTab: 0,
@@ -86,7 +97,8 @@ export default {
 
       items: [],
       fields: [
-        { key: "refNo", label: "Ref. No", sortable: true },
+        { key: "checkbox", label: "" },
+        { key: "id", label: "Ref. No", sortable: true },
         { key: "date", label: "Date", sortable: true },
         { key: "item", label: "Item", sortable: true },
         { key: "image", label: "Image" },
@@ -111,7 +123,7 @@ export default {
     ]),
       (this.items = [
         {
-          refNo: "123456",
+          id: "123456",
           date: "22/04/19",
           item: "A5 Photo",
           image: "image",
@@ -120,7 +132,7 @@ export default {
           actions: "Print"
         },
         {
-          refNo: "123457",
+          id: "123457",
           date: "24/04/19",
           item: "Keychain",
           image: "image",
@@ -129,7 +141,7 @@ export default {
           actions: "Completed"
         },
         {
-          refNo: "123458",
+          id: "123458",
           date: "25/04/19",
           item: "ID Card",
           image: "image",
@@ -138,7 +150,7 @@ export default {
           actions: "Completed"
         },
         {
-          refNo: "123459",
+          id: "123459",
           date: "05/05/19",
           item: "A5 Photo + Frame",
           image: "image",
@@ -147,7 +159,7 @@ export default {
           actions: "Archive"
         },
         {
-          refNo: "123458",
+          id: "123458",
           date: "28/04/19",
           item: "A5 Photo + Black Frame",
           image: "image",
@@ -156,7 +168,7 @@ export default {
           actions: "Deliver"
         },
         {
-          refNo: "123459",
+          id: "123459",
           date: "14/05/19",
           item: "Keychain (Black)",
           image: "image",
@@ -165,7 +177,7 @@ export default {
           actions: "Archive"
         },
         {
-          refNo: "123460",
+          id: "123460",
           date: "30/05/19",
           item: "Name Tag (Black)",
           image: "image",
@@ -174,7 +186,7 @@ export default {
           actions: "Archive"
         },
         {
-          refNo: "123461",
+          id: "123461",
           date: "30/05/19",
           item: "Name Tag (Red)",
           image: "image",
@@ -183,7 +195,7 @@ export default {
           actions: "Print"
         },
         {
-          refNo: "123462",
+          id: "123462",
           date: "13/05/19",
           item: "A4 Photo + Red Frame",
           image: "image",
@@ -192,7 +204,7 @@ export default {
           actions: "Accept"
         },
         {
-          refNo: "123463",
+          id: "123463",
           date: "14/05/19",
           item: "Keychain",
           image: "image",
@@ -201,7 +213,7 @@ export default {
           actions: "Accept"
         },
         {
-          refNo: "123464",
+          id: "123464",
           date: "23/04/19",
           item: "Keychain + A5 Photo",
           image: "image",
@@ -210,7 +222,7 @@ export default {
           actions: "Archive"
         },
         {
-          refNo: "123465",
+          id: "123465",
           date: "26/04/19",
           item: "A5 Photo",
           image: "image",
@@ -219,7 +231,7 @@ export default {
           actions: "Accept"
         },
         {
-          refNo: "123466",
+          id: "123466",
           date: "16/04/19",
           item: "A3 Photo",
           image: "image",
@@ -229,9 +241,26 @@ export default {
         }
       ]);
 
+
     this.sortItems = this.items;
 
+//creating checkbox.
+    let index;
+    for(index = 0; this.sortItems.length> index; index++){
+    this.sortItems[index].checkbox = "checkbox"
+    
+    }
+
     this.onTabChange(0);
+
+    
+       eventBus.$on(this.headerButtonClick, () => {
+    console.log("select all orders")
+    });
+
+    eventBus.$on(this.actionButtonClick,  (id) => {
+      console.log(id)
+    });
   },
 
   methods: {
@@ -265,7 +294,8 @@ export default {
 
       if (this.forceRender) this.forceRender = false;
       else this.forceRender = true;
-    }
+    },
+  
   }
 };
 </script>

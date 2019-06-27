@@ -22,7 +22,7 @@
             </b-col>
             <b-col>
               <b-button
-                v-on:click="onHeaderButtonClick"
+                v-on:click="onHeaderButtonClick()"
                 variant="primary"
                 class="float-right"
                 v-if="headerButton"
@@ -50,6 +50,19 @@
             <!-- <template slot="name" slot-scope="row">
         {{ row.value }} {{ row.value }}
             </template>-->
+        <template slot="HEAD_checkbox">
+         <b-form-checkbox 
+           @change="checkAllCheckBox()" 
+           v-model="checkAll"
+           > </b-form-checkbox>
+        </template>
+         <template slot="checkbox" slot-scope="row">
+             <b-form-checkbox
+      :checked="checkedCheckBox.includes(row.item.id)"
+      @change="onCheckBoxCheck(row.item.id)" >
+    </b-form-checkbox>
+            </template>
+
 
             <template slot="actions" slot-scope="row">
               <b-button
@@ -100,7 +113,9 @@ export default {
       sortBy: null,
       sortDesc: false,
       sortDirection: "asc",
-      filter: null
+      filter: null,
+      checkedCheckBox:[],
+      checkAll : false,
     };
   },
   props: {
@@ -130,16 +145,74 @@ export default {
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
+      console.log("filtererd item : "+ filteredItems)
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
     onHeaderButtonClick() {
-      eventBus.$emit(this.headerButtonClick);
+      //for summaryoforders
+      if(this.headerButton == "Select All Orders")
+      eventBus.$emit(this.headerButtonClick, this.checkedCheckBox);
+      else
+      eventBus.$emit(this.headerButtonClick)
+
     },
     onActionButtonClick(id) {
       eventBus.$emit(this.actionButtonClick, id);
-    }
-  }
+    },
+    onCheckBoxCheck(refNo){
+      let index = 0;
+
+      if(this.checkedCheckBox.includes(refNo)){
+      for(index;index< this.checkedCheckBox.length; index ++)
+        if(this.checkedCheckBox[index] == refNo)
+        this.checkedCheckBox.splice(index,1)
+      }
+      else
+      this.checkedCheckBox.push(refNo)
+
+      console.log(this.checkedCheckBox)
+  
+    },
+    checkAllCheckBox(){
+    let index = 0
+
+    let rowsPerPage = this.perPage
+
+    let shownItems = (this.currentPage - 1) * rowsPerPage
+    console.log(shownItems)
+
+  //if the last page has less than 5 stuff.
+    if(((this.items.length - shownItems) <rowsPerPage) && this.currentPage != 1 )
+    rowsPerPage = this.items.length - shownItems
+  
+    
+    //if the first page has less than 5 stuff.
+    if(this.currentPage == 1 && this.items.length < rowsPerPage)
+    rowsPerPage = this.items.length 
+    
+    console.log(this.currentPage)
+    console.log(rowsPerPage)
+
+    if(!this.checkAll)
+    this.checkAll = true;
+    else
+    this.checkAll = false;
+
+    this.checkedCheckBox = [];  
+      if(this.checkAll){
+      for(index = 0; index<rowsPerPage; index++){
+       this.checkedCheckBox[index] = this.items[shownItems + index].id;
+      }
+      }
+      console.log(this.checkAll)
+      console.log(this.checkedCheckBox)
+
+}
+  },
+
+  
+      
 };
 </script>
 
