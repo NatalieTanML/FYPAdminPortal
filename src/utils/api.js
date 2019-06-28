@@ -13,7 +13,8 @@ export const api_routes = {
   },
   order: {
     get:'api/orders/1',
-    get_all : 'api/orders/'
+    get_all : 'api/orders/',
+    get_all_status: 'api/orders/getOrderStatus'
   }
 
 };
