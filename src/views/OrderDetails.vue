@@ -164,13 +164,13 @@ export default {
    this.$store
         .dispatch(ORDER_GET_REQUEST)
          .then(response => {
-           console.dir(response);
+          console.dir(response);
           this.order = response;
           console.log(response);
         })
         .catch(error => {
           console.dir(error);
-          alert("error");
+          alert("error", error.response.data.message);
         });
   }
 };

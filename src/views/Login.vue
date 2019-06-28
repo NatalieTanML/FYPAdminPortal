@@ -107,9 +107,9 @@ export default {
           })
           .catch(error => {
             this.$store
-          .dispatch(USER_LOGOUT)
-            console.dir(error);
-            this.message("danger", error);
+              .dispatch(USER_LOGOUT)
+            console.log(error);
+            this.message("danger", error.response.data.message);
           });
 
         // this.$store.dispatch(BYPASSLOGIN)
