@@ -1,1 +1,3 @@
 export const ORDER_GET_REQUEST = "ORDER_GET_REQUEST";
+export const GET_ALL_ORDERS = "GET_ALL_ORDERS"
+export const GET_ALL_STATUS = "GET_ALL_STATUS"
