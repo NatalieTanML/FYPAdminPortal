@@ -73,21 +73,18 @@ export default {
       if (newPassword != newConfirmPassword) this.newPasswordNotSame = true;
       else {
         this.newPasswordNotSame = false;
-
          const userStr = {
       "password" : newPassword
     };
-
         this.$store
           .dispatch(CHANGEOWNPASSWORD, userStr)
           .then(response => {
             this.message("success", "Your password has been updated!");
             this.$router.replace({ name: "Login" });
                       this.$store.dispatch(USER_LOGOUT);
-
           })
           .catch(error => {
-            this.message("danger", error);
+            this.message("danger", error.response.data.message);
           });
 
       }
@@ -100,8 +97,6 @@ export default {
         this.$router.replace({ name: previousPathName });
         else
         this.$router.replace({ name: "Login" });
-
-
     }
   },
 
