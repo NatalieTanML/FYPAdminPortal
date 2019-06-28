@@ -84,6 +84,7 @@
         arrayOfNumberOfRows: [],
         typesOfTabs: [],
         Tabs: [],
+        actions:[],
 
         sortItems: [],
 
@@ -147,7 +148,15 @@
 
           let typesOfTabs = this.typesOfTabs
 
-          x = 0;
+          //set up actions based on the type of tabs
+          //you can generate the actions in the previous for loop. but i feel that
+          //the code will be extra messy.
+
+          for(x = 0; x<typesOfTabs.length; x++)
+          if(typesOfTabs == "Received")
+          this.actions.push("")
+
+          //x = 0;
           for (x = 0; x < typesOfTabs.length; x++)
             //initialize the tabs to get title, id and isDark.
             this.Tabs[x] = {

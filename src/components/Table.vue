@@ -25,7 +25,7 @@
                 v-on:click="onHeaderButtonClick()"
                 variant="primary"
                 class="float-right"
-                v-if="headerButton"
+                v-if="headerButton && checkedCheckBox.length != 0"
               >{{headerButton}}</b-button>
             </b-col>
           </b-row>
