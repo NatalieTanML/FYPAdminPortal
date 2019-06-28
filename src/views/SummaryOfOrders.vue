@@ -84,7 +84,7 @@
         arrayOfNumberOfRows: [],
         typesOfTabs: [],
         Tabs: [],
-        actions:[],
+ 
 
         sortItems: [],
 
@@ -94,7 +94,7 @@
             label: ""
           },
           {
-            key: "id",
+            key: "refNo",
             label: "Ref. No",
             sortable: true
           },
@@ -151,10 +151,6 @@
           //set up actions based on the type of tabs
           //you can generate the actions in the previous for loop. but i feel that
           //the code will be extra messy.
-
-          for(x = 0; x<typesOfTabs.length; x++)
-          if(typesOfTabs == "Received")
-          this.actions.push("")
 
           //x = 0;
           for (x = 0; x < typesOfTabs.length; x++)
@@ -373,13 +369,14 @@
               //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
               //item: response[x].orderItems[0].options[0].product.productName,
               this.items[x] = {
-                id: response[x].referenceNo,
+                id: response[x].orderId,
+                refNo : response[x].referenceNo,
                 date: response[x].createdAt,
-                item: response[x].orderItems[0].options.product.productName,
+                item: response[x].orderItems[0].options.product.productName+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n a5 photo",
                 image: response[x].orderItems[0].OrderImageUrl,
                 quantity: response[x].orderItems[0].quantity,
                 status: response[x].status,
-                actions: response[x].status
+                actions: this.getAction(response[x].status)
               }
 
           
@@ -401,7 +398,26 @@
           });
 
 
-      }
+      },
+        getAction(status){
+          if(status == "Received")
+          return "Accept Order"
+          else if(status == "Awaiting Printing")
+          return "Print"
+          else if(status == "Printed")
+          return "Deliver"
+          else if(status == "Out for Delivery")
+          return "Delivered"
+          else if(status == "Completed")
+          return "Archive"
+          else if(status == "Delivery Failed")
+          return "Re-Deliver"
+          else if(status == "Cancelled")
+          return "Archive"
+          else
+          return null
+          }
+
     }
   };
 </script>
