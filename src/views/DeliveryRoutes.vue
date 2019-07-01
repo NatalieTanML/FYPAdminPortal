@@ -259,7 +259,9 @@ export default {
   
             this.$store
              .dispatch(UPDATE_DELIVERYMAN, [this.id,this.allDeliverymen[i].id])
-             
+              .then(response => {
+                this.refreshTable();
+              })
         .catch(error => {
           console.dir(error);
           alert("error");
