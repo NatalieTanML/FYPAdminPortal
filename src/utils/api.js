@@ -16,7 +16,7 @@ export const api_routes = {
     get:'api/orders/1',
     get_all : 'api/orders/',
     get_all_status: 'api/orders/getOrderStatus',
-    update_deliveryman : 'api/orders/deliveryman/6',
+    update_deliveryman : "api/orders/deliveryman",
   }
 
 };

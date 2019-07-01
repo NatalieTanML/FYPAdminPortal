@@ -72,6 +72,7 @@ export default {
     return {
       actionButtonClick: "Assign One to Deliveryman",
       headerButtonClick: "Assign Many to Deliveryman",
+      id:"",
       items: [],
       fields: [
         { key: "refNo", label: "Ref. No", sortable: true },
@@ -81,9 +82,7 @@ export default {
         { key: "actions", label: "Actions" }
       ],
       selected: null,
-      deliveryman: [
-         { value: null, text: "Please select an option" },
-      ],
+      deliveryman: [],
       allOrders:[],
       allDeliverymen: []
     };
@@ -224,15 +223,43 @@ export default {
     else return "Postalcode does not match any district in Singapore"
     },
 
+    refreshTable(){
+
+      this.$store
+      .dispatch(GET_ALL_ORDERS)
+      .then(response => {
+        console.dir(response);
+        this.allOrders = response;
+        for (var i = 0; i < this.allOrders.length; i++) {
+          this.items[i].id= this.allOrders[i].orderId;
+          this.items[i].refNo= this.allOrders[i].referenceNo;
+          this.items[i].postcode = this.allOrders[i].address.postalCode;
+          this.items[i].region = this.getRegionByPostalCode(this.items[i].postcode);
+          if (this.allOrders[i].deliveryManId != null){
+          this.items[i].actions = "Update Deliveryman";
+          this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
+          }
+          else {
+            this.items[i].actions = "Assign Deliveryman";
+            this.items[i].deliveryman = "Not Assigned"
+          }
+        }
+        console.log(response);
+      })
+      .catch(error => {
+        console.dir(error);
+        alert("error");
+      });
+ 
+    },
+
     updateDeliveryman(){
-          for(var i = 0; i < this.allDeliverymen.length; i++){
+      for(var i = 0; i < this.allDeliverymen.length; i++){
            if(this.allDeliverymen[i].email == this.selected){
-            
+  
             this.$store
-             .dispatch(UPDATE_DELIVERYMAN, [,])
-             .then(response => {
-              console.log("!!!!!!!!!");
-        })
+             .dispatch(UPDATE_DELIVERYMAN, [this.id,this.allDeliverymen[i].id])
+             
         .catch(error => {
           console.dir(error);
           alert("error");
@@ -244,9 +271,10 @@ export default {
     
   },
   mounted() {
-    eventBus.$on(this.actionButtonClick, () => {
+    eventBus.$on(this.actionButtonClick,  (id) => {
       console.log("Action button clicked");
       this.$bvModal.show("delivery-routes-modal");
+      this.id = id;
     });
     eventBus.$on(this.headerButtonClick, () => {
       console.log("Header button clicked");
@@ -264,15 +292,16 @@ export default {
             deliveryman: "",
             actions: ""
           });
-           this.items[i].refNo= this.allOrders[i].orderId;
+          this.items[i].id= this.allOrders[i].orderId;
+          this.items[i].refNo= this.allOrders[i].referenceNo;
           this.items[i].postcode = this.allOrders[i].address.postalCode;
           this.items[i].region = this.getRegionByPostalCode(this.items[i].postcode);
           if (this.allOrders[i].deliveryManId != null){
-          this.items[i].actions = "Assign to Another Deliveryman";
+          this.items[i].actions = "Update Deliveryman";
           this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
           }
           else {
-            this.items[i].actions = "Assign to Deliveryman";
+            this.items[i].actions = "Assign Deliveryman";
             this.items[i].deliveryman = "Not Assigned"
           }
         }
@@ -287,6 +316,10 @@ export default {
       .then(response => {
         console.dir(response);
         this.allDeliverymen = response;
+        this.deliveryman.push({
+            value: null,
+            text: "Please select an option"
+          });
         for (var i = 0; i < this.allDeliverymen.length; i++) {
           this.deliveryman.push({
             value: null,
