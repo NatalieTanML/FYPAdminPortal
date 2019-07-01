@@ -20,7 +20,8 @@ import {
   GET_ALL_ROLES,
   GET_ALL_ROLES_ERROR,
   BYPASSLOGIN,
-  CHANGED_PASSWORD
+  CHANGED_PASSWORD,
+  GET_ALL_DELIVERYMEN
 } from "@/store/actions/user"
 
 import { apiCall, api_routes } from "@/utils/api";
@@ -167,6 +168,19 @@ const actions = {
       });
   },
 
+  [GET_ALL_DELIVERYMEN]:({commit})=>{
+    return new Promise((resolve, reject) => {
+      commit(GET_ALL_DELIVERYMEN);
+      apiCall({ url: api_routes.user.get_all_deliverymen, method: "get" })
+          .then(resp => {
+              resolve(resp);
+          })
+          .catch(err => {
+              reject(err);
+          })
+  })
+},
+
 }
 
 const mutations = {
@@ -253,7 +267,10 @@ state.roles = roles;
 },
 [GET_ALL_ROLES_ERROR] : (state)=>{
 state.status = "get all roles failed."
-}
+},
+[GET_ALL_DELIVERYMEN] : (state)=>{
+  state.status = "getting all deliverymen"
+  }
 }
 
 export default {

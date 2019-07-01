@@ -20,3 +20,5 @@ export const GET_ALL_ROLES = "GET_ALL_ROLES";
 export const GET_ALL_ROLES_ERROR = "GET_ALL_ROLES_ERROR";
 export const BYPASSLOGIN = "BYPASSLOGIN";
 //the bypasslogin method lets you become the admin if you are creating your account for the first time.
+export const GET_ALL_DELIVERYMEN = "GET_ALL_DELIVERYMEN";
+
