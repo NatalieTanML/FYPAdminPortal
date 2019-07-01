@@ -44,6 +44,7 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             :sort-direction="sortDirection"
+            
             @filtered="onFiltered"
             hover
           >
@@ -75,6 +76,37 @@
                 size="sm"
               >{{row.value}}</b-button>
             </template>
+
+               <template slot="refNo" slot-scope="row">
+           
+         <div style="max-width:80px;">{{row.item.refNo}}</div>
+        
+            </template>
+
+
+          <template slot="images" slot-scope="row">
+          <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId" style="height:100px;max-height:100px;display: block;">
+         <div>{{oneItem.orderImageUrl}}</div>
+         <hr>
+         </div>
+        
+        </template>
+
+          <template slot="quantity" slot-scope="row">
+         <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId" style="height:100px;max-height:100px;display:block;">
+         <div>{{oneItem.quantity}}</div>
+         <hr>
+         </div>
+        </template>
+
+          <template slot="items" slot-scope="row">
+         <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId"  style="height:100px;max-height:100px;display:block;">
+         <div>{{oneItem.options.product.productName}}</div>
+         <hr>
+         </div>
+        </template>
+
+  
 
             <template slot="row-details" slot-scope="row">
               <b-card>
@@ -219,5 +251,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+
+
 </style>

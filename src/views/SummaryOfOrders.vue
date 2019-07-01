@@ -104,12 +104,12 @@
             sortable: true
           },
           {
-            key: "item",
+            key: "items",
             label: "Item",
             sortable: true
           },
           {
-            key: "image",
+            key: "images",
             label: "Image"
           },
           {
@@ -365,21 +365,22 @@
 
             let x = 0;
 
-            for (x; x < response.length; x++)
+            for (x; x < response.length; x++){
               //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
               //item: response[x].orderItems[0].options[0].product.productName,
               this.items[x] = {
                 id: response[x].orderId,
                 refNo : response[x].referenceNo,
-                date: response[x].createdAt,
-                item: response[x].orderItems[0].options.product.productName+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n a5 photo",
-                image: response[x].orderItems[0].OrderImageUrl,
-                quantity: response[x].orderItems[0].quantity,
+                date: (response[x].createdAt).substring(0,10),
+                items: response[x].orderItems,
+                images: response[x].orderItems,
+                quantity: response[x].orderItems,
                 status: response[x].status,
                 actions: this.getAction(response[x].status)
               }
-
-          
+               console.log(this.items[x])
+            }
+         
             this.sortItems = this.items;
 
             //creating checkbox.
