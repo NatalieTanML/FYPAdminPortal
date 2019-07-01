@@ -9,7 +9,8 @@ export const api_routes = {
     get_one: 'api/users/',
     update_one: 'api/users/',
     get_all_roles: 'api/users/getRoles',
-    get_all_deliverymen : 'api/users/deliverymen'
+    get_all_deliverymen : 'api/users/deliverymen',
+    change_password: 'api/users/changepassword'
   },
   order: {
     get:'api/orders/1',

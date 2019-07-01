@@ -21,7 +21,11 @@ import {
   GET_ALL_ROLES_ERROR,
   BYPASSLOGIN,
   CHANGED_PASSWORD,
-  GET_ALL_DELIVERYMEN
+  GET_ALL_DELIVERYMEN,
+  RESETUSERPASSWORD,
+  CHANGEOWNPASSWORD_ERROR,
+  CHANGEOWNPASSWORD,
+  
 } from "@/store/actions/user"
 
 import { apiCall, api_routes } from "@/utils/api";
@@ -62,7 +66,7 @@ const actions = {
 
               localStorage.setItem("token", resp.token);
               axios.defaults.headers.common['Authorization'] = 'Bearer ' + resp.token
-              
+            
               commit(SIGN_IN_SUCCESS, resp);
               //dispatch(USER_REQUEST);
               resolve(resp);
@@ -123,10 +127,10 @@ const actions = {
 
     });
   },
-  [UPDATE_ONE_USER]:({commit, dispatch}, formData) =>{
+  [UPDATE_ONE_USER]:({commit, dispatch}, jsonData) =>{
     return new Promise((resolve, reject) => {
       commit(UPDATE_ONE_USER);
-      apiCall({ url: api_routes.user.update_one + store.getters.userId, data:formData , method: 'put' })
+      apiCall({ url: api_routes.user.update_one + jsonData.userId, data:jsonData , method: 'put' })
       .then(resp => {
         commit(UPDATE_ONE_USER_SUCCESS, resp);
         resolve(resp);
@@ -138,11 +142,41 @@ const actions = {
 
     });
   },
+  [CHANGEOWNPASSWORD]:({commit, dispatch}, formData) =>{
+    return new Promise((resolve, reject) => {
+      commit(UPDATE_ONE_USER);
+      apiCall({ url: api_routes.user.update_one + store.getters.userId, data:formData , method: 'put' })
+      .then(resp => {
+        commit(CHANGEOWNPASSWORD, resp);
+        resolve(resp);
+      })
+      .catch(err => {
+       
+        reject(err);
+      });
+
+    });
+  },
+
+  [RESETUSERPASSWORD]:({commit, dispatch}, id) =>{
+    return new Promise((resolve, reject) => {
+      apiCall({ url: api_routes.user.change_password +"/"+ id, method: 'put' })
+      .then(resp => {
+        commit(RESETUSERPASSWORD);
+        resolve(resp);
+      })
+      .catch(err => {
+      
+        reject(err);
+      });
+
+    });
+  },
   
-  [GET_ONE_USER]:({commit, dispatch}) =>{
+  [GET_ONE_USER]:({commit, dispatch}, id) =>{
     return new Promise((resolve, reject) => {
       commit(GET_ONE_USER);
-      apiCall({ url: api_routes.user.get_one + store.getters.userId, method: 'get' })
+      apiCall({ url: api_routes.user.get_one + id, method: 'get' })
       .then(resp => {
         commit(GET_ONE_USER_SUCCESS, resp);
         resolve(resp)
@@ -156,7 +190,7 @@ const actions = {
   },
   [GET_ALL_ROLES]:({commit, dispatch})=>{
       return new Promise((resolve, reject)=>{
-        apiCall({ url: api_routes.user.get_all_roles , method: 'get' })
+        apiCall({ url: api_routes.user.get_all_roles  , method: 'get' })
         .then(resp => {
           commit(GET_ALL_ROLES, resp);
           resolve(resp)
@@ -167,6 +201,8 @@ const actions = {
         });
       });
   },
+  
+
 
   [GET_ALL_DELIVERYMEN]:({commit})=>{
     return new Promise((resolve, reject) => {
@@ -258,7 +294,9 @@ state.status = "updated one user"
 [UPDATE_ONE_USER_ERROR]: state =>{
 state.status = "failed to update one user"
 },
-
+[CHANGEOWNPASSWORD]: state =>{
+  state.status = "changing own password"
+},
 [SET_GETONEUSERID]: (state, id) =>{
 state.getOneId = id
 },
@@ -270,7 +308,13 @@ state.status = "get all roles failed."
 },
 [GET_ALL_DELIVERYMEN] : (state)=>{
   state.status = "getting all deliverymen"
-  }
+},
+[RESETUSERPASSWORD] : (state)=>{
+  state.status = "changing user password"
+},
+[CHANGEOWNPASSWORD_ERROR]: (state)=>{
+  state.status = "change user password failed."
+}
 }
 
 export default {

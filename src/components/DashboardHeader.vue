@@ -61,7 +61,7 @@ export default {
     },
     resetPassword(){
      
-     this.$router.replace({ name: "Login" });
+     this.$router.replace({ name: "ChangePassword" });
 
     }
   },

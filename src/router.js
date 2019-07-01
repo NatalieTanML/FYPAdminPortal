@@ -68,7 +68,7 @@ let router = new Router({
     },
     {
       path: "/UserManagement",
-      name: "ManageUser",
+      name: "UserManagement",
       component: UserManagement,
       meta: {
         needAuthentication: true,
@@ -179,9 +179,11 @@ console.log("token: "+store.getters.isAuthenticated)
 
 console.log("change password: "+store.getters.changePassword)
 
-console.log(to.path)
+console.log("To : "+to.name)
 
-console.log(to.path == '/ChangePassword')
+console.log("From : "+from.name)
+
+localStorage.setItem("previousPathName", from.name);
 
 //if people try to go to the login page after they logged in,
 //they will be redirected to summaryoforders
@@ -253,10 +255,19 @@ else{
     })
   }
   else{
-    console.log("last next()")
   next()
   }
+
 }
+
+//if admin leaves the updateuser page, updateuser page will reset.
+if(to.name != "UpdateUser" && localStorage.getItem("updateUserId") != null)
+localStorage.setItem("updateUserId", null);
+
+//if people try to access the updateuser page by typing in the url, it will just
+//redirect them to usermanagement
+if(to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
+ next({ path: '/UserManagement'})
 
 
  })

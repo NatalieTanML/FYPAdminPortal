@@ -22,10 +22,10 @@
             </b-col>
             <b-col>
               <b-button
-                v-on:click="onHeaderButtonClick"
+                v-on:click="onHeaderButtonClick()"
                 variant="primary"
                 class="float-right"
-                v-if="headerButton"
+                v-if="headerButton && checkedCheckBox.length != 0"
               >{{headerButton}}</b-button>
             </b-col>
           </b-row>
@@ -44,23 +44,69 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             :sort-direction="sortDirection"
+            
             @filtered="onFiltered"
             hover
           >
             <!-- <template slot="name" slot-scope="row">
         {{ row.value }} {{ row.value }}
             </template>-->
+        <template v-if="enableCheckbox" slot="HEAD_checkbox">
+         <b-form-checkbox  
+           @change="checkAllCheckBox()" 
+           v-model="checkAll"
+           > </b-form-checkbox>
+        </template>
+
+         <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
+             <b-form-checkbox
+      :checked="checkedCheckBox.includes(row.item.id)"
+      @change="onCheckBoxCheck(row.item.id)" >
+    </b-form-checkbox>
+            </template>
+
 
             <template slot="actions" slot-scope="row">
               <b-button
                 type="button"
-                v-on:click="onActionButtonClick"
+                v-on:click="onActionButtonClick(row.item.id)"
                 lg="4"
                 class="w-75"
                 variant="primary"
                 size="sm"
               >{{row.value}}</b-button>
             </template>
+
+               <template slot="refNo" slot-scope="row">
+           
+         <div style="max-width:80px;">{{row.item.refNo}}</div>
+        
+            </template>
+
+
+          <template slot="images" slot-scope="row">
+          <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId" style="height:100px;max-height:100px;display: block;">
+         <div>{{oneItem.orderImageUrl}}</div>
+         <hr>
+         </div>
+        
+        </template>
+
+          <template slot="quantity" slot-scope="row">
+         <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId" style="height:100px;max-height:100px;display:block;">
+         <div>{{oneItem.quantity}}</div>
+         <hr>
+         </div>
+        </template>
+
+          <template slot="items" slot-scope="row">
+         <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId"  style="height:100px;max-height:100px;display:block;">
+         <div>{{oneItem.options.product.productName}}</div>
+         <hr>
+         </div>
+        </template>
+
+  
 
             <template slot="row-details" slot-scope="row">
               <b-card>
@@ -100,7 +146,9 @@ export default {
       sortBy: null,
       sortDesc: false,
       sortDirection: "asc",
-      filter: null
+      filter: null,
+      checkedCheckBox:[],
+      checkAll : false,
     };
   },
   props: {
@@ -108,11 +156,15 @@ export default {
     items: Array,
     headerButton: String,
     headerButtonClick: String,
-    actionButtonClick: String
+    actionButtonClick: String,
+    enableCheckbox: Boolean,
+
+  
+
   },
   mounted() {
     this.totalRows = this.items.length;
-   
+  
   },
 
   computed: {
@@ -128,18 +180,78 @@ export default {
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
+      console.log("filtererd item : "+ filteredItems)
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
     onHeaderButtonClick() {
-      eventBus.$emit(this.headerButtonClick);
+      //for summaryoforders
+      if(this.headerButton == "Select All Orders")
+      eventBus.$emit(this.headerButtonClick, this.checkedCheckBox);
+      else
+      eventBus.$emit(this.headerButtonClick)
+
     },
-    onActionButtonClick() {
-      eventBus.$emit(this.actionButtonClick);
-    }
-  }
+    onActionButtonClick(id) {
+      eventBus.$emit(this.actionButtonClick, id);
+    },
+    onCheckBoxCheck(refNo){
+      let index = 0;
+
+      if(this.checkedCheckBox.includes(refNo)){
+      for(index;index< this.checkedCheckBox.length; index ++)
+        if(this.checkedCheckBox[index] == refNo)
+        this.checkedCheckBox.splice(index,1)
+      }
+      else
+      this.checkedCheckBox.push(refNo)
+
+      console.log(this.checkedCheckBox)
+  
+    },
+    checkAllCheckBox(){
+    let index = 0
+
+    let rowsPerPage = this.perPage
+
+    let shownItems = (this.currentPage - 1) * rowsPerPage
+    // console.log(shownItems)
+
+  //if the last page has less than 5 stuff.
+    if(((this.items.length - shownItems) <rowsPerPage) && this.currentPage != 1 )
+    rowsPerPage = this.items.length - shownItems
+  
+    
+    //if the first page has less than 5 stuff.
+    if(this.currentPage == 1 && this.items.length < rowsPerPage)
+    rowsPerPage = this.items.length 
+    
+    // console.log(this.currentPage)
+    // console.log(rowsPerPage)
+
+    if(!this.checkAll)
+    this.checkAll = true;
+    else
+    this.checkAll = false;
+
+    this.checkedCheckBox = [];  
+      if(this.checkAll){
+      for(index = 0; index<rowsPerPage; index++){
+       this.checkedCheckBox[index] = this.items[shownItems + index].id;
+      }
+      }
+      console.log(this.checkAll)
+      console.log(this.checkedCheckBox)
+
+}
+  },
+
+  
+      
 };
 </script>
 
-<style>
+<style scoped>
+
+
 </style>

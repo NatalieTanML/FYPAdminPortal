@@ -2,8 +2,8 @@
   <div class="ml-3">
     <div class="card shadow align-items-center">
       <li :class="[ isDark ? 'background-dark' : 'background-light' ]" class="nav-item">
-        <a class="nav-link" href="#">
-          <span :class="[ isDark ? 'font-dark' : 'font-light' ]">{{title}}</span>
+        <a class="nav-link" style="cursor:pointer">
+          <span :class="[ isDark ? 'font-dark' : 'font-light' ]" style="font-size:0.9em">{{title}}{{noOfRowsString}}</span>
         </a>
       </li>
     </div>
@@ -16,7 +16,17 @@ export default {
   props: {
     title: String,
     isDark: Boolean,
-    tabId: String
+    tabId: String,
+    noOfRows:  Number,
+  },
+  data(){
+    return{
+     noOfRowsString: "",
+    }
+  },
+  created(){
+  if(this.noOfRows != null)
+  this.noOfRowsString = " ("+this.noOfRows+")"
   }
 };
 </script>
@@ -34,4 +44,5 @@ export default {
 .font-light {
   color: #4e72dd;
 }
+
 </style>

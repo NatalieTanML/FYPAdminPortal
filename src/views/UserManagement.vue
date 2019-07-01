@@ -46,6 +46,7 @@ import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
+import { GET_ALL_USERS } from "@/store/actions/user";
 
 export default {
   components: {
@@ -57,44 +58,7 @@ export default {
     return {
       headerButtonClick: "Add One User",
       actionButtonClick: "Edit One User",
-      items: [
-        {
-          id: "1",
-          username: "kidzania@hotmail.com",
-          role: "Super Admin",
-          createdAt: "08/02/19 08:12",
-          createdBy: "kidzania@hotmail.com",
-          isEnabled: "Yes",
-          actions: "Edit"
-        },
-        {
-          id: "2",
-          username: "superman@hotmail.com",
-          role: "Admin",
-          createdAt: "09/02/19 09:20",
-          createdBy: "kidzania@hotmail.com",
-          isEnabled: "Yes",
-          actions: "Edit"
-        },
-        {
-          id: "3",
-          username: "deliveryman@hotmail.com",
-          role: "Delivery",
-          createdAt: "09/02/19 10:05",
-          createdBy: "kidzania@hotmail.com",
-          isEnabled: "Yes",
-          actions: "Edit"
-        },
-        {
-          id: "4",
-          username: "deliveryman2@hotmail.com",
-          role: "Delivery",
-          createdAt: "10/02/19 12:16",
-          createdBy: "kidzania@hotmail.com",
-          isEnabled: "No",
-          actions: "Edit"
-        }
-      ],
+      items: [],
       fields: [
         { key: "id", label: "", sortable: true },
         { key: "username", label: "Username", sortable: true },
@@ -107,15 +71,47 @@ export default {
     };
   },
 
-  methods: {},
+  methods: {
+     message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+      // this.$snack[method](config)
+    },
+  },
   mounted() {
     eventBus.$on(this.headerButtonClick, () => {
       this.$router.replace({ name: "AddUser" });
     });
 
-    eventBus.$on(this.actionButtonClick, () => {
-      this.$router.replace({ name: "UpdateUser" });
+    eventBus.$on(this.actionButtonClick,  (id) => {
+      localStorage.setItem("updateUserId", id);
+         this.$router.replace({ name: "UpdateUser" });
     });
+
+      this.$store
+          .dispatch(GET_ALL_USERS)
+          .then(response => {
+         console.log(response)
+         this.items = response;
+         let index;
+         for(index = 0; index < this.items.length; index++){
+
+         if(this.items[index].isEnabled)
+         this.items[index].isEnabled = "Yes"
+         else
+         this.items[index].isEnabled = "No"
+
+         this.items[index].actions = "Edit";
+         }
+          })
+          .catch(error => {
+  
+            console.dir(error);
+            this.message("danger", error);
+          });
   }
 };
 </script>
