@@ -9,12 +9,14 @@ export const api_routes = {
     get_one: 'api/users/',
     update_one: 'api/users/',
     get_all_roles: 'api/users/getRoles',
+    get_all_deliverymen : 'api/users/deliverymen',
     change_password: 'api/users/changepassword'
   },
   order: {
     get:'api/orders/1',
     get_all : 'api/orders/',
-    get_all_status: 'api/orders/getOrderStatus'
+    get_all_status: 'api/orders/getOrderStatus',
+    update_deliveryman : "api/orders/deliveryman",
   }
 
 };
