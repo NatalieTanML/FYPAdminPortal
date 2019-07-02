@@ -44,8 +44,9 @@
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
             :sort-direction="sortDirection"
-            
+            @row-clicked="myRowClickHandler"
             @filtered="onFiltered"
+            :bordered="false"
             hover
           >
             <!-- <template slot="name" slot-scope="row">
@@ -84,27 +85,38 @@
             </template>
 
 
-          <template slot="images" slot-scope="row">
-          <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId" style="height:100px;max-height:100px;display: block;">
-         <div>{{oneItem.orderImageUrl}}</div>
-         <hr>
+           <template  slot="items" slot-scope="row">
+          <div ref="itemdiv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId"   >
+         <div  style="height:60px;max-height:60px;display:block;">{{oneItem.options.product.productName}}</div>
+          <!-- <hr  :style="{width : mounted ? arrayOfTdWidth[0] : '150%'}"  ref="itemhr" v-if="(index + 1 ) != row.item.items.length"> -->
+        <hr  v-if="(index + 1 ) != row.item.items.length">
+
+          <br v-else>
          </div>
-        
+       
         </template>
 
-          <template slot="quantity" slot-scope="row">
-         <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId" style="height:100px;max-height:100px;display:block;">
-         <div>{{oneItem.quantity}}</div>
-         <hr>
+          <template   slot="images" slot-scope="row" >
+          <div ref="imagediv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId"   >
+         <div  style="height:60px;max-height:60px;display:block;max-width: 260px">{{oneItem.orderImageUrl}}</div>
+          <!-- <hr :style="{width : mounted ? arrayOfTdWidth[1] : '150%'}"  ref="imageshr" v-if="(index + 1 ) != row.item.items.length"> -->
+          <hr  v-if="(index + 1 ) != row.item.items.length">
+          <br v-else>
          </div>
+       
         </template>
 
-          <template slot="items" slot-scope="row">
-         <div v-for="oneItem in row.item.items" v-bind:key="oneItem.optionId"  style="height:100px;max-height:100px;display:block;">
-         <div>{{oneItem.options.product.productName}}</div>
-         <hr>
+          <template  slot="quantity" slot-scope="row">
+         <div ref="quantitydiv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId" > 
+         <div  style="height:60px;max-height:60px;display:block;">{{oneItem.quantity}}</div>
+         <!-- <hr :style="{width : mounted ? arrayOfTdWidth[2] : '150%'}"  ref="quantityhr" v-if="(index + 1 ) != row.item.items.length"> -->
+         <hr  v-if="(index + 1 ) != row.item.items.length">
+            <br v-else>
          </div>
+         
         </template>
+
+     
 
   
 
@@ -135,6 +147,7 @@
 
 <script>
 import { eventBus } from "@/eventBus";
+import { timeout } from 'q';
 
 export default {
   data() {
@@ -149,6 +162,8 @@ export default {
       filter: null,
       checkedCheckBox:[],
       checkAll : false,
+      // arrayOfTdWidth : [],
+      // mounted: false,
     };
   },
   props: {
@@ -158,12 +173,26 @@ export default {
     headerButtonClick: String,
     actionButtonClick: String,
     enableCheckbox: Boolean,
+    tableName : String,
 
   
 
   },
   mounted() {
     this.totalRows = this.items.length;
+
+
+    //to redraw the hr line.
+    
+    // if(this.$refs.itemdiv != undefined){
+    //   console.log(this.$refs.itemdiv[0].clientWidth)
+    // this.arrayOfTdWidth.push((this.$refs.itemdiv[0].clientWidth  + (this.$refs.itemdiv[0].clientWidth * 0.75 )) + 'px')
+    // this.arrayOfTdWidth.push((this.$refs.imagediv[0].clientWidth + (this.$refs.imagediv[0].clientWidth * 0.75)) + 'px')
+    // this.arrayOfTdWidth.push((this.$refs.quantitydiv[0].clientWidth + (this.$refs.quantitydiv[0].clientWidth * 0.75 )) + 'px')
+    // console.log(this.arrayOfTdWidth)
+    // this.mounted = true;
+    // console.log(this.mounted)
+    // }
   
   },
 
@@ -186,7 +215,7 @@ export default {
     },
     onHeaderButtonClick() {
       //for summaryoforders
-      if(this.headerButton == "Select All Orders")
+      if(this.tableName == "Orders")
       eventBus.$emit(this.headerButtonClick, this.checkedCheckBox);
       else
       eventBus.$emit(this.headerButtonClick)
@@ -243,6 +272,11 @@ export default {
       console.log(this.checkAll)
       console.log(this.checkedCheckBox)
 
+},
+myRowClickHandler(){
+  if(this.tableName == "Orders"){
+
+  }
 }
   },
 
@@ -251,7 +285,6 @@ export default {
 };
 </script>
 
-<style scoped>
-
+<style>
 
 </style>

@@ -32,7 +32,7 @@
         <div cols="4">
           <Table :key="this.forceRender" v-bind:fields="this.fields" v-bind:items="this.sortItems"
             v-bind:headerButtonClick="this.headerButtonClick" v-bind:actionButtonClick="this.actionButtonClick"
-            v-bind:enableCheckbox="this.enableCheckbox" headerButton="Update Order Status">
+            v-bind:enableCheckbox="this.enableCheckbox" tableName="Orders" headerButton="Update Order Status">
 
           </Table>
         </div>
