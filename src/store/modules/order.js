@@ -20,11 +20,11 @@ status: state => state.status
 }
 
 const actions = {
-    [ORDER_GET_REQUEST]: ({ commit }) => {
+    [ORDER_GET_REQUEST]: ({ commit }, orderId) => {
         console.log("getOrder() called")
         return new Promise((resolve, reject) => {
             commit(ORDER_GET_REQUEST);
-            apiCall({ url: api_routes.order.get, method: "get" })
+            apiCall({ url: api_routes.order.get + '/' +orderId, method: "get" })
                 .then(resp => {
                     console.log("this is called")
                     console.dir(resp)

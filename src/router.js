@@ -269,6 +269,15 @@ localStorage.setItem("updateUserId", null);
 if(to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
  next({ path: '/UserManagement'})
 
+ //if admin leaves the orderdetails page, orderdetails page will reset.
+if(to.name != "OrderDetails" && localStorage.getItem("viewOrderId") != null)
+localStorage.setItem("viewOrderId", null);
+
+//if people try to access the orderdetails page by typing in the url, it will just
+//redirect them to summaryofOrders
+if(to.name == "OrderDetails" && localStorage.getItem("viewOrderId") == "null")
+ next({ path: '/SummaryOfOrders'})
+
 
  })
 

@@ -22,7 +22,7 @@
             </b-col>
             <b-col>
               <b-button
-                v-on:click="onHeaderButtonClick()"
+                v-on:click="onHeaderButtonClick"
                 variant="primary"
                 class="float-right"
                 v-if="headerButton && checkedCheckBox.length != 0"
@@ -273,9 +273,14 @@ export default {
       console.log(this.checkedCheckBox)
 
 },
-myRowClickHandler(){
+myRowClickHandler(record, index){
   if(this.tableName == "Orders"){
-
+    console.log(this.items)
+    console.log(index)
+    //get orderid to show in the orderdetails
+    localStorage.setItem("viewOrderId", this.items[index].id);
+   console.log(localStorage.getItem("viewOrderId"))
+    this.$router.replace({ name: "OrderDetails" });
   }
 }
   },

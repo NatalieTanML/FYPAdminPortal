@@ -24,12 +24,13 @@
             </div>
           </div>
         </div>
-
+      <div v-if="order != null"> 
         <b-container fluid class="bg-white text-left" align-h="center">
           <div class="card shadow">
             <div class="card-header py-3">
               <h4 class="mb-3">Order Information</h4>
 
+              
               <b-row class="b1 mb-2">
                 <b-col>Order No.</b-col>
                 <b-col>Created At</b-col>
@@ -68,6 +69,8 @@
                 <b-col v-else>{{order.deliveryMan.name}}</b-col>
               </b-row>
 
+             
+
               <b-row class="b2">
                 <b-col cols="8">Item(s)</b-col>
                 <b-col>Image Url</b-col>
@@ -77,7 +80,7 @@
               </b-row>
               <hr class="mb-3">
 
-              <b-row v-for="(orderItem) in order.orderItems" v-bind:key="orderItem">
+              <b-row v-for="(orderItem) in order.orderItems" v-bind:key="orderItem.orderId">
                 <b-col cols="8">{{orderItem.options.product.productName}}({{orderItem.options.optionValue}}) {{orderItem.options.skuNumber}}</b-col>
                 <b-col>
                   <a :href="orderItem.orderImageUrl">Click Here</a>
@@ -123,6 +126,7 @@
             </div>
           </div>
         </b-container>
+        </div>
 
         <footer class="sticky-footer bg-white">
           <div class="container my-auto">
@@ -151,7 +155,7 @@ export default {
     return {
 
       pad: null,
-      order: []
+      order: null
     };
   },
 
@@ -161,8 +165,11 @@ export default {
     // }
   },
   mounted() {
+
+    const orderId = localStorage.getItem("viewOrderId");
+
    this.$store
-        .dispatch(ORDER_GET_REQUEST)
+        .dispatch(ORDER_GET_REQUEST, orderId)
          .then(response => {
           console.dir(response);
           this.order = response;
