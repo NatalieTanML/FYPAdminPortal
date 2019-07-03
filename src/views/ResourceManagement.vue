@@ -53,17 +53,21 @@ export default {
       actionButtonClick: "Edit One Resource",
       products: "",
       items: [],
+      time:"",
       fields: [
         { key: "sku", label: "SKU", sortable: true },
         { key: "name", label: "Name", sortable: true },
         { key: "qtyLeft", label: "Qty Left", sortable: true },
         { key: "originalPrice", label: "Original Price", sortable: true },
         { key: "activeDiscount", label: "Active Discount", sortable: true },
+        { key: "availability", label: "Availability", sortable: true },
         { key: "actions", label: "Actions" }
       ]
     };
   },
   mounted() {
+    //this.time = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+    this.time = new Date("2015-03-25T12:00:00");
     eventBus.$on(this.headerButtonClick, () => {
       this.$router.replace({ name: "AddResource" });
     });
@@ -72,71 +76,68 @@ export default {
       this.$router.replace({ name: "UpdateResource" });
     });
 
-    for(var i=0;i<10;i++){
-      this.items.push({
+    this.$store
+      .dispatch(GET_ALL_PRODUCTS)
+      .then(response => {
+
+        this.products = response;
+        var x = 0;
+        for (var i = 0; i < this.products.length; i++) {
+          for(var k = 0; k < this.products[i].options.length; k++){
+          this.items.push({
           sku: "",
           name: "",
           qtyLeft: "",
           originalPrice: "",
           activeDiscount: "",
+          availability:"",
           actions: ""
           });
-          this.items[i].sku = "1";
+          if(new Date() > new Date(this.products[i].effectiveStartDate)){
+            if(this.products[i].effectiveEndDate == null || new Date() < new Date(this.products[i].effectiveEndDate))
+            this.items[x].availability = "Available";
+            else this.items[x].availability = "Expired";
+          }else this.items[x].availability = "Not active";
+          this.items[x].sku = this.products[i].options[k].skuNumber;
+          this.items[x].name  = this.products[i].productName + "(" + this.products[i].options[k].optionValue + ")";
+          this.items[x].qtyLeft = this.products[i].options[k].currentQuantity;
+          this.items[x].originalPrice = "$" + this.products[i].price;
 
-    }
-     console.log(this.items)
-
-    // this.$store
-    //   .dispatch(GET_ALL_PRODUCTS)
-    //   .then(response => {
-
-    //     this.products = response;
-    //     var x = 0;
-    //     for (var i = 0; i < this.products.length; i++) {
-          
-    //       for(var k = 0; k < this.products[i].options.length; k++){
-    //       this.items.push({
-    //       sku: "",
-    //       name: "",
-    //       qtyLeft: "",
-    //       originalPrice: "",
-    //       activeDiscount: "",
-    //       actions: ""
-    //       });
-    //       console.log(this.products[i].options[k].skuNumber);
-    //       this.items[x].sku = this.products[i].options[k].skuNumber;
-    //       x= x+1;
-    //       // this.items[i].name  = this.products[i].productName + "(" + this.products[i].options[k].optionValue + ")";
-
-    //       // this.items[i].qtyLeft = this.products[i].options[k].currentQuantity;
-    //       // this.items[i].originalPrice = this.products[i].price;
-    //       // this.items[i].activeDiscount = "this.products[i].price";
-    //       // this.items[i].actions = "this.products[i].price";
-          
-    //     }
-    //     }
-    //     console.log(x);
-    //     console.log(this.items);
-    //     //   if(this.products[i].discountPrice.length == 0)
-    //     //     this.items[i].activeDiscount = "N/A";
-    //     //   else {
-    //     //       for (var j = 0; j < this.products[i].discountPrice.length; j++) {
-    //     //         console.log(this.products[i].discountPrice[j].isPercentage)
-    //     //         if (this.products[i].discountPrice[j].isPercentage == true)
-    //     //         this.items.activeDiscount = this.products[i].discountPrice[j].discountValue + "%";
-    //     //         else this.items.activeDiscount = "$" + this.products[i].discountPrice[j].discountValue;
-    //     //       }
-    //     //   }
+         if(this.products[i].discountPrice.length == 0)
+            this.items[x].activeDiscount = "N/A";
+          else {
+              for (var j = 0; j < this.products[i].discountPrice.length; j++) {
+                if(new Date() > new Date(this.products[i].discountPrice[j].effectiveStartDate))
+                {
+                  if(this.products[i].discountPrice[j].effectiveEndDate == null || new Date() < new Date(this.products[i].discountPrice[j].effectiveEndDate))
+                  {
+                    if (this.products[i].discountPrice[j].isPercentage == true)
+                    this.items[x].activeDiscount = this.products[i].discountPrice[j].discountValue + "%";
+                    else this.items[x].activeDiscount = "$" + this.products[i].discountPrice[j].discountValue;
+                  }
+                  else this.items[x].activeDiscount = "N/A";
+                }
+                else this.items[x].activeDiscount = "N/A";
+                
+              }
+          }
             
           
-    //     //   this.items[i].actions = "Edit"
-    //     // }
+          this.items[x].actions = "Edit";
+          x= x+1;
+        }
+         
+        }
+        console.log(this.items)
+        
+        
+         
 
-    //   })
-    //   .catch(error => {
+      })
+      .catch(error => {
 
-    //     alert(error);
-    //   });
+        alert(error);
+      });
   }
 };
 </script>
