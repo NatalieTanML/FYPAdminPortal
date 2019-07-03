@@ -53,7 +53,6 @@ export default {
       actionButtonClick: "Edit One Resource",
       products: "",
       items: [],
-      time:"",
       fields: [
         { key: "sku", label: "SKU", sortable: true },
         { key: "name", label: "Name", sortable: true },
@@ -66,8 +65,6 @@ export default {
     };
   },
   mounted() {
-    //this.time = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-    this.time = new Date("2015-03-25T12:00:00");
     eventBus.$on(this.headerButtonClick, () => {
       this.$router.replace({ name: "AddResource" });
     });

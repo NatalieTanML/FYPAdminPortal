@@ -40,7 +40,7 @@
 
               <b-row>
                 <b-col cols="3">{{order.orderId}}</b-col>
-                <b-col cols="3">{{order.createdAt}}</b-col>
+                <b-col cols="3">{{new Date(order.createdAt).toJSON().slice(0,19).replace(/T/g,' ')}}</b-col>
                 <b-col cols="3">${{order.orderTotal}}</b-col>
                 <b-col cols="3">{{order.status}}</b-col>
               </b-row>
@@ -54,7 +54,7 @@
 
               <b-row>
                 <b-col cols="3">{{order.referenceNo}}</b-col>
-                <b-col cols="3">{{order.updatedAt}}</b-col>
+                <b-col cols="3">{{new Date(order.updatedAt).toJSON().slice(0,19).replace(/T/g,' ')}}</b-col>
                 <b-col v-if="order.updatedBy == null" cols="3">N/A</b-col>
                 <b-col v-else cols="3">{{order.updatedBy}}</b-col>
                 <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
@@ -92,7 +92,7 @@
               <b-row v-for="(orderItem) in order.orderItems" v-bind:key="orderItem.orderId">
                 <b-col cols="8">{{orderItem.options.product.productName}}({{orderItem.options.optionValue}}) {{orderItem.options.skuNumber}}</b-col>
                 <b-col cols="1">
-                  <a :href="orderItem.orderImageUrl">Click Here</a>
+                  <a :href="orderItem.orderImageUrl" target="_blank">Click Here</a>
                 </b-col>
                 <b-col cols="1">${{orderItem.options.product.price}}</b-col>
                 <b-col cols="1">{{orderItem.quantity}}</b-col>
@@ -146,6 +146,7 @@
           </div>
         </b-container>
           </div> 
+          <p>{{time}}</p>
 
         <footer class="sticky-footer bg-white">
           <div class="container my-auto">
@@ -174,7 +175,8 @@ export default {
     return {
 
       pad: null,
-      order: null
+      order: null,
+      time:"",
     };
   },
 
@@ -184,7 +186,6 @@ export default {
     // }
   },
   mounted() {
-
     const orderId = localStorage.getItem("viewOrderId");
 
    this.$store
