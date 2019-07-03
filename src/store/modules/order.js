@@ -3,6 +3,7 @@ import {
     GET_ALL_ORDERS,
     GET_ALL_STATUS,
     UPDATE_DELIVERYMAN,
+    UPDATE_ORDER_STATUS,
 } from "@/store/actions/order";
 
 
@@ -75,6 +76,17 @@ const actions = {
                 })
         })
     },
+    [UPDATE_ORDER_STATUS] : ({commit}, jsonData) =>{    
+        return new Promise((resolve, reject) => {
+            apiCall({ url: api_routes.order.update_order_status+"/"+jsonData.isSuccessful, data:jsonData.orderIds, method: "put" })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                })
+        })
+    }
 }
 
 

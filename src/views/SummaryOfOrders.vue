@@ -21,8 +21,8 @@
             <div class="row mb-4">
               <ul class="nav" ref="tabs">
                 <DashboardTabs v-for="tab in this.Tabs" v-bind:key="tab.id" v-bind:title="tab.title"
-                  v-bind:isDark="tab.isDark" v-bind:noOfRows="arrayOfNumberOfRows[tab.id]"
-                  @click.native="onTabChange(tab.id)"></DashboardTabs>
+                  v-bind:isDark="tab.isDark" v-bind:noOfRows="tab.noOfRows" @click.native="onTabChange(tab.id)">
+                </DashboardTabs>
               </ul>
             </div>
           </div>
@@ -63,7 +63,8 @@
   } from "@/eventBus";
   import {
     GET_ALL_ORDERS,
-    GET_ALL_STATUS
+    GET_ALL_STATUS,
+    UPDATE_ORDER_STATUS
   } from "@/store/actions/order";
 
   export default {
@@ -84,7 +85,7 @@
         arrayOfNumberOfRows: [],
         typesOfTabs: [],
         Tabs: [],
- 
+
 
         sortItems: [],
 
@@ -136,35 +137,19 @@
       this.$store
         .dispatch(GET_ALL_STATUS)
         .then(response => {
-
           //standardize the typesOfTabs
+          //set up default tabs.
           let x = 1;
           this.typesOfTabs[0] = "All"
           for (x; x < response.length; x++)
-            this.typesOfTabs[x] = response[x -1 ].statusName
+            this.typesOfTabs[x] = response[x - 1].statusName
 
-        //had to hardcode the last tab string.
+          //had to hardcode the last tab string.
           this.typesOfTabs[x] = response[x - 1].statusName;
 
-          let typesOfTabs = this.typesOfTabs
 
-          //set up actions based on the type of tabs
-          //you can generate the actions in the previous for loop. but i feel that
-          //the code will be extra messy.
-
-          //x = 0;
-          for (x = 0; x < typesOfTabs.length; x++)
-            //initialize the tabs to get title, id and isDark.
-            this.Tabs[x] = {
-              title: typesOfTabs[x],
-              id: x,
-              isDark: false
-            }
 
           this.getAllOrders();
-
-          
-
         })
         .catch(error => {
 
@@ -172,128 +157,25 @@
           this.message("danger", error);
         });
 
-      // (this.items = [
-      //   {
-      //     id: "123456",
-      //     date: "22/04/19",
-      //     item: "A5 Photo",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Awaiting Print",
-      //     actions: "Print"
-      //   },
-      //   {
-      //     id: "123457",
-      //     date: "24/04/19",
-      //     item: "Keychain",
-      //     image: "image",
-      //     quantity: "1",
-      //     status: "Delivering",
-      //     actions: "Completed"
-      //   },
-      //   {
-      //     id: "123458",
-      //     date: "25/04/19",
-      //     item: "ID Card",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Delivering",
-      //     actions: "Completed"
-      //   },
-      //   {
-      //     id: "123459",
-      //     date: "05/05/19",
-      //     item: "A5 Photo + Frame",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Delivered",
-      //     actions: "Archive"
-      //   },
-      //   {
-      //     id: "123458",
-      //     date: "28/04/19",
-      //     item: "A5 Photo + Black Frame",
-      //     image: "image",
-      //     quantity: "1",
-      //     status: "Printed",
-      //     actions: "Deliver"
-      //   },
-      //   {
-      //     id: "123459",
-      //     date: "14/05/19",
-      //     item: "Keychain (Black)",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Cancelled",
-      //     actions: "Archive"
-      //   },
-      //   {
-      //     id: "123460",
-      //     date: "30/05/19",
-      //     item: "Name Tag (Black)",
-      //     image: "image",
-      //     quantity: "1",
-      //     status: "Cancelled",
-      //     actions: "Archive"
-      //   },
-      //   {
-      //     id: "123461",
-      //     date: "30/05/19",
-      //     item: "Name Tag (Red)",
-      //     image: "image",
-      //     quantity: "1",
-      //     status: "Awaiting Print",
-      //     actions: "Print"
-      //   },
-      //   {
-      //     id: "123462",
-      //     date: "13/05/19",
-      //     item: "A4 Photo + Red Frame",
-      //     image: "image",
-      //     quantity: "3",
-      //     status: "Ordered",
-      //     actions: "Accept"
-      //   },
-      //   {
-      //     id: "123463",
-      //     date: "14/05/19",
-      //     item: "Keychain",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Ordered",
-      //     actions: "Accept"
-      //   },
-      //   {
-      //     id: "123464",
-      //     date: "23/04/19",
-      //     item: "Keychain + A5 Photo",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Completed",
-      //     actions: "Archive"
-      //   },
-      //   {
-      //     id: "123465",
-      //     date: "26/04/19",
-      //     item: "A5 Photo",
-      //     image: "image",
-      //     quantity: "1",
-      //     status: "Ordered",
-      //     actions: "Accept"
-      //   },
-      //   {
-      //     id: "123466",
-      //     date: "16/04/19",
-      //     item: "A3 Photo",
-      //     image: "image",
-      //     quantity: "2",
-      //     status: "Delivering",
-      //     actions: "Completed"
-      //   }
-      // ]);
+      eventBus.$once(this.headerButtonClick, (orderIds) => {
+        console.log("headereventbus")
+          this.updateStatusTabsAndTable(orderIds);
 
+      });
+
+      eventBus.$once(this.actionButtonClick, (orderIds) => {
+                console.log("actioneventbus")
+
+    this.updateStatusTabsAndTable(orderIds);
+
+
+      });
 
     },
+    //  beforeDestory(){
+    //   eventBus.$off(this.headerButtonClick);
+    //      eventBus.$off(this.actionButtonClick);
+    // },
     methods: {
       message(method, messageText) {
         let config = {
@@ -303,13 +185,64 @@
         this.$snack[method](config);
         // this.$snack[method](config)
       },
+      getAllOrders() {
+        this.$store
+          .dispatch(GET_ALL_ORDERS)
+          .then(response => {
+
+            let x = 0;
+
+            for (x; x < response.length; x++) {
+              //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
+              //item: response[x].orderItems[0].options[0].product.productName,
+              this.items[x] = {
+                id: response[x].orderId,
+                refNo: response[x].referenceNo,
+                date: (response[x].createdAt).substring(0, 10),
+                items: response[x].orderItems,
+                images: response[x].orderItems,
+                quantity: response[x].orderItems,
+                status: response[x].status,
+                actions: this.getAction(response[x].status)
+              }
+            }
+
+
+
+            //creating checkbox.
+            let index;
+            for (index = 0; this.items.length > index; index++)
+              this.items[index].checkbox = "checkbox"
+
+
+            //for counting the amount of rows in each tab.
+
+
+            this.setUpTabs()
+      
+
+          })
+          .catch(error => {
+
+            console.dir(error);
+            this.message("danger", error);
+          });
+
+
+      },
       onTabChange(id) {
         //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
         //reason why i don't use const ^ is because when the data is displayed,
         //it will become read-only.
+        console.log("on tab change is called")
 
         this.sortItems = [];
         //change background color for the tab
+        
+        //will have an error if you remove this if statement.
+        //because the html section will run first, then it will cause an error
+        //because the tabs have not been created.
+        if(this.$refs.tabs != undefined)
         this.noOfTabs = this.$refs.tabs.childElementCount;
 
         if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
@@ -329,9 +262,27 @@
           if (sortBy === this.items[index].status)
             this.sortItems.push(this.items[index]);
 
-        //for counting the amount of rows in each tab.
-        let numberOfRows = 0;
+
+
+        if (sortBy === "All") this.sortItems = this.items;
+
+        //to disable checkbox is All tabs are selected
+        if (sortBy == "All")
+          this.enableCheckbox = false
+        else
+          this.enableCheckbox = true
+
+        // if (this.forceRender) this.forceRender = false;
+        // else this.forceRender = true;
+      },
+      setUpTabs() {
+        console.log("set up tab is called")
+
         let x;
+        let index;
+        let numberOfRows = 0;
+
+        this.arrayOfNumberOfRows = []
         //index is 1 so as to skip the All tab. then i push a 0 on the first
         //number of the arrayofNumberOfRows.
         this.arrayOfNumberOfRows.push(null)
@@ -343,81 +294,99 @@
 
           }
           this.arrayOfNumberOfRows.push(numberOfRows)
+
+          //set up tabs after getting all the items and what
+
+
         }
 
 
-        if (sortBy === "All") this.sortItems = this.items;
+        let typesOfTabs = this.typesOfTabs
 
-        //to disable checkbox is All tabs are selected
-        if (sortBy == "All")
-          this.enableCheckbox = false
-        else
-          this.enableCheckbox = true
+        //set up actions based on the type of tabs
+        //you can generate the actions in the previous for loop. but i feel that
+        //the code will be extra messy.
 
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
+        //reset tab.
+       
+        this.Tabs = []
+
+        for (x = 0; x < typesOfTabs.length; x++)
+          //initialize the tabs to get title, id and isDark.
+          this.Tabs[x] = {
+            title: typesOfTabs[x],
+            id: x,
+            isDark: false,
+            noOfRows: this.arrayOfNumberOfRows[x]
+          }
+
+            //selects current tabs.
+            //if no tab is selected, the default will be 0
+           this.onTabChange(this.selectedTab)
+
       },
-      getAllOrders() {
-        this.$store
-          .dispatch(GET_ALL_ORDERS)
+
+
+      getAction(status) {
+        if (status == "Received")
+          return "Accept Order"
+        else if (status == "Awaiting Printing")
+          return "Print"
+        else if (status == "Printed")
+          return "Deliver"
+        else if (status == "Out for Delivery")
+          return "Delivered"
+        else if (status == "Completed")
+          return "Archive"
+        else if (status == "Delivery Failed")
+          return "Re-Deliver"
+        else if (status == "Cancelled")
+          return "Archive"
+        else
+          return null
+      },
+
+      updateStatusTabsAndTable(orderIds){
+
+            //isSuccessful will always be true unless the admin presses on the dropdown at the
+          //end of the row and click cancel order
+
+            const isSuccessful = true;
+           
+         const jsonData = {
+            "orderIds": orderIds,
+            "isSuccessful": isSuccessful
+         } 
+
+            this.$store
+          .dispatch(UPDATE_ORDER_STATUS, jsonData)
           .then(response => {
+            this.message("success", "Order Status(es) is updated successfully!");
             console.log(response)
+            let updatedOrders = response.orders;
+            let x;
+            for (x = 0; x < this.items.length; x++) { 
+              updatedOrders.forEach((oneUpdatedOrder, index) => {
+                if (this.items[x].id == oneUpdatedOrder.orderId) {
+                  this.items[x].status = oneUpdatedOrder.statusName;
+                  this.items[x].actions = this.getAction(oneUpdatedOrder.statusName)
+                 
+                }
 
-            let x = 0;
-
-            for (x; x < response.length; x++){
-              //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
-              //item: response[x].orderItems[0].options[0].product.productName,
-              this.items[x] = {
-                id: response[x].orderId,
-                refNo : response[x].referenceNo,
-                date: (response[x].createdAt).substring(0,10),
-                items: response[x].orderItems,
-                images: response[x].orderItems,
-                quantity: response[x].orderItems,
-                status: response[x].status,
-                actions: this.getAction(response[x].status)
-              }
-               console.log(this.items[x])
+              })
             }
-         
-            this.sortItems = this.items;
 
-            //creating checkbox.
-            let index;
-            for (index = 0; this.sortItems.length > index; index++)
-              this.sortItems[index].checkbox = "checkbox"
-
-      //selects the first tab so that the tabs will bind up with the order.
-        this.onTabChange(0);
+            //reset the tabs.
+            this.setUpTabs();
 
           })
           .catch(error => {
-
             console.dir(error);
             this.message("danger", error);
           });
 
 
-      },
-        getAction(status){
-          if(status == "Received")
-          return "Accept Order"
-          else if(status == "Awaiting Printing")
-          return "Print"
-          else if(status == "Printed")
-          return "Deliver"
-          else if(status == "Out for Delivery")
-          return "Delivered"
-          else if(status == "Completed")
-          return "Archive"
-          else if(status == "Delivery Failed")
-          return "Re-Deliver"
-          else if(status == "Cancelled")
-          return "Archive"
-          else
-          return null
-          }
+      }
 
     }
   };
