@@ -10,10 +10,10 @@ require("./assets/styles/sb-admin-2.css");
 import Vuelidate from "vuelidate";
 import VueSnackbar from "vue-snack";
 import "@fortawesome/fontawesome-free/css/all.css";
-import "vue-multiselect/dist/vue-multiselect.min.css"
-import 'vue2-dropzone/dist/vue2Dropzone.min.css'
-import VueSignaturePad from 'vue-signature-pad';
-
+import "vue-multiselect/dist/vue-multiselect.min.css";
+import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import VueSignaturePad from "vue-signature-pad";
+var signalR = require("@aspnet/signalr");
 
 require("vue-snack/dist/vue-snack.min.css");
 
@@ -22,6 +22,7 @@ Vue.use(Vuelidate);
 Vue.use(VueSnackbar);
 Vue.use(VueSignaturePad);
 
+Vue.prototype.$signalR = signalR;
 
 // Vue.use(Notifications)
 
