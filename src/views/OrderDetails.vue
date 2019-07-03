@@ -29,7 +29,7 @@
           <div class="card shadow">
             <div class="card-header py-3">
               <h4 class="mb-3">Order Information</h4>
-
+              
               
               <b-row class="b1 mb-2">
                 <b-col>Order No.</b-col>
@@ -39,18 +39,10 @@
               </b-row>
 
               <b-row>
-                <b-col>{{order.orderId}}</b-col>
-                <b-col>{{order.createdAt}}</b-col>
-                <b-col>${{order.orderTotal}}</b-col>
-                <b-col>
-                  <b-button
-                    type="button"
-                    lg="4"
-                    class="w-75"
-                    variant="primary"
-                    size="sm"
-                  >{{order.status}}</b-button>
-                </b-col>
+                <b-col cols="3">{{order.orderId}}</b-col>
+                <b-col cols="3">{{new Date(order.createdAt).toJSON().slice(0,19).replace(/T/g,' ')}}</b-col>
+                <b-col cols="3">${{order.orderTotal}}</b-col>
+                <b-col cols="3">{{order.status}}</b-col>
               </b-row>
 
               <b-row class="b1 mb-2">
@@ -61,15 +53,32 @@
               </b-row>
 
               <b-row>
-                <b-col>{{order.referenceNo}}</b-col>
-                <b-col>{{order.updatedAt}}</b-col>
-                <b-col v-if="order.updatedBy == null">N/A</b-col>
-                <b-col v-else>{{order.updatedBy}}</b-col>
-                <b-col v-if="order.deliveryMan.name == null">Not Assigned</b-col>
-                <b-col v-else>{{order.deliveryMan.name}}</b-col>
+                <b-col cols="3">{{order.referenceNo}}</b-col>
+                <b-col cols="3">{{new Date(order.updatedAt).toJSON().slice(0,19).replace(/T/g,' ')}}</b-col>
+                <b-col v-if="order.updatedBy == null" cols="3">N/A</b-col>
+                <b-col v-else cols="3">{{order.updatedBy}}</b-col>
+                <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
+                <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
               </b-row>
-
-             
+              <b-row class="b4 mb-2">
+                <b-col class="b3">Actions</b-col>
+                <b-col class="b3"></b-col>
+                <b-col class="b3"></b-col>
+              </b-row>
+              <b-row class="mb-2">
+                <b-col class="b3">
+                  <b-button
+                    type="button"
+                    lg="4"
+                    class="btnAction"
+                    variant="primary"
+                    size="sm"
+                  >{{order.status}}</b-button>
+                </b-col>
+                <b-col class="b3"></b-col>
+                <b-col class="b3"></b-col>
+                <b-col class="b3"></b-col>
+              </b-row>
 
               <b-row class="b2">
                 <b-col cols="8">Item(s)</b-col>
@@ -82,20 +91,20 @@
 
               <b-row v-for="(orderItem) in order.orderItems" v-bind:key="orderItem.orderId">
                 <b-col cols="8">{{orderItem.options.product.productName}}({{orderItem.options.optionValue}}) {{orderItem.options.skuNumber}}</b-col>
-                <b-col>
-                  <a :href="orderItem.orderImageUrl">Click Here</a>
+                <b-col cols="1">
+                  <a :href="orderItem.orderImageUrl" target="_blank">Click Here</a>
                 </b-col>
-                <b-col>${{orderItem.options.product.price}}</b-col>
-                <b-col>{{orderItem.quantity}}</b-col>
-                <b-col>NA</b-col>
+                <b-col cols="1">${{orderItem.options.product.price}}</b-col>
+                <b-col cols="1">{{orderItem.quantity}}</b-col>
+                <b-col cols="1">N/A</b-col>
               </b-row>
               <hr class="mb-3">
 
               <b-row>
                 <b-col cols="8"></b-col>
                 <b-col></b-col>
-                <b-col class="total">Total :</b-col>
-                <b-col class="total">${{order.orderTotal}}</b-col>
+                <b-col class="total" cols="1">Total :</b-col>
+                <b-col class="total" cols="1">${{order.orderTotal}}</b-col>
               </b-row>
 
             </div>
@@ -115,18 +124,29 @@
               </b-row>
 
               <b-row>
-                <b-col>{{order.emailString}}</b-col>
-                <b-col v-if="order.addressId == null">Self Pick-up</b-col>
-                <b-col v-else>{{order.address.hotel.hotelName}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.unitNo}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
-                <b-col v-if="order.addressId == null">Self Pick-up</b-col>
-                <b-col v-else>{{order.address.hotel.hotelName}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.unitNo}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
-                <b-col v-if="order.request == null">N/A</b-col>
-                <b-col v-else>{{order.request}}</b-col>
+                <b-col cols="3" v-if="order.emailString == null">N/A</b-col>
+                <b-col cols="3" v-else>{{order.emailString}}</b-col>
+                <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
+                <b-col cols="3" v-else>{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
+                <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
+                <b-col cols="3" v-else>{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
+                <b-col cols="3" v-if="order.request == null">N/A</b-col>
+                <b-col cols="3" v-else>{{order.request}}</b-col>
               </b-row>
             </div>
           </div>
         </b-container>
         </div>
+        <div v-else>
+          <b-container fluid class="bg-white text-left" align-h="center">
+          <div class="card shadow">
+            <div class="card-header py-3">
+              <h4 class="mb-3">Error, No Order Data Retrived !</h4>
+              </div>
+          </div>
+        </b-container>
+          </div> 
+          <p>{{time}}</p>
 
         <footer class="sticky-footer bg-white">
           <div class="container my-auto">
@@ -155,7 +175,8 @@ export default {
     return {
 
       pad: null,
-      order: null
+      order: null,
+      time:"",
     };
   },
 
@@ -165,18 +186,14 @@ export default {
     // }
   },
   mounted() {
-
     const orderId = localStorage.getItem("viewOrderId");
 
    this.$store
         .dispatch(ORDER_GET_REQUEST, orderId)
          .then(response => {
-          console.dir(response);
           this.order = response;
-          console.log(response);
         })
         .catch(error => {
-          console.dir(error);
           alert("error", error.response.data.message);
         });
   }
@@ -198,7 +215,17 @@ export default {
 .b3 {
   padding-top: 10px;
 }
+.b4 {
+   font-weight: bold;
+   padding-top: 10px;
+}
 .card2 {
   padding-top: 20px;
+}
+.btnAction {
+  width: 30%;
+}
+.orderInfo {
+  max-width: 100%;
 }
 </style>
