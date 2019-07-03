@@ -97,14 +97,14 @@ export default {
             if(this.products[i].effectiveEndDate == null || new Date() < new Date(this.products[i].effectiveEndDate))
             this.items[x].availability = "Available";
             else this.items[x].availability = "Expired";
-          }else this.items[x].availability = "Not active";
+          }else this.items[x].availability = "Not Active";
           this.items[x].sku = this.products[i].options[k].skuNumber;
           this.items[x].name  = this.products[i].productName + "(" + this.products[i].options[k].optionValue + ")";
           this.items[x].qtyLeft = this.products[i].options[k].currentQuantity;
           this.items[x].originalPrice = "$" + this.products[i].price;
 
          if(this.products[i].discountPrice.length == 0)
-            this.items[x].activeDiscount = "N/A";
+            this.items[x].activeDiscount = "No Active Discount";
           else {
               for (var j = 0; j < this.products[i].discountPrice.length; j++) {
                 if(new Date() > new Date(this.products[i].discountPrice[j].effectiveStartDate))
@@ -115,9 +115,9 @@ export default {
                     this.items[x].activeDiscount = this.products[i].discountPrice[j].discountValue + "%";
                     else this.items[x].activeDiscount = "$" + this.products[i].discountPrice[j].discountValue;
                   }
-                  else this.items[x].activeDiscount = "N/A";
+                  else this.items[x].activeDiscount = "No Active Discount";
                 }
-                else this.items[x].activeDiscount = "N/A";
+                else this.items[x].activeDiscount = "No Active Discount";
                 
               }
           }
