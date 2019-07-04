@@ -13,6 +13,7 @@ import "@fortawesome/fontawesome-free/css/all.css";
 import "vue-multiselect/dist/vue-multiselect.min.css"
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import VueSignaturePad from 'vue-signature-pad';
+import VueCurrencyFilter from 'vue-currency-filter'
 
 
 require("vue-snack/dist/vue-snack.min.css");
@@ -21,7 +22,14 @@ Vue.use(BootstrapVue);
 Vue.use(Vuelidate);
 Vue.use(VueSnackbar);
 Vue.use(VueSignaturePad);
-
+Vue.use(VueCurrencyFilter, {
+  symbol: '$',
+  thousandsSeparator: ',',
+  fractionCount: 2,
+  fractionSeparator: '.',
+  symbolPosition: 'front',
+  symbolSpacing: true
+});
 
 // Vue.use(Notifications)
 
