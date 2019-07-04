@@ -15,7 +15,7 @@
           <Table
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
-            headerButton="Add Resource"
+            :headerButton="headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
           ></Table>
@@ -51,7 +51,8 @@ export default {
   },
   data() {
     return {
-      headerButtonClick: "Add One Resource",
+      headerButtonClick: "Add Resource",
+      headerButton: [{id: 1, title: "Add Resource"}],
       actionButtonClick: "Edit One Resource",
       products: "",
       items: [],
@@ -67,7 +68,7 @@ export default {
     };
   },
   mounted() {
-    eventBus.$on(this.headerButtonClick, () => {
+    eventBus.$on(this.headerButtonClick[0], () => {
       this.$router.replace({ name: "AddResource" });
     });
 
