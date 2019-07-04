@@ -45,7 +45,9 @@ export default {
   components: {
     SideBar,
     DashboardHeader,
-    Table
+    Table,
+    
+
   },
   data() {
     return {
@@ -98,7 +100,7 @@ export default {
           this.items[x].sku = this.products[i].options[k].skuNumber;
           this.items[x].name  = this.products[i].productName + "(" + this.products[i].options[k].optionValue + ")";
           this.items[x].qtyLeft = this.products[i].options[k].currentQuantity;
-          this.items[x].originalPrice = "$" + this.products[i].price;
+          this.items[x].originalPrice = this.$options.filters.currency(this.products[i].price);
 
          if(this.products[i].discountPrice.length == 0)
             this.items[x].activeDiscount = "No Active Discount";
