@@ -17,8 +17,12 @@
               </b-input-group>
             </b-col>
             <b-col>
-              <b-button v-on:click="onHeaderButtonClick" variant="primary" class="float-right"
-                v-if="headerButton && checkedCheckBox.length != 0">{{headerButton}}</b-button>
+              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
+              <b-button 
+               v-on:click="onHeaderButtonClick(oneHeaderButton.title)" variant="primary" class="float-right"
+                v-if="oneHeaderButton.title && checkedCheckBox.length != 0">{{oneHeaderButton.title}}
+                </b-button>
+                </div>
             </b-col>
           </b-row>
         </div>
@@ -43,25 +47,25 @@
 
 
             <template slot="actions" slot-scope="row">
+
+              <div v-if="row.item.actions != null">
               <b-button type="button" v-on:click="onActionButtonClick(row.item)" lg="4" class="w-75"
                 variant="primary" size="sm">{{row.value}}</b-button>
+                 </div>
+
               <div style="display: inline-block;margin-left:5px" v-if="tableName == 'Orders'">
                 <b-dropdown id="dropdown-header" variant="transparent" no-caret class="mb-1 mydropdown">
             <template slot="button-content">  <i class="fas fa-ellipsis-v fa-sm"></i></template>
-                  <b-dropdown-header id="dropdown-header-label">
-                    Order
-                  </b-dropdown-header>
-                  <b-dropdown-divider></b-dropdown-divider>
+                 
                   <b-dropdown-item-button v-on:click="editOrder()" aria-describedby="dropdown-header-label">
                     Edit Order
                   </b-dropdown-item-button>
                   <b-dropdown-item-button  v-b-modal.cancelOrder  aria-describedby="dropdown-header-label">
                     Cancel Order
                   </b-dropdown-item-button>
-
-
                 </b-dropdown>
               </div>
+             
             </template>
 
             <template slot="refNo" slot-scope="row">
@@ -73,7 +77,7 @@
 
             <template slot="items" slot-scope="row">
               <div ref="itemdiv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId">
-                <div style="height:60px;max-height:60px;display:block;">{{oneItem.options.product.productName}}</div>
+                <div class="multiRowStyle">{{oneItem.options.product.productName}}</div>
                 <!-- <hr  :style="{width : mounted ? arrayOfTdWidth[0] : '150%'}"  ref="itemhr" v-if="(index + 1 ) != row.item.items.length"> -->
                 <hr v-if="(index + 1 ) != row.item.items.length">
 
@@ -83,9 +87,10 @@
             </template>
 
             <template slot="images" slot-scope="row">
-              <div  ref="imagediv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId">
-                <div style="height:60px;max-height:60px;display:block;max-width: 150px">{{oneItem.orderImageUrl}}</div>
+              <div ref="imagediv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId">
+                <!-- <div style="height:60px;max-height:60px;display:block;max-width: 150px">{{oneItem.orderImageUrl}}</div> -->
                 <!-- <hr :style="{width : mounted ? arrayOfTdWidth[1] : '150%'}"  ref="imageshr" v-if="(index + 1 ) != row.item.items.length"> -->
+                <div @click.stop="onImageClick(oneItem.orderImageKey)"><img class="multiRowStyle" style="max-width: 150px;" v-bind:src="oneItem.orderImageUrl" ></div>
                 <hr v-if="(index + 1 ) != row.item.items.length">
                 <br v-else>
               </div>
@@ -94,7 +99,7 @@
 
             <template slot="quantity" slot-scope="row">
               <div ref="quantitydiv" v-for="(oneItem, index) in row.item.items" v-bind:key="oneItem.optionId">
-                <div style="height:60px;max-height:60px;display:block;">{{oneItem.quantity}}</div>
+                <div class="multiRowStyle">{{oneItem.quantity}}</div>
                 <!-- <hr :style="{width : mounted ? arrayOfTdWidth[2] : '150%'}"  ref="quantityhr" v-if="(index + 1 ) != row.item.items.length"> -->
                 <hr v-if="(index + 1 ) != row.item.items.length">
                 <br v-else>
@@ -103,7 +108,11 @@
             </template>
 
 
+           <template slot="status" slot-scope="row">
 
+              <div style="max-width:80px;">{{row.item.status}}</div>
+
+            </template>
 
 
             <template slot="row-details" slot-scope="row">
@@ -162,11 +171,12 @@
     props: {
       fields: Array,
       items: Array,
-      headerButton: String,
-      headerButtonClick: String,
+      headerButton: Array,
+      headerButtonClick: Array,
       actionButtonClick: String,
       enableCheckbox: Boolean,
       tableName: String,
+      imageClick: String,
 
 
 
@@ -210,16 +220,24 @@
         this.totalRows = filteredItems.length;
         this.currentPage = 1;
       },
-      onHeaderButtonClick() {
+      onHeaderButtonClick(clickedHeaderTitle) {
         //for summaryoforders
         if (this.tableName == "Orders"){
-          eventBus.$emit(this.headerButtonClick, this.checkedCheckBox);
+ 
+              if(this.headerButton[0].title == clickedHeaderTitle){
+          eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
           this.checkedCheckBox = [];
-
            this.checkAll = false;
+              }
+              else if(this.headerButton[1].title== clickedHeaderTitle){
+                 eventBus.$emit(this.headerButton[1]);
+              }
+              
+
+          
         }
         else
-          eventBus.$emit(this.headerButtonClick)
+          eventBus.$emit(this.headerButtonClick[0])
 
       },
       onActionButtonClick(item) {
@@ -300,6 +318,11 @@
       },
       cancelOrder() {
             console.log("order is cancelled")
+      },
+      onImageClick(orderImageThumbNail){
+        if (this.tableName == "Orders")
+          eventBus.$emit(this.imageClick, orderImageThumbNail);
+        
       }
     },
 
@@ -308,6 +331,10 @@
   };
 </script>
 
-<style>
-
+<style scoped>
+.multiRowStyle{
+  height:100px;
+  max-height:100px;
+  display:block;
+}
 </style>

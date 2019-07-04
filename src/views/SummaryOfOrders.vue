@@ -32,7 +32,7 @@
         <div cols="4">
           <Table :key="this.forceRender" v-bind:fields="this.fields" v-bind:items="this.sortItems"
             v-bind:headerButtonClick="this.headerButtonClick" v-bind:actionButtonClick="this.actionButtonClick"
-            v-bind:enableCheckbox="this.enableCheckbox" tableName="Orders" headerButton="Update Order Status">
+            v-bind:enableCheckbox="this.enableCheckbox" tableName="Orders" :imageClick ="this.imageClick" :headerButton="this.headerButton">
 
           </Table>
         </div>
@@ -48,8 +48,9 @@
       </footer>
       <!-- End of Footer -->
     </div>
+        
   </div>
-
+              
   <!-- End of Content Wrapper -->
 </template>
 
@@ -64,7 +65,8 @@
   import {
     GET_ALL_ORDERS,
     GET_ALL_STATUS,
-    UPDATE_ORDER_STATUS
+    UPDATE_ORDER_STATUS,
+    GET_PRESIGNED_URL
   } from "@/store/actions/order";
 
   export default {
@@ -76,8 +78,21 @@
     },
     data() {
       return {
-        headerButtonClick: "Check All Orders",
-        actionButtonClick: "Edit One Order",
+        //have multiple buttons
+        headerButtonClick:["Update Order Status","Download Images"],
+
+        headerButton:[
+           {
+          id: 1,
+          title: "Update Order Status",
+           },
+          {
+          id: 2,
+          title: "Download Images"
+           }
+        ],
+        actionButtonClick: "Update One Order Status",
+        imageClick: "On Order Image Click",
         forceRender: true,
         noOfTabs: 0,
         enableCheckbox: true,
@@ -85,6 +100,7 @@
         arrayOfNumberOfRows: [],
         typesOfTabs: [],
         Tabs: [],
+        presignedUrl: "",
 
 
         sortItems: [],
@@ -146,9 +162,6 @@
 
           //had to hardcode the last tab string.
           this.typesOfTabs[x] = response[x - 1].statusName;
-
-
-
           this.getAllOrders();
         })
         .catch(error => {
@@ -157,19 +170,37 @@
           this.message("danger", error);
         });
 
-      eventBus.$once(this.headerButtonClick, (orderIds) => {
-        console.log("headereventbus")
+      eventBus.$on(this.headerButtonClick[0], (orderIds) => {
           this.updateStatusTabsAndTable(orderIds);
-
       });
 
-      eventBus.$once(this.actionButtonClick, (orderIds) => {
-                console.log("actioneventbus")
-
+      eventBus.$on(this.actionButtonClick, (orderIds) => {
     this.updateStatusTabsAndTable(orderIds);
-
-
       });
+
+      eventBus.$on(this.imageClick, (thumbNailUrl) => {
+        //because controller only accepts a list of url
+        const listOfThumbNailUrl = []
+        listOfThumbNailUrl.push(thumbNailUrl);
+     
+
+        this.$store
+        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
+        .then(response => {
+        console.log(response)
+        this.downloadURI(response.imgUrls[0],"a")
+        // this.presignedUrl = response.imgUrls[0];
+        // this.$bvModal.show("viewPresignedImage");
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+
+    
+      });
+      
+
 
     },
     //  beforeDestory(){
@@ -203,8 +234,10 @@
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,
                 status: response[x].status,
-                actions: this.getAction(response[x].status)
-              }
+                actions: this.getAction(response[x].status),
+               
+                              
+            }
             }
 
 
@@ -337,11 +370,11 @@
         else if (status == "Out for Delivery")
           return "Delivered"
         else if (status == "Completed")
-          return "Archive"
+          return null
         else if (status == "Delivery Failed")
           return "Re-Deliver"
         else if (status == "Cancelled")
-          return "Archive"
+          return null
         else
           return null
       },
@@ -379,6 +412,9 @@
             //reset the tabs.
             this.setUpTabs();
 
+            //there is a few lines in the router.js where i reset the eventbus listener too
+            //do take note of that.
+
           })
           .catch(error => {
             console.dir(error);
@@ -386,7 +422,17 @@
           });
 
 
-      }
+      },
+  downloadURI(uri, name) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link.download;
+  delete link.href
+},
 
     }
   };

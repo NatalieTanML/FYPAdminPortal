@@ -228,7 +228,7 @@ export default {
       this.$store
       .dispatch(GET_ALL_ORDERS)
       .then(response => {
-        console.dir(response);
+
         this.allOrders = response;
         for (var i = 0; i < this.allOrders.length; i++) {
           this.items[i].id= this.allOrders[i].orderId;
@@ -244,11 +244,11 @@ export default {
             this.items[i].deliveryman = "Not Assigned"
           }
         }
-        console.log(response);
+        
       })
       .catch(error => {
-        console.dir(error);
-        alert("error");
+
+        alert(error);
       });
  
     },
@@ -256,15 +256,14 @@ export default {
     updateDeliveryman(){
       for(var i = 0; i < this.allDeliverymen.length; i++){
            if(this.allDeliverymen[i].email == this.selected){
-  
             this.$store
              .dispatch(UPDATE_DELIVERYMAN, [this.id,this.allDeliverymen[i].id])
               .then(response => {
                 this.refreshTable();
               })
         .catch(error => {
-          console.dir(error);
-          alert("error");
+
+          alert(error);
         });
            }
           }
@@ -274,17 +273,16 @@ export default {
   },
   mounted() {
     eventBus.$on(this.actionButtonClick,  (id) => {
-      console.log("Action button clicked");
       this.$bvModal.show("delivery-routes-modal");
       this.id = id;
     });
-    eventBus.$on(this.headerButtonClick, () => {
-      console.log("Header button clicked");
-    });
+    // eventBus.$on(this.headerButtonClick, () => {
+    //   console.log("Header button clicked");
+    // });
     this.$store
       .dispatch(GET_ALL_ORDERS)
       .then(response => {
-        console.dir(response);
+
         this.allOrders = response;
         for (var i = 0; i < this.allOrders.length; i++) {
           this.items.push({
@@ -307,16 +305,16 @@ export default {
             this.items[i].deliveryman = "Not Assigned"
           }
         }
-        console.log(response);
+
       })
       .catch(error => {
-        console.dir(error);
-        alert("error");
+
+        alert(error);
       });
     this.$store
       .dispatch(GET_ALL_DELIVERYMEN)
       .then(response => {
-        console.dir(response);
+
         this.allDeliverymen = response;
         this.deliveryman.push({
             value: null,
@@ -331,11 +329,11 @@ export default {
           this.deliveryman[i+1].text = this.allDeliverymen[i].name;
 
         }
-        console.log(response);
+
       })
       .catch(error => {
-        console.dir(error);
-        alert("error");
+
+        alert(error);
       });
   }
 };

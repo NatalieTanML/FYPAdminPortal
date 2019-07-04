@@ -18,7 +18,14 @@ export const api_routes = {
     get_all_status: 'api/orders/getOrderStatus',
     update_deliveryman : "api/orders/deliveryman",
     update_order_status : "api/orders/status",
-  }
+    get_presigned_url : 'api/s3/url'
+  },
+  
+  product: {
+    get_all: 'api/products/',
+    
+  },
+
 
 };
 
