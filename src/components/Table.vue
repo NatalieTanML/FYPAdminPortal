@@ -149,7 +149,6 @@
 
 <script>
 import { eventBus } from "@/eventBus";
-// import { timeout } from 'q';
 
 export default {
   data() {

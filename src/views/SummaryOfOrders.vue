@@ -79,6 +79,7 @@ export default {
   },
   data() {
     return {
+      connection: null,
       headerButtonClick: "Check All Orders",
       actionButtonClick: "Edit One Order",
       forceRender: true,
@@ -88,9 +89,7 @@ export default {
       arrayOfNumberOfRows: [],
       typesOfTabs: [],
       Tabs: [],
-
       sortItems: [],
-
       items: [],
       fields: [
         {
@@ -136,6 +135,16 @@ export default {
 
   computed: {},
 
+  created() {
+    // create a connection to the hub
+    this.connection = new this.$signalR.HubConnectionBuilder()
+      .withUrl("https://localhost:44393/order-hub")
+      .configureLogging(this.$signalR.LogLevel.Error)
+      .build();
+
+    
+  },
+
   mounted() {
     this.$store
       .dispatch(GET_ALL_STATUS)
@@ -170,6 +179,28 @@ export default {
         console.dir(error);
         this.message("danger", error);
       });
+
+    // Connect to hub
+    this.connection
+      .start()
+      .then(response => {
+        console.log("Connection to hub started");
+      })
+      .catch(err => {
+        console.error("Connection failed", err.toString());
+      });
+
+      // establish hub methods first
+    this.connection.on("OneOrder", order => {
+      console.log("OneOrder called");
+      console.log(order);
+      this.getAllOrders();
+    });
+    this.connection.on("MultipleOrders", orders => {
+      console.log("MultipleOrders called");
+      console.log(orders);
+      this.getAllOrders();
+    });
   },
   methods: {
     message(method, messageText) {

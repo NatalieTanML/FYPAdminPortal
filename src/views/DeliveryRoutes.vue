@@ -64,7 +64,6 @@ import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
 import { GET_ALL_ORDERS, UPDATE_DELIVERYMAN } from "@/store/actions/order";
 import { GET_ALL_DELIVERYMEN } from "@/store/actions/user";
-//import * as signalR from "@aspnet/signalr";
 
 export default {
   components: {
@@ -74,6 +73,7 @@ export default {
   },
   data() {
     return {
+      connection: null,
       actionButtonClick: "Assign One to Deliveryman",
       headerButtonClick: "Assign Many to Deliveryman",
       id: "",
@@ -89,7 +89,6 @@ export default {
       deliveryman: [],
       allOrders: [],
       allDeliverymen: [],
-      connection: null
     };
   },
 
