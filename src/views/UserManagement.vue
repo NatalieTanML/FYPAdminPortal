@@ -19,7 +19,7 @@
           <Table
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
-            headerButton="Add User"
+            :headerButton="headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
           ></Table>
@@ -56,7 +56,8 @@ export default {
   },
   data() {
     return {
-      headerButtonClick: "Add One User",
+      headerButtonClick: ["Add One User"],
+      headerButton: [{id: 1, title: "Add User"}],
       actionButtonClick: "Edit One User",
       items: [],
       fields: [
@@ -82,7 +83,7 @@ export default {
     },
   },
   mounted() {
-    eventBus.$on(this.headerButtonClick, () => {
+    eventBus.$on(this.headerButtonClick[0], () => {
       this.$router.replace({ name: "AddUser" });
     });
 
