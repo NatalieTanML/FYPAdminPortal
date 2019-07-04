@@ -265,42 +265,26 @@ export default {
 
     refreshTable() {
       this.$store
-      .dispatch(GET_ALL_ORDERS)
-      .then(response => {
-
-        this.allOrders = response;
-        for (var i = 0; i < this.allOrders.length; i++) {
-          this.items[i].id= this.allOrders[i].orderId;
-          this.items[i].refNo= this.allOrders[i].referenceNo;
-          this.items[i].postcode = this.allOrders[i].address.postalCode;
-          this.items[i].region = this.getRegionByPostalCode(this.items[i].postcode);
-          if (this.allOrders[i].deliveryManId != null){
-          this.items[i].actions = "Update Deliveryman";
-          this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
+        .dispatch(GET_ALL_ORDERS)
+        .then(response => {
+          this.allOrders = response;
+          for (var i = 0; i < this.allOrders.length; i++) {
+            this.items[i].id = this.allOrders[i].orderId;
+            this.items[i].refNo = this.allOrders[i].referenceNo;
+            this.items[i].postcode = this.allOrders[i].address.postalCode;
+            this.items[i].region = this.getRegionByPostalCode(
+              this.items[i].postcode
+            );
+            if (this.allOrders[i].deliveryManId != null) {
+              this.items[i].actions = "Update Deliveryman";
+              this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
+            } else {
+              this.items[i].actions = "Assign Deliveryman";
+              this.items[i].deliveryman = "Not Assigned";
+            }
           }
-          else {
-            this.items[i].actions = "Assign Deliveryman";
-            this.items[i].deliveryman = "Not Assigned"
-          }
-        }
-        
-      })
-      .catch(error => {
-        alert(error);
-      });
- 
-    },
-
-    updateDeliveryman(){
-      for(var i = 0; i < this.allDeliverymen.length; i++){
-           if(this.allDeliverymen[i].email == this.selected){
-            this.$store
-             .dispatch(UPDATE_DELIVERYMAN, [this.id,this.allDeliverymen[i].id])
-              .then(response => {
-                this.refreshTable();
-              })
+        })
         .catch(error => {
-
           alert(error);
         });
     },
@@ -314,8 +298,7 @@ export default {
               this.refreshTable();
             })
             .catch(error => {
-              console.dir(error);
-              alert("error");
+              alert(error);
             });
         }
       }
@@ -329,7 +312,7 @@ export default {
       .build();
   },
   mounted() {
-    eventBus.$on(this.actionButtonClick,  (id) => {
+    eventBus.$on(this.actionButtonClick, id => {
       this.$bvModal.show("delivery-routes-modal");
       this.id = id;
     });
@@ -339,7 +322,6 @@ export default {
     this.$store
       .dispatch(GET_ALL_ORDERS)
       .then(response => {
-
         this.allOrders = response;
         for (var i = 0; i < this.allOrders.length; i++) {
           this.items.push({
@@ -363,16 +345,13 @@ export default {
             this.items[i].deliveryman = "Not Assigned";
           }
         }
-
       })
       .catch(error => {
-
         alert(error);
       });
     this.$store
       .dispatch(GET_ALL_DELIVERYMEN)
       .then(response => {
-
         this.allDeliverymen = response;
         this.deliveryman.push({
           value: null,
@@ -386,10 +365,8 @@ export default {
           this.deliveryman[i + 1].value = this.allDeliverymen[i].email;
           this.deliveryman[i + 1].text = this.allDeliverymen[i].name;
         }
-
       })
       .catch(error => {
-
         alert(error);
       });
     // establish hub methods first
