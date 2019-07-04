@@ -10,7 +10,6 @@
         <DashboardHeader title="Orders"></DashboardHeader>
         <!-- Topbar Navbar -->
 
-
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -20,9 +19,14 @@
           <div id="content">
             <div class="row mb-4">
               <ul class="nav" ref="tabs">
-                <DashboardTabs v-for="tab in this.Tabs" v-bind:key="tab.id" v-bind:title="tab.title"
-                  v-bind:isDark="tab.isDark" v-bind:noOfRows="tab.noOfRows" @click.native="onTabChange(tab.id)">
-                </DashboardTabs>
+                <DashboardTabs
+                  v-for="tab in this.Tabs"
+                  v-bind:key="tab.id"
+                  v-bind:title="tab.title"
+                  v-bind:isDark="tab.isDark"
+                  v-bind:noOfRows="arrayOfNumberOfRows[tab.id]"
+                  @click.native="onTabChange(tab.id)"
+                ></DashboardTabs>
               </ul>
             </div>
           </div>
@@ -145,13 +149,61 @@
           }
         ]
       };
+      this.$snack[method](config);
+      // this.$snack[method](config)
     },
+    onTabChange(id) {
+      //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
+      //reason why i don't use const ^ is because when the data is displayed,
+      //it will become read-only.
 
-    computed: {},
+      this.sortItems = [];
+      //change background color for the tab
+      this.noOfTabs = this.$refs.tabs.childElementCount;
 
-    mounted() {
+      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
+
+      this.selectedTab = id;
+      var index;
+
+      for (index = 0; index < this.Tabs.length; index++) {
+        if (id != this.Tabs[index].id)
+          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
+      }
+      //manipulate table data after changing tab color
+
+      let sortBy = this.typesOfTabs[id];
+
+      for (index = 0; index < this.items.length; index++)
+        if (sortBy === this.items[index].status)
+          this.sortItems.push(this.items[index]);
+
+      //for counting the amount of rows in each tab.
+      let numberOfRows = 0;
+      let x;
+      //index is 1 so as to skip the All tab. then i push a 0 on the first
+      //number of the arrayofNumberOfRows.
+      this.arrayOfNumberOfRows.push(null);
+      for (index = 1; index < this.typesOfTabs.length; index++) {
+        numberOfRows = 0;
+        for (x = 0; x < this.items.length; x++) {
+          if (this.items[x].status == this.typesOfTabs[index]) numberOfRows++;
+        }
+        this.arrayOfNumberOfRows.push(numberOfRows);
+      }
+
+      if (sortBy === "All") this.sortItems = this.items;
+
+      //to disable checkbox is All tabs are selected
+      if (sortBy == "All") this.enableCheckbox = false;
+      else this.enableCheckbox = true;
+
+      if (this.forceRender) this.forceRender = false;
+      else this.forceRender = true;
+    },
+    getAllOrders() {
       this.$store
-        .dispatch(GET_ALL_STATUS)
+        .dispatch(GET_ALL_ORDERS)
         .then(response => {
           //standardize the typesOfTabs
           //set up default tabs.
@@ -196,7 +248,6 @@
           console.dir(error);
           this.message("danger", error);
         });
-
     
       });
       
@@ -435,8 +486,4 @@
 },
 
     }
-  };
-</script>
-
-<style>
-</style>
+  }

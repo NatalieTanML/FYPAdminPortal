@@ -45,6 +45,12 @@
               </b-form-checkbox>
             </template>
 
+            <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
+              <b-form-checkbox
+                :checked="checkedCheckBox.includes(row.item.id)"
+                @change="onCheckBoxCheck(row.item.id)"
+              ></b-form-checkbox>
+            </template>
 
             <template slot="actions" slot-scope="row">
 
