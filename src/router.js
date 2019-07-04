@@ -15,29 +15,23 @@ import UpdateUser from "./views/UpdateUser";
 import OrderDetails from "./views/OrderDetails";
 import ErrorPage from "./views/Error";
 
-
-
 //3 roles: Admin, Store, Delivery
 //Admin -> Every Page
-//Store -> Nav Bar: Orders, Resource Management.   
+//Store -> Nav Bar: Orders, Resource Management.
 //Delivery -> Delivery Routes, Deliveries.
-
 
 Vue.use(Router);
 
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
 let router = new Router({
-
-
   routes: [
-
     {
       path: "/Login",
       name: "Login",
       component: Login,
       meta: {
-        needAuthentication: false,
+        needAuthentication: false
       }
     },
     {
@@ -45,7 +39,7 @@ let router = new Router({
       name: "",
       component: Login,
       meta: {
-        needAuthentication: false,
+        needAuthentication: false
       }
     },
     {
@@ -84,7 +78,6 @@ let router = new Router({
         needNewPassword: true
       }
     },
-
     {
       path: "/Deliveries",
       name: "Deliveries",
@@ -125,8 +118,7 @@ let router = new Router({
       path: "/DeliveryRoutes",
       name: "DeliveryRoutes",
       component: DeliveryRoutes,
-      meta: 
-      {
+      meta: {
         needAuthentication: true,
         needNewPassword: true
       }
@@ -153,15 +145,13 @@ let router = new Router({
       path: "/Error",
       name: "Error",
       component: ErrorPage,
-      meta: {
-      }
+      meta: {}
     },
     {
-      path: '*',
-      name:'404', 
+      path: "*",
+      name: "404",
       component: ErrorPage
-  }
-    
+    }
   ]
 });
 
@@ -169,116 +159,113 @@ let router = new Router({
 //user has logged in or not.
 //reference : https://router.vuejs.org/guide/advanced/meta.html
 
- router.beforeEach((to, from, next) => {
+router.beforeEach((to, from, next) => {
+  console.log("token: " + store.getters.isAuthenticated);
 
-console.log("token: "+store.getters.isAuthenticated)
+  // let resolved = router.resolve(to.path)
+  //  if(resolved.route.name != '404')
+  // console.log("resolve")
 
-// let resolved = router.resolve(to.path)
-//  if(resolved.route.name != '404')
-// console.log("resolve")
+  console.log("change password: " + store.getters.changePassword);
+  console.log("To : " + to.name);
+  console.log("From : " + from.name);
 
-console.log("change password: "+store.getters.changePassword)
+  localStorage.setItem("previousPathName", from.name);
 
-console.log("To : "+to.name)
+  //if people try to go to the login page after they logged in,
+  //they will be redirected to summaryoforders
+  if (
+    store.getters.isAuthenticated &&
+    to.path == "/Login" &&
+    store.getters.changePassword
+  ) {
+    console.log("first if");
+    next({
+      path: "/SummaryOfOrders"
+    });
+  }
 
-console.log("From : "+from.name)
+  // //if they are logged in already, and have changed their password,
+  // //they cant access the changepassword page again.
+  // else if(store.getters.isAuthenticated && to.path == '/ChangePassword' && store.getters.changePassword){
+  //   console.log("second if")
+  //   next({
+  //     path: '/SummaryOfOrders',
+  //   })
+  // }
 
-localStorage.setItem("previousPathName", from.name);
-
-//if people try to go to the login page after they logged in,
-//they will be redirected to summaryoforders
- if(store.getters.isAuthenticated && to.path == '/Login' && store.getters.changePassword){
-  console.log("first if")
-  next({
-    path: '/SummaryOfOrders',
-  })
-}
-
-
-// //if they are logged in already, and have changed their password,
-// //they cant access the changepassword page again.
-// else if(store.getters.isAuthenticated && to.path == '/ChangePassword' && store.getters.changePassword){
-//   console.log("second if")
-//   next({
-//     path: '/SummaryOfOrders',
-//   })
-// }
- 
-
-//start of validation pages that needs authentication.
-else if( to.matched.some(record => record.meta.needAuthentication) && store.getters.isAuthenticated ){
- 
-  if(to.matched.some(record => record.meta.needNewPassword)){
-  if( !store.getters.changePassword && to.path != '/ChangePassword'){
-       next({
-          path: '/ChangePassword',
+  //start of validation pages that needs authentication.
+  else if (
+    to.matched.some(record => record.meta.needAuthentication) &&
+    store.getters.isAuthenticated
+  ) {
+    if (to.matched.some(record => record.meta.needNewPassword)) {
+      if (!store.getters.changePassword && to.path != "/ChangePassword") {
+        next({
+          path: "/ChangePassword"
           //params: { nextUrl: to.fullPath }
-      })
-  }
-  else
-  next()
-}
+        });
+      } else next();
+    } else if (store.getters.userRole != null) {
+      //check for roles.
 
-else if(store.getters.userRole != null){ //check for roles.
-
-if(store.getters.userRole == "Admin")
-  next()
-else if(store.getters.userRole == "Store"){
-  if(to.path == '/SummaryOfOrders' || to.path == '/ResourceManagement' || to.path == '/Login')
-  next()
-  else
-  next({
-    path: '/SummaryOfOrders',
-  })
-}
-else if(store.getters.userRole == "Delivery"){
-   if(to.path == '/SummaryOfOrders' || to.path == '/Deliveries' || to.path == '/DeliveryRoutes' || to.path == '/Login')
-  next()
-  else
-  { 
-  next({
-  path: '/SummaryOfOrders'
-  })
-}
-}
-else
-next()
-}
-  
-else
-next()
-}
-else{
-  if(to.path != '/Login'){
-  next({
-    path: '/Login'
-    })
-  }
-  else{
-  next()
+      if (store.getters.userRole == "Admin") next();
+      else if (store.getters.userRole == "Store") {
+        if (
+          to.path == "/SummaryOfOrders" ||
+          to.path == "/ResourceManagement" ||
+          to.path == "/Login"
+        )
+          next();
+        else
+          next({
+            path: "/SummaryOfOrders"
+          });
+      } else if (store.getters.userRole == "Delivery") {
+        if (
+          to.path == "/SummaryOfOrders" ||
+          to.path == "/Deliveries" ||
+          to.path == "/DeliveryRoutes" ||
+          to.path == "/Login"
+        )
+          next();
+        else {
+          next({
+            path: "/SummaryOfOrders"
+          });
+        }
+      } else next();
+    } else next();
+  } else {
+    if (to.path != "/Login") {
+      next({
+        path: "/Login"
+      });
+    } else {
+      next();
+    }
   }
 
-}
+  //if admin leaves the updateuser page, updateuser page will reset.
+  if (to.name != "UpdateUser" && localStorage.getItem("updateUserId") != null)
+    localStorage.setItem("updateUserId", null);
 
-//if admin leaves the updateuser page, updateuser page will reset.
-if(to.name != "UpdateUser" && localStorage.getItem("updateUserId") != null)
-localStorage.setItem("updateUserId", null);
+  //if people try to access the updateuser page by typing in the url, it will just
+  //redirect them to usermanagement
+  if (to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
+    next({ path: "/UserManagement" });
 
-//if people try to access the updateuser page by typing in the url, it will just
-//redirect them to usermanagement
-if(to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
- next({ path: '/UserManagement'})
+  //if admin leaves the orderdetails page, orderdetails page will reset.
+  if (to.name != "OrderDetails" && localStorage.getItem("viewOrderId") != null)
+    localStorage.setItem("viewOrderId", null);
 
- //if admin leaves the orderdetails page, orderdetails page will reset.
-if(to.name != "OrderDetails" && localStorage.getItem("viewOrderId") != null)
-localStorage.setItem("viewOrderId", null);
-
-//if people try to access the orderdetails page by typing in the url, it will just
-//redirect them to summaryofOrders
-if(to.name == "OrderDetails" && localStorage.getItem("viewOrderId") == "null")
- next({ path: '/SummaryOfOrders'})
-
-
- })
+  //if people try to access the orderdetails page by typing in the url, it will just
+  //redirect them to summaryofOrders
+  if (
+    to.name == "OrderDetails" &&
+    localStorage.getItem("viewOrderId") == "null"
+  )
+    next({ path: "/SummaryOfOrders" });
+});
 
 export default router;

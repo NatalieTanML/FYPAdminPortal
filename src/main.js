@@ -15,6 +15,10 @@ import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import VueSignaturePad from 'vue-signature-pad';
 import VueCurrencyFilter from 'vue-currency-filter'
 
+import "vue-multiselect/dist/vue-multiselect.min.css";
+import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import VueSignaturePad from "vue-signature-pad";
+var signalR = require("@aspnet/signalr");
 
 require("vue-snack/dist/vue-snack.min.css");
 
@@ -30,6 +34,8 @@ Vue.use(VueCurrencyFilter, {
   symbolPosition: 'front',
   symbolSpacing: true
 });
+
+Vue.prototype.$signalR = signalR;
 
 // Vue.use(Notifications)
 
