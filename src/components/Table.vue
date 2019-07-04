@@ -20,7 +20,7 @@
               <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
               <b-button 
                v-on:click="onHeaderButtonClick(oneHeaderButton.title)" variant="primary" class="float-right"
-                v-if="oneHeaderButton.title && checkedCheckBox.length != 0">{{oneHeaderButton.title}}
+                v-if="tableName != 'Orders' ||(checkedCheckBox.length != 0 && tableName == 'Orders')">{{oneHeaderButton.title}}
                 </b-button>
                 </div>
             </b-col>
@@ -190,7 +190,7 @@
     mounted() {
       this.totalRows = this.items.length;
 
-
+    console.log(this.enableCheckbox)
       //to redraw the hr line.
 
       // if(this.$refs.itemdiv != undefined){

@@ -56,7 +56,7 @@ export default {
   },
   data() {
     return {
-      headerButtonClick: ["Add One User"],
+      headerButtonClick: ["Add User"],
       headerButton: [{id: 1, title: "Add User"}],
       actionButtonClick: "Edit One User",
       items: [],

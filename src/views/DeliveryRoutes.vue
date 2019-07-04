@@ -75,7 +75,8 @@ export default {
     return {
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
-      headerButtonClick: "Assign Many to Deliveryman",
+      headerButton: [{id: 1, title: "Assign to Deliveryman"}],
+      headerButtonClick: ["Assign to Deliveryman"],
       id: "",
       items: [],
       fields: [
@@ -315,7 +316,7 @@ export default {
       this.$bvModal.show("delivery-routes-modal");
       this.id = id;
     });
-    // eventBus.$on(this.headerButtonClick, () => {
+    // eventBus.$on(this.headerButtonClick[0], () => {
     //   console.log("Header button clicked");
     // });
     this.$store
