@@ -18,9 +18,10 @@
             </b-col>
             <b-col>
               <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
+                <!-- b-buutton validates whether the table is orders. then it will generates different headers. -->
               <b-button 
                v-on:click="onHeaderButtonClick(oneHeaderButton.title)" variant="primary" class="float-right"
-                v-if="tableName != 'Orders' ||(checkedCheckBox.length != 0 && tableName == 'Orders')">{{oneHeaderButton.title}}
+                v-if="tableName != 'Orders' || ((checkedCheckBox.length != 0) &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))">{{oneHeaderButton.title}}
                 </b-button>
                 </div>
             </b-col>
@@ -41,15 +42,8 @@
             </template>
 
             <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
-              <b-form-checkbox :checked="checkedCheckBox.includes(row.item.id)" @change="onCheckBoxCheck(row.item.id)">
+              <b-form-checkbox :checked="checkedCheckBox.includes(row.item.id)" @change="onCheckBoxCheck(row.item)">
               </b-form-checkbox>
-            </template>
-
-            <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
-              <b-form-checkbox
-                :checked="checkedCheckBox.includes(row.item.id)"
-                @change="onCheckBoxCheck(row.item.id)"
-              ></b-form-checkbox>
             </template>
 
             <template slot="actions" slot-scope="row">
@@ -170,6 +164,8 @@
         filter: null,
         checkedCheckBox: [],
         checkAll: false,
+        showHeaderButton: true,
+        
         // arrayOfTdWidth : [],
         // mounted: false,
       };
@@ -189,7 +185,7 @@
     },
     mounted() {
       this.totalRows = this.items.length;
-
+      
     console.log(this.enableCheckbox)
       //to redraw the hr line.
 
@@ -236,9 +232,26 @@
            this.checkAll = false;
               }
               else if(this.headerButton[1].title== clickedHeaderTitle){
-                 eventBus.$emit(this.headerButton[1]);
-              }
+                
+           const listOfThumbNailUrl = []
+                let index;
+
+                for(index = 0; index < this.items.length; index++){
+                this.checkedCheckBox.forEach((checkedItemId) => {
+                  console.log(checkedItemId)
+                if (this.items[index].id == checkedItemId) {
+                     console.log(this.items[index])
+                 this.items[index].items.forEach((eachItemInOrder)=>{
+                   listOfThumbNailUrl.push(eachItemInOrder.orderImageKey)
+                 })
+                }
+                })
+                
               
+              }
+                  console.log(listOfThumbNailUrl)
+                 eventBus.$emit(this.headerButtonClick[1],listOfThumbNailUrl);
+              }
 
           
         }
@@ -259,15 +272,20 @@
         //id is the row's item's id
         
       },
-      onCheckBoxCheck(refNo) {
+      onCheckBoxCheck(item) {
         let index = 0;
 
-        if (this.checkedCheckBox.includes(refNo)) {
+        if(item.actions == null)
+        this.showHeaderButton = false;
+        else
+        this.showHeaderButton = true;
+
+        if (this.checkedCheckBox.includes(item.id)) {
           for (index; index < this.checkedCheckBox.length; index++)
-            if (this.checkedCheckBox[index] == refNo)
+            if (this.checkedCheckBox[index] == item.id)
               this.checkedCheckBox.splice(index, 1)
         } else
-          this.checkedCheckBox.push(refNo)
+          this.checkedCheckBox.push(item.id)
 
         console.log(this.checkedCheckBox)
 
@@ -283,6 +301,14 @@
         //if the last page has less than 5 stuff.
         if (((this.items.length - shownItems) < rowsPerPage) && this.currentPage != 1)
           rowsPerPage = this.items.length - shownItems
+
+  
+  
+        if(this.items[0].actions == null)
+        this.showHeaderButton = false;
+        else
+        this.showHeaderButton = true;
+          
 
 
         //if the first page has less than 5 stuff.
@@ -308,11 +334,12 @@
 
       },
       myRowClickHandler(record, index) {
+       
         if (this.tableName == "Orders") {
           console.log(this.items)
           console.log(index)
           //get orderid to show in the orderdetails
-          localStorage.setItem("viewOrderId", this.items[index].id);
+          localStorage.setItem("viewOrderId", record.id);
           console.log(localStorage.getItem("viewOrderId"))
           this.$router.replace({
             name: "OrderDetails"
@@ -326,8 +353,13 @@
             console.log("order is cancelled")
       },
       onImageClick(orderImageThumbNail){
-        if (this.tableName == "Orders")
-          eventBus.$emit(this.imageClick, orderImageThumbNail);
+        if (this.tableName == "Orders"){
+
+        const listOfThumbNailUrl = []
+        listOfThumbNailUrl.push(orderImageThumbNail);
+
+          eventBus.$emit(this.imageClick, listOfThumbNailUrl);
+        }
         
       }
     },
