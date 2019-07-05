@@ -6,19 +6,16 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-    
-          <DashboardHeader title="Deliveries"></DashboardHeader>
-          <!-- Topbar Navbar -->
-         
+
+        <DashboardHeader title="Deliveries"></DashboardHeader>
+        <!-- Topbar Navbar -->
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
         <div cols="4">
-          <Table
-            v-bind:actionButtonClick="this.actionButtonClick"
-            v-bind:fields="this.fields"
-            v-bind:items="this.items"
-          ></Table>
+          <Table v-bind:actionButtonClick="this.actionButtonClick" v-bind:fields="this.fields"
+            v-bind:items="this.items"></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -32,16 +29,13 @@
       </footer>
       <!-- End of Footer -->
     </div>
-    <b-modal
-      ref="showSignatureDialog"
-      id="showSignatureDialog"
-      title="Confirm Delivery - Order 12345"
-    >
+    <b-modal ref="showSignatureDialog" id="showSignatureDialog" title="Confirm Delivery - Order 12345">
       <b-form-group label="Received By">
         <b-form-input></b-form-input>
       </b-form-group>
       <b-form-group label="Receipient's Signature">
-        <VueSignaturePad class="pad" width="100%" height="200px" ref="signaturePad"/>
+        <VueSignaturePad :options="{onBegin: () => {$refs.signaturePad.resizeCanvas()}}" class="pad" width="100%"
+          height="200px" ref="signaturePad" />
       </b-form-group>
     </b-modal>
   </div>
@@ -50,98 +44,107 @@
 </template>
 
 <script>
-import SideBar from "@/components/SideBar";
-import DashboardHeader from "@/components/DashboardHeader";
-import DashboardTabs from "@/components/DashboardTabs";
-import Table from "@/components/Table";
-import { eventBus } from "@/eventBus";
+  import SideBar from "@/components/SideBar";
+  import DashboardHeader from "@/components/DashboardHeader";
+  import DashboardTabs from "@/components/DashboardTabs";
+  import Table from "@/components/Table";
+  import {
+    eventBus
+  } from "@/eventBus";
+  import {
+    GET_ALL_ORDERS,
+  } from "@/store/actions/order";
 
-export default {
-  components: {
-    SideBar,
-    DashboardHeader,
-    DashboardTabs,
-    Table
-  },
-  data() {
-    return {
-      noOfTabs: 0,
-      selectedTab: 0,
-      pad: null,
+  export default {
+    components: {
+      SideBar,
+      DashboardHeader,
+      DashboardTabs,
+      Table
+    },
+    data() {
+      return {
+        noOfTabs: 0,
+        selectedTab: 0,
+        pad: null,
+        sortBy: '',
+        actionButtonClick: "Delivery Signature",
 
-      actionButtonClick: "Delivery Signature",
+        items: [{}],
+        fields: [{
+            key: "refNo",
+            label: "Ref. No",
+            sortable: true
+          },
+          {
+            key: "date",
+            label: "Date",
+            sortable: true
+          },
+          {
+            key: "items",
+            label: "Item",
+            sortable: true
+          },
+          {
+            key: "address",
+            label: "Address",
+            sortable: true
+          },
+          {
+            key: "actions",
+            label: "Actions"
+          }
+        ]
+      };
+    },
 
-      items: [
-        {
-          refNo: "123456",
-          date: "22/04/19",
-          item: "A5 Photo",
-          hotel: "Resorts World Sentosa",
-          actions: "Delivered"
-        },
-        {
-          refNo: "123457",
-          date: "24/04/19",
-          item: "Keychain",
-          hotel: "Siloso Beach Resort",
-          actions: "Delivered"
-        },
-        {
-          refNo: "123458",
-          date: "25/04/19",
-          item: "ID Card",
-          hotel: "ONE°15 Marina Sentosa Cove",
-          actions: "Delivered"
-        },
-        {
-          refNo: "123459",
-          date: "05/05/19",
-          item: "A5 Photo + Frame",
-          hotel: "Le Méridien Singapore",
-          actions: "Delivered"
-        }
-      ],
-      fields: [
-        { key: "refNo", label: "Ref. No", sortable: true },
-        { key: "date", label: "Date", sortable: true },
-        { key: "item", label: "Item", sortable: true },
-        { key: "hotel", label: "Hotel", sortable: true },
-        { key: "actions", label: "Actions" }
-      ]
-    };
-  },
+    methods: {
 
-  methods: {
-    changeBackgroundColor(id) {
-      this.noOfTabs = this.$refs.tabs.childElementCount;
+    },
+    mounted() {
+      eventBus.$on(this.actionButtonClick, () => {
+        this.$bvModal.show("showSignatureDialog");
 
-      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
 
-      this.selectedTab = id;
-      var index;
+      });
 
-      for (index = 0; index < this.Tabs.length; index++) {
-        if (id != this.Tabs[index].id)
-          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
-      }
-    }
-  },
-  mounted() {
-    eventBus.$on(this.actionButtonClick, () => {
-      this.$bvModal.show("showSignatureDialog");
+      this.$store
+        .dispatch(GET_ALL_ORDERS)
+        .then(response => {
+          let x;
+          for (x = 0; x < response.length; x++) {
+            //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
+            //item: response[x].orderItems[0].options[0].product.productName,
 
-      // https://stackoverflow.com/questions/37465289/how-to-set-timeout-in-a-vuejs-method
-      setTimeout(() => {
-        this.$refs.signaturePad.resizeCanvas();
-      }, 1);
-    });
-  }
-};
+            this.items[x] = {
+              id: response[x].orderId,
+              refNo: response[x].referenceNo,
+              date: (response[x].createdAt),
+              items: response[x].orderItems,
+              // address: response[x].address,
+              actions: "Delivered",
+
+
+            }
+          }
+
+
+        })
+        .catch(error => {
+
+          console.dir(error);
+          this.message("danger", error);
+        });
+      console.log(this.items)
+    },
+
+  };
 </script>
 
 <style>
-.pad {
-  border: 2px solid #cbc9c6;
-  border-radius: 5px;
-}
+  .pad {
+    border: 2px solid #cbc9c6;
+    border-radius: 5px;
+  }
 </style>

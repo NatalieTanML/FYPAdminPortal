@@ -158,7 +158,7 @@
         currentPage: 1,
         perPage: 5,
         pageOptions: [5, 10, 15, 20, 25],
-        sortBy: null,
+       
         sortDesc: false,
         sortDirection: "asc",
         filter: null,
@@ -179,6 +179,7 @@
       enableCheckbox: Boolean,
       tableName: String,
       imageClick: String,
+      sortBy: String
 
 
 

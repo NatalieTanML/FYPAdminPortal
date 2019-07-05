@@ -32,7 +32,7 @@
         <div cols="4">
           <Table :key="this.forceRender" v-bind:fields="this.fields" v-bind:items="this.sortItems"
             v-bind:headerButtonClick="this.headerButtonClick" v-bind:actionButtonClick="this.actionButtonClick"
-            v-bind:enableCheckbox="this.enableCheckbox" tableName="Orders" :imageClick ="this.imageClick" :headerButton="this.headerButton">
+            v-bind:enableCheckbox="this.enableCheckbox" tableName="Orders" :imageClick ="this.imageClick" :headerButton="this.headerButton" :sortBy="this.sortBy">
 
           </Table>
         </div>
@@ -102,7 +102,7 @@
         Tabs: [],
         presignedUrl: "",
 
-
+        sortBy:'date',
         sortItems: [],
 
         items: [],
@@ -205,6 +205,8 @@
         // this.$snack[method](config)
       },
       getAllOrders() {
+
+
         this.$store
           .dispatch(GET_ALL_ORDERS)
           .then(response => {
@@ -217,7 +219,7 @@
               this.items[x] = {
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
-                date: (response[x].createdAt).substring(0, 10),
+                date: (response[x].createdAt),
                 items: response[x].orderItems,
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,
@@ -227,8 +229,6 @@
                               
             }
             }
-
-
 
             //creating checkbox.
             let index;
@@ -278,14 +278,17 @@
         //manipulate table data after changing tab color
 
         let sortBy = this.typesOfTabs[id];
+        console.log(sortBy)
 
-        for (index = 0; index < this.items.length; index++)
+        for (index = 0; index < this.items.length; index++){
           if (sortBy === this.items[index].status)
             this.sortItems.push(this.items[index]);
+          if(sortBy == "All")
+          this.sortItems.push(this.items[index]);
+        }
 
 
-
-        if (sortBy === "All") this.sortItems = this.items;
+        // if (sortBy === "All") this.sortItems = this.items;
 
         //to disable checkbox is All tabs are selected
         if (sortBy == "All")
