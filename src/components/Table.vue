@@ -255,7 +255,7 @@
         eventBus.$emit(this.actionButtonClick,orderIds);
         }
         else
-        eventBus.$emit(this.actionButtonClick, jsonData);
+        eventBus.$emit(this.actionButtonClick, item.id);
         //id is the row's item's id
         
       },
