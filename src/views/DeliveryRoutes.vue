@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import OrderHub from "@/services/orderHub.js";
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
@@ -304,14 +305,8 @@ export default {
       }
     }
   },
-  created() {
-    // create a connection to the hub
-    this.connection = new this.$signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:44393/order-hub")
-      .configureLogging(this.$signalR.LogLevel.Error)
-      .build();
-  },
-  mounted() {
+  
+  async mounted() {
     eventBus.$on(this.actionButtonClick, id => {
       this.$bvModal.show("delivery-routes-modal");
       this.id = id;
@@ -369,26 +364,41 @@ export default {
       .catch(error => {
         alert(error);
       });
-    // establish hub methods first
+
+    // Establish hub connection
+    this.connection = await OrderHub.connectToOrderHub();
+    this.connection
+      .start()
+      .then(() => {
+        console.log("Connection to hub started");
+      })
+      .catch(err => console.log(err));
+
+    // Establish hub methods 
     this.connection.on("OneOrder", order => {
       console.log("OneOrder called");
       console.log(order);
       this.refreshTable();
     });
+
     this.connection.on("MultipleOrders", orders => {
       console.log("MultipleOrders called");
       console.log(orders);
       this.refreshTable();
     });
-    // Connect to hub
-    this.connection
-      .start()
-      .then(response => {
-        console.log("Connection to hub started");
-      })
-      .catch(err => {
-        console.error("Connection failed", err.toString());
-      });
+    // // Connect to hub
+    // this.connection
+    //   .start()
+    //   .then(response => {
+    //     console.log("Connection to hub started");
+    //   })
+    //   .catch(err => {
+    //     console.error("Connection failed", err.toString());
+    //   });
+  },
+
+  async beforeDestroy() {
+    this.connection.stop();
   }
 };
 </script>
