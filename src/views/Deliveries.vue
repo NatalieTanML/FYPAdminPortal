@@ -184,7 +184,7 @@
               date: new Date(Date.parse(response[x].createdAt)).toLocaleString(),
               items: response[x].orderItems,
               address: addressOrHotel,
-              actions: "Delivered",
+              actions: ["Delivered"],
 
 
             }

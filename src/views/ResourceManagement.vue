@@ -123,7 +123,7 @@ export default {
           }
             
           
-          this.items[x].actions = "Edit";
+          this.items[x].actions = ["Edit","Add"];
           x= x+1;
         }
          

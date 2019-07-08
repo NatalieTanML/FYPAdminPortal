@@ -39,7 +39,7 @@
                   <b-col cols="3">{{order.orderId}}</b-col>
                   <b-col
                     cols="3"
-                  >{{new Date(order.createdAt).toJSON().slice(0,19).replace(/T/g,' ')}}</b-col>
+                  >{{new Date(Date.parse(order.createdAt)).toLocaleString()}}</b-col>
                   <b-col cols="3">
                     {{order.orderTotal | currency}}
                   </b-col>
@@ -57,7 +57,7 @@
                   <b-col cols="3">{{order.referenceNo}}</b-col>
                   <b-col
                     cols="3"
-                  >{{new Date(order.updatedAt).toJSON().slice(0,19).replace(/T/g,' ')}}</b-col>
+                  >{{new Date(Date.parse(order.updatedAt)).toLocaleString()}}</b-col>
                   <b-col v-if="order.updatedBy == null" cols="3">N/A</b-col>
                   <b-col v-else cols="3">{{order.updatedBy}}</b-col>
                   <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
@@ -69,7 +69,7 @@
                   <b-col class="b3"></b-col>
                 </b-row>
                 <b-row class="mb-2">
-                  <b-col class="b3">
+                  <b-col cols="5">
                     <b-button
                       type="button"
                       lg="4"
@@ -84,36 +84,37 @@
                 </b-row>
 
                 <b-row class="b2">
-                  <b-col cols="8">Item(s)</b-col>
-                  <b-col>Image Url</b-col>
-                  <b-col>Cost</b-col>
-                  <b-col>Qty</b-col>
-                  <b-col>Discount</b-col>
+                  <b-col cols="3">Item(s)</b-col>
+                  <b-col cols="3">Image</b-col>
+                  <b-col cols="2">Cost</b-col>
+                  <b-col cols="2">Qty</b-col>
+                  <b-col cols="2">Discount</b-col>
                 </b-row>
                 <hr class="mb-3">
 
-                <b-row v-for="(orderItem) in order.orderItems" v-bind:key="orderItem.orderId">
+                <b-row style="height: 150px;" v-for="(orderItem) in order.orderItems" v-bind:key="orderItem.orderId">
                   <b-col
-                    cols="8"
+                    cols="3"
                   >{{orderItem.options.product.productName}}({{orderItem.options.optionValue}}) {{orderItem.options.skuNumber}}</b-col>
-                  <b-col cols="1">
-                    <a :href="orderItem.orderImageUrl" target="_blank">Click Here</a>
+                  <b-col cols="3">
+                     <img
+                     @click="onImageClick()"
+                     style="height: 100px; max-height: 150px"
+                    v-bind:src="orderItem.orderImageUrl"
+                  />
                   </b-col>
-                  <b-col cols="1">
+                  <b-col cols="2">
                     {{orderItem.options.product.price | currency}}
                   </b-col>
-                  <b-col cols="1">{{orderItem.quantity}}</b-col>
-                  <b-col cols="1">N/A</b-col>
+                  <b-col cols="2">{{orderItem.quantity}}</b-col>
+                  <b-col cols="2">N/A</b-col>
                 </b-row>
                 <hr class="mb-3">
 
                 <b-row>
-                  <b-col cols="8"></b-col>
-                  <b-col></b-col>
-                  <b-col class="total" cols="1">Total :</b-col>
-                  <b-col class="total" cols="1">
-                    {{order.orderTotal | currency}}
-                  </b-col>
+                  <b-col cols="10"></b-col>
+                  <b-col  cols="2"><span>Total :</span><span> {{order.orderTotal | currency}}</span></b-col>
+               
                 </b-row>
               </div>
             </div>
