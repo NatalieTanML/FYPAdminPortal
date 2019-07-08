@@ -435,7 +435,7 @@ export default {
       }
     }
   }
-
+};
 </script>
 
 <style>
