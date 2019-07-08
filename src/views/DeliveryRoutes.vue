@@ -333,10 +333,10 @@ export default {
             this.items[i].postcode
           );
           if (this.allOrders[i].deliveryManId != null) {
-            this.items[i].actions = "Update Deliveryman";
+            this.items[i].actions = ["Update Deliveryman"];
             this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
           } else {
-            this.items[i].actions = "Assign Deliveryman";
+            this.items[i].actions = ["Assign Deliveryman"];
             this.items[i].deliveryman = "Not Assigned";
           }
         }

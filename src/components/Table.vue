@@ -263,7 +263,9 @@
 
       },
       onActionButtonClick(item, oneActionButton) {
-    
+          console.log(item)
+          console.log(oneActionButton)
+
         if (this.tableName == "Orders"){
           const orderIds = [];
             orderIds.push(item.id);
@@ -271,7 +273,13 @@
         eventBus.$emit(this.actionButtonClick,orderIds);
         }
         else if(this.tableName == "Resource Management"){
-           eventBus.$emit(this.actionButtonClick,(item,oneActionButton));
+
+          const itemAndButton = {
+          "item" : item,
+          "actionButton" : oneActionButton
+          }
+
+           eventBus.$emit(this.actionButtonClick,itemAndButton);
         }
         else
         eventBus.$emit(this.actionButtonClick, item.id);
@@ -281,11 +289,16 @@
       onCheckBoxCheck(item) {
         let index = 0;
 
-        if(item.actions == null)
+        //made for order table. since completed items does not have any actions, and therefore
+        //it will not show the update status button.
+        for(index = 0; index < item.actions.length; index ++){
+        if(item.actions[index] == null){
+          console.log("action is null")
         this.showHeaderButton = false;
+        }
         else
         this.showHeaderButton = true;
-
+        }
         if (this.checkedCheckBox.includes(item.id)) {
           for (index; index < this.checkedCheckBox.length; index++)
             if (this.checkedCheckBox[index] == item.id)
@@ -309,12 +322,12 @@
           rowsPerPage = this.items.length - shownItems
 
   
-  
-        if(this.items[0].actions == null)
+        for(index = 0; index < this.items[0].actions.length; index ++){
+        if(this.items[0].actions[index] == null)
         this.showHeaderButton = false;
         else
         this.showHeaderButton = true;
-          
+        }
 
 
         //if the first page has less than 5 stuff.

@@ -18,6 +18,7 @@
             :headerButton="headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
+            v-bind:tableName="this.tableName"
           ></Table>
         </div>
         <!-- Footer -->
@@ -51,10 +52,11 @@ export default {
   },
   data() {
     return {
-      headerButtonClick: "Add Resource",
+      headerButtonClick: ["Add Resource"],
       headerButton: [{id: 1, title: "Add Resource"}],
-      actionButtonClick: "Edit One Resource",
+      actionButtonClick: "Resource Action Buttons",
       products: "",
+      tableName: "Resource Management",
       items: [],
       fields: [
         { key: "sku", label: "SKU", sortable: true },
@@ -72,8 +74,10 @@ export default {
       this.$router.replace({ name: "AddResource" });
     });
 
-    eventBus.$on(this.actionButtonClick, () => {
-      this.$router.replace({ name: "UpdateResource" });
+    eventBus.$on(this.actionButtonClick, (jsonData) => {
+   
+        if(jsonData.actionButton == "Edit")
+     this.$router.replace({ name: "UpdateResource" });
     });
 
     this.$store
