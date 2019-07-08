@@ -59,7 +59,7 @@
                 <b-dropdown id="dropdown-header" variant="transparent" no-caret class="mb-1 mydropdown">
             <template slot="button-content">  <i class="fas fa-ellipsis-v fa-sm"></i></template>
                  
-                  <b-dropdown-item-button v-on:click="editOrder()" aria-describedby="dropdown-header-label">
+                  <b-dropdown-item-button v-on:click="editOrder(row.item.id)" aria-describedby="dropdown-header-label">
                     Edit Order
                   </b-dropdown-item-button>
                   <b-dropdown-item-button  v-b-modal.cancelOrder  aria-describedby="dropdown-header-label">
@@ -365,7 +365,12 @@
           });
         }
       },
-      editOrder() {
+      editOrder(orderId) {
+        console.log("edit order" +orderId)
+      localStorage.setItem("editOrderId", orderId);
+        this.$router.replace({
+            name: "EditOrderDetails"
+          });
 
       },
       cancelOrder() {

@@ -76,7 +76,7 @@
                       class="btnAction"
                       variant="primary"
                       size="sm"
-                    >{{order.status}}</b-button>
+                    >{{getAction(order.status)}}</b-button>
                   </b-col>
                   <b-col class="b3"></b-col>
                   <b-col class="b3"></b-col>
@@ -98,7 +98,7 @@
                   >{{orderItem.options.product.productName}}({{orderItem.options.optionValue}}) {{orderItem.options.skuNumber}}</b-col>
                   <b-col cols="3">
                      <img
-                     @click="onImageClick()"
+                     @click="onImageClick(orderItem.orderImageKey)"
                      style="height: 100px; max-height: 150px"
                     v-bind:src="orderItem.orderImageUrl"
                   />
@@ -178,7 +178,7 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
-import { ORDER_GET_REQUEST } from "@/store/actions/order";
+import { ORDER_GET_REQUEST, GET_PRESIGNED_URL } from "@/store/actions/order";
 
 export default {
   components: {
@@ -194,8 +194,60 @@ export default {
   },
 
   methods: {
-    // getOrder() {
-    // }
+    
+    onImageClick(thumbNailUrl){
+      console.log(thumbNailUrl)
+        var listOfThumbNailUrl = [];
+        listOfThumbNailUrl.push(thumbNailUrl);
+        this.$store
+        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
+        .then(response => {
+        console.log(response)
+        let index;
+
+        var interval = setInterval(download, 300, response.imgUrls);
+
+        function download(urls) {
+         var url = urls.pop();
+        console.log(url)
+         var a = document.createElement("a");
+         a.setAttribute('href', url);
+         a.setAttribute('download', '');
+         a.setAttribute('target', '_blank');
+         a.click();
+
+        if (urls.length == 0) {
+          clearInterval(interval);
+        }
+}
+
+        // this.presignedUrl = response.imgUrls[0];
+        // this.$bvModal.show("viewPresignedImage");
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+
+    },
+       getAction(status) {
+        if (status == "Received")
+          return "Accept Order"
+        else if (status == "Awaiting Printing")
+          return "Print"
+        else if (status == "Printed")
+          return "Deliver"
+        else if (status == "Out for Delivery")
+          return "Delivered"
+        else if (status == "Completed")
+          return null
+        else if (status == "Delivery Failed")
+          return "Re-Deliver"
+        else if (status == "Cancelled")
+          return null
+        else
+          return null
+      },
   },
   mounted() {
     const orderId = localStorage.getItem("viewOrderId");

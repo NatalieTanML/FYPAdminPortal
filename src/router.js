@@ -13,7 +13,9 @@ import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
 import OrderDetails from "./views/OrderDetails";
+import EditOrderDetails from "./views/EditOrderDetails"
 import ErrorPage from "./views/Error";
+
 
 import {eventBus} from "@/eventBus";
 
@@ -152,6 +154,15 @@ let router = new Router({
       }
     },
     {
+      path: "/EditOrderDetails",
+      name: "EditOrderDetails",
+      component: EditOrderDetails,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
       path: "/Error",
       name: "Error",
       component: ErrorPage,
@@ -278,6 +289,15 @@ localStorage.setItem("viewOrderId", null);
 //if people try to access the orderdetails page by typing in the url, it will just
 //redirect them to summaryofOrders
 if(to.name == "OrderDetails" && localStorage.getItem("viewOrderId") == "null")
+ next({ path: '/SummaryOfOrders'})
+
+//if admin leaves the editorderdetails page, editorderdetails page will reset.
+if(to.name != "EditOrderDetails" && localStorage.getItem("editOrderId") != null)
+localStorage.setItem("editOrderId", null);
+
+//if people try to access the editorderdetails page by typing in the url, it will just
+//redirect them to summaryofOrders
+if(to.name == "EditOrderDetails" && localStorage.getItem("editOrderId") == "null")
  next({ path: '/SummaryOfOrders'})
 
 if(from.name == "SummaryOfOrders"){
