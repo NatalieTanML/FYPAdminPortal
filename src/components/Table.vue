@@ -58,18 +58,11 @@
             <template v-if="enableCheckbox" slot="HEAD_checkbox">
               <b-form-checkbox @change="checkAllCheckBox()" v-model="checkAll"></b-form-checkbox>
             </template>
-            <!-- 
-            <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
-              <b-form-checkbox
-                :checked="checkedCheckBox.includes(row.item.id)"
-                @change="onCheckBoxCheck(row.item.id)"
-              ></b-form-checkbox>
-            </template>-->
 
             <template v-if="enableCheckbox" slot="checkbox" slot-scope="row">
               <b-form-checkbox
                 :checked="checkedCheckBox.includes(row.item.id)"
-                @change="onCheckBoxCheck(row.item.id)"
+                @change="onCheckBoxCheck(row.item)"
               ></b-form-checkbox>
             </template>
 
@@ -297,26 +290,23 @@ export default {
     },
     checkAllCheckBox() {
       let index = 0;
-
       let rowsPerPage = this.perPage;
-
       let shownItems = (this.currentPage - 1) * rowsPerPage;
       // console.log(shownItems)
-
       //if the last page has less than 5 stuff.
       if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
         rowsPerPage = this.items.length - shownItems;
 
+      if (this.items[0].actions == null) this.showHeaderButton = false;
+      else this.showHeaderButton = true;
+
       //if the first page has less than 5 stuff.
       if (this.currentPage == 1 && this.items.length < rowsPerPage)
         rowsPerPage = this.items.length;
-
       // console.log(this.currentPage)
       // console.log(rowsPerPage)
-
       if (!this.checkAll) this.checkAll = true;
       else this.checkAll = false;
-
       this.checkedCheckBox = [];
       if (this.checkAll) {
         for (index = 0; index < rowsPerPage; index++) {

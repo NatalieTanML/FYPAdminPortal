@@ -286,7 +286,12 @@ if(from.name == "SummaryOfOrders"){
   //summaryoforders page.
   //https://stackoverflow.com/questions/49484390/eventbus-is-listening-duplicate-events-when-component-is-loaded-multiple-times/49526856
   //eventbus.once doesnt work because then the button can only be clicked once. then it will be "disabled."
-  eventBus.$off(SummaryOfOrders.data().headerButtonClick)
+ 
+  //since summaryoforders have multiple headers, need to reset each listender for the headers.
+ let index;
+ for(index = 0; index < SummaryOfOrders.data().headerButtonClick.length; index++){
+ eventBus.$off(SummaryOfOrders.data().headerButtonClick)
+  }
  eventBus.$off(SummaryOfOrders.data().actionButtonClick)
  eventBus.$off(SummaryOfOrders.data().imageClick)
 

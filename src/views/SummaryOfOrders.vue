@@ -279,7 +279,6 @@ export default {
       //reason why i don't use const ^ is because when the data is displayed,
       //it will become read-only.
       console.log("on tab change is called");
-
       this.sortItems = [];
       //change background color for the tab
 
@@ -288,33 +287,25 @@ export default {
       //because the tabs have not been created.
       if (this.$refs.tabs != undefined)
         this.noOfTabs = this.$refs.tabs.childElementCount;
-
       if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
-
       this.selectedTab = id;
       var index;
-
       for (index = 0; index < this.Tabs.length; index++) {
         if (id != this.Tabs[index].id)
           if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
       }
       //manipulate table data after changing tab color
-
       let sortBy = this.typesOfTabs[id];
       console.log(sortBy);
-
       for (index = 0; index < this.items.length; index++) {
         if (sortBy === this.items[index].status)
           this.sortItems.push(this.items[index]);
         if (sortBy == "All") this.sortItems.push(this.items[index]);
       }
-
       // if (sortBy === "All") this.sortItems = this.items;
-
       //to disable checkbox is All tabs are selected
       if (sortBy == "All") this.enableCheckbox = false;
       else this.enableCheckbox = true;
-
       //forceRender resets all the variable in the table.
       //like the array list of orderids that will be used to update the status
       //of the products.
@@ -323,12 +314,9 @@ export default {
     },
 
     setUpTabs() {
-      console.log("set up tab is called");
-
       let x;
       let index;
       let numberOfRows = 0;
-
       this.arrayOfNumberOfRows = [];
       //index is 1 so as to skip the All tab. then i push a 0 on the first
       //number of the arrayofNumberOfRows.
@@ -339,20 +327,15 @@ export default {
           if (this.items[x].status == this.typesOfTabs[index]) numberOfRows++;
         }
         this.arrayOfNumberOfRows.push(numberOfRows);
-
         //set up tabs after getting all the items and what
       }
-
       let typesOfTabs = this.typesOfTabs;
-
       //set up actions based on the type of tabs
       //you can generate the actions in the previous for loop. but i feel that
       //the code will be extra messy.
-
       //reset tab.
 
       this.Tabs = [];
-
       for (x = 0; x < typesOfTabs.length; x++)
         //initialize the tabs to get title, id and isDark.
         this.Tabs[x] = {
@@ -361,12 +344,10 @@ export default {
           isDark: false,
           noOfRows: this.arrayOfNumberOfRows[x]
         };
-
       //selects current tabs.
       //if no tab is selected, the default will be 0
       this.onTabChange(this.selectedTab);
     },
-
     getAction(status) {
       if (status == "Received") return "Accept Order";
       else if (status == "Awaiting Printing") return "Print";
@@ -377,18 +358,15 @@ export default {
       else if (status == "Cancelled") return null;
       else return null;
     },
-
     updateStatusTabsAndTable(orderIds) {
       //isSuccessful will always be true unless the admin presses on the dropdown at the
       //end of the row and click cancel order
-
       const isSuccessful = true;
 
       const jsonData = {
         orderIds: orderIds,
         isSuccessful: isSuccessful
       };
-
       this.$store
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
@@ -406,10 +384,8 @@ export default {
               }
             });
           }
-
           //reset the tabs.
-          //this.setUpTabs();
-
+          this.setUpTabs();
           //there is a few lines in the router.js where i reset the eventbus listener too
           //do take note of that.
         })
@@ -418,18 +394,48 @@ export default {
           this.message("danger", error);
         });
     },
-    downloadURI(uri, name) {
-      var link = document.createElement("a");
-      link.download = name;
-      link.href = uri;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      delete link.download;
-      delete link.href;
+    downloadImages(listOfThumbNailUrl) {
+      console.log("downloadImages : " + listOfThumbNailUrl);
+      this.$store
+        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
+        .then(response => {
+          console.log(response);
+          let index;
+          var interval = setInterval(download, 300, response.imgUrls);
+          function download(urls) {
+            var url = urls.pop();
+            console.log(url);
+            var a = document.createElement("a");
+            a.setAttribute("href", url);
+            a.setAttribute("download", "");
+            a.setAttribute("target", "_blank");
+            a.click();
+            if (urls.length == 0) {
+              clearInterval(interval);
+            }
+          }
+          // this.presignedUrl = response.imgUrls[0];
+          // this.$bvModal.show("viewPresignedImage");
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
+
+    downloadURI(urls, interval) {
+      var url = urls.pop();
+      var a = document.createElement("a");
+      a.setAttribute("href", url);
+      a.setAttribute("download", "");
+      a.setAttribute("target", "_blank");
+      a.click();
+      if (urls.length == 0) {
+        clearInterval(interval);
+      }
     }
   }
-};
+
 </script>
 
 <style>
