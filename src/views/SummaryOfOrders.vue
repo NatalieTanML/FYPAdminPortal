@@ -398,7 +398,7 @@
               updatedOrders.forEach((oneUpdatedOrder, index) => {
                 if (this.items[x].id == oneUpdatedOrder.orderId) {
                   this.items[x].status = oneUpdatedOrder.statusName;
-                  this.items[x].actions = this.getAction(oneUpdatedOrder.statusName)
+                  this.items[x].actions = [this.getAction(oneUpdatedOrder.statusName)]
                  
                 }
 
