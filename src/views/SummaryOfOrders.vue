@@ -150,6 +150,8 @@
     computed: {},
 
     mounted() {
+
+
       this.$store
         .dispatch(GET_ALL_STATUS)
         .then(response => {
@@ -219,7 +221,8 @@
               this.items[x] = {
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
-                date: (response[x].createdAt),
+                //https://stackoverflow.com/questions/14638018/current-time-formatting-with-javascript
+                date: new Date(Date.parse(response[x].createdAt)).toLocaleString(),
                 items: response[x].orderItems,
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,
@@ -460,9 +463,11 @@ downloadURI(urls, interval) {
 
   if (urls.length == 0) {
     clearInterval(interval);
-  }
-    
+    }
+      
 },
+
+
 
     }
   };

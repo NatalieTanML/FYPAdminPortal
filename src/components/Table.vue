@@ -186,7 +186,7 @@
     },
     mounted() {
       this.totalRows = this.items.length;
-      
+      console.log(this.items)
     console.log(this.enableCheckbox)
       //to redraw the hr line.
 
