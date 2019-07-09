@@ -75,7 +75,7 @@ export default {
   data() {
     return {
       actionButtonClick: "Assign One to Deliveryman",
-      headerButtonClick: "Assign Many to Deliveryman",
+      headerButtonClick: ["Assign Many to Deliveryman"],
       id: "",
       items: [],
       fields: [
@@ -276,10 +276,10 @@ export default {
               this.items[i].postcode
             );
             if (this.allOrders[i].deliveryManId != null) {
-              this.items[i].actions = "Update Deliveryman";
+              this.items[i].actions = ["Update Deliveryman"];
               this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
             } else {
-              this.items[i].actions = "Assign Deliveryman";
+              this.items[i].actions = ["Assign Deliveryman"];
               this.items[i].deliveryman = "Not Assigned";
             }
           }
@@ -313,9 +313,32 @@ export default {
   },
   mounted() {
     eventBus.$on(this.actionButtonClick, id => {
-      this.$bvModal.show("delivery-routes-modal");
       this.id = id;
+      this.$bvModal.show("delivery-routes-modal");
+
+
+      //A function that allows the admin to reset order deliveryman to null but no api supports yet
+
+      // for (var d = 0; d < this.deliveryman.length; d++) {
+      //   if (this.deliveryman[d].value == "remove") {
+      //     this.deliveryman.splice(d, 1);
+      //   }
+      // }
+      // for (var i = 0; i < this.items.length; i++) {
+      //   if (this.items[i].id == id) {
+      //     console.log("deli value "+ this.items[i].deliveryman)
+      //     if (this.items[i].deliveryman != "Not Assigned") {
+      //       this.deliveryman.push({
+      //         value: "remove",
+      //         text: "Remove Assigned Deliveryman"
+      //       });
+      //       this.$bvModal.show("delivery-routes-modal");
+      //     } else this.$bvModal.show("delivery-routes-modal");
+      //   }
+      // }
+
     });
+
     // eventBus.$on(this.headerButtonClick, () => {
     //   console.log("Header button clicked");
     // });
@@ -338,10 +361,10 @@ export default {
             this.items[i].postcode
           );
           if (this.allOrders[i].deliveryManId != null) {
-            this.items[i].actions = "Update Deliveryman";
+            this.items[i].actions = ["Update Deliveryman"];
             this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
           } else {
-            this.items[i].actions = "Assign Deliveryman";
+            this.items[i].actions = ["Assign Deliveryman"];
             this.items[i].deliveryman = "Not Assigned";
           }
         }

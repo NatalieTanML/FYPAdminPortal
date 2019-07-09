@@ -77,28 +77,28 @@ export default {
           date: "22/04/19",
           item: "A5 Photo",
           hotel: "Resorts World Sentosa",
-          actions: "Delivered"
+          actions: ["Delivered"]
         },
         {
           refNo: "123457",
           date: "24/04/19",
           item: "Keychain",
           hotel: "Siloso Beach Resort",
-          actions: "Delivered"
+          actions: ["Delivered"]
         },
         {
           refNo: "123458",
           date: "25/04/19",
           item: "ID Card",
           hotel: "ONE°15 Marina Sentosa Cove",
-          actions: "Delivered"
+          actions: ["Delivered"]
         },
         {
           refNo: "123459",
           date: "05/05/19",
           item: "A5 Photo + Frame",
           hotel: "Le Méridien Singapore",
-          actions: "Delivered"
+          actions: ["Delivered"]
         }
       ],
       fields: [

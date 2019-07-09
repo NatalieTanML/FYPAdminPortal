@@ -14,7 +14,6 @@ import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
 import OrderDetails from "./views/OrderDetails";
 import ErrorPage from "./views/Error";
-
 //3 roles: Admin, Store, Delivery
 //Admin -> Every Page
 //Store -> Nav Bar: Orders, Resource Management.
@@ -151,7 +150,7 @@ let router = new Router({
       path: "*",
       name: "404",
       component: ErrorPage
-    }
+    },
   ]
 });
 
