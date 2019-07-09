@@ -272,10 +272,12 @@ export default {
           for (var i = 0; i < this.allOrders.length; i++) {
             this.items[i].id = this.allOrders[i].orderId;
             this.items[i].refNo = this.allOrders[i].referenceNo;
-            this.items[i].postcode = this.allOrders[i].address.postalCode;
-            this.items[i].region = this.getRegionByPostalCode(
-              this.items[i].postcode
-            );
+            if (this.allOrders[i].addressId != null) {
+              this.items[i].postcode = this.allOrders[i].address.postalCode;
+              this.items[i].region = this.getRegionByPostalCode(
+                this.items[i].postcode
+              );
+            }
             if (this.allOrders[i].deliveryManId != null) {
               this.items[i].actions = "Update Deliveryman";
               this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
@@ -344,10 +346,12 @@ export default {
           });
           this.items[i].id = this.allOrders[i].orderId;
           this.items[i].refNo = this.allOrders[i].referenceNo;
-          this.items[i].postcode = this.allOrders[i].address.postalCode;
-          this.items[i].region = this.getRegionByPostalCode(
-            this.items[i].postcode
-          );
+          if (this.allOrders[i].addressId != null) {
+            this.items[i].postcode = this.allOrders[i].address.postalCode;
+            this.items[i].region = this.getRegionByPostalCode(
+              this.items[i].postcode
+            );
+          }
           if (this.allOrders[i].deliveryManId != null) {
             this.items[i].actions = "Update Deliveryman";
             this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;

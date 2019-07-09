@@ -22,12 +22,11 @@
             </b-col>
             <b-col>
               <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
-                <!-- b-buutton validates whether the table is orders. then it will generates different headers. -->
                 <b-button
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
                   class="float-right"
-                  v-if="tableName != 'Orders' || ((checkedCheckBox.length != 0) &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))"
+                  v-if="tableName != 'Orders' ||(checkedCheckBox.length != 0 && tableName == 'Orders')"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -48,6 +47,7 @@
             :sort-desc.sync="sortDesc"
             :sort-direction="sortDirection"
             @row-clicked="myRowClickHandler"
+            @row-hovered="myRowHoverHandler"
             @filtered="onFiltered"
             :bordered="false"
             hover
@@ -67,17 +67,15 @@
             </template>
 
             <template slot="actions" slot-scope="row">
-              <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div v-if="oneActionButton != null">
-                  <b-button
-                    type="button"
-                    v-on:click="onActionButtonClick(row.item, oneActionButton)"
-                    lg="4"
-                    class="w-75"
-                    variant="primary"
-                    size="sm"
-                  >{{oneActionButton}}</b-button>
-                </div>
+              <div v-if="row.item.actions != null">
+                <b-button
+                  type="button"
+                  v-on:click="onActionButtonClick(row.item)"
+                  lg="4"
+                  class="w-75"
+                  variant="primary"
+                  size="sm"
+                >{{row.value}}</b-button>
               </div>
 
               <div style="display: inline-block;margin-left:5px" v-if="tableName == 'Orders'">
@@ -92,7 +90,7 @@
                   </template>
 
                   <b-dropdown-item-button
-                    v-on:click="editOrder(row.item.id)"
+                    v-on:click="editOrder()"
                     aria-describedby="dropdown-header-label"
                   >Edit Order</b-dropdown-item-button>
                   <b-dropdown-item-button
@@ -200,14 +198,12 @@ export default {
       currentPage: 1,
       perPage: 5,
       pageOptions: [5, 10, 15, 20, 25],
-
+      sortBy: null,
       sortDesc: false,
       sortDirection: "asc",
       filter: null,
       checkedCheckBox: [],
-      checkAll: false,
-      showHeaderButton: true
-
+      checkAll: false
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -220,8 +216,7 @@ export default {
     actionButtonClick: String,
     enableCheckbox: Boolean,
     tableName: String,
-    imageClick: String,
-    sortBy: String
+    imageClick: String
   },
   mounted() {
     this.totalRows = this.items.length;
@@ -269,90 +264,49 @@ export default {
           this.checkedCheckBox = [];
           this.checkAll = false;
         } else if (this.headerButton[1].title == clickedHeaderTitle) {
-          const listOfThumbNailUrl = [];
-          let index;
-
-          for (index = 0; index < this.items.length; index++) {
-            this.checkedCheckBox.forEach(checkedItemId => {
-              console.log(checkedItemId);
-              if (this.items[index].id == checkedItemId) {
-                console.log(this.items[index]);
-                this.items[index].items.forEach(eachItemInOrder => {
-                  listOfThumbNailUrl.push(eachItemInOrder.orderImageKey);
-                });
-              }
-            });
-          }
-          console.log(listOfThumbNailUrl);
-          eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
+          eventBus.$emit(this.headerButton[1]);
         }
       } else eventBus.$emit(this.headerButtonClick[0]);
     },
-    onActionButtonClick(item, oneActionButton) {
-      console.log(item);
-      console.log(oneActionButton);
-
+    onActionButtonClick(item) {
       if (this.tableName == "Orders") {
         const orderIds = [];
         orderIds.push(item.id);
 
         eventBus.$emit(this.actionButtonClick, orderIds);
-      } else if (this.tableName == "Resource Management") {
-        const itemAndButton = {
-          item: item,
-          actionButton: oneActionButton
-        };
-
-        eventBus.$emit(this.actionButtonClick, itemAndButton);
       } else eventBus.$emit(this.actionButtonClick, item.id);
       //id is the row's item's id
     },
-    onCheckBoxCheck(item) {
+    onCheckBoxCheck(refNo) {
       let index = 0;
 
-      //made for order table. since completed items does not have any actions, and therefore
-      //it will not show the update status button.
-      for (index = 0; index < item.actions.length; index++) {
-        if (item.actions[index] == null) {
-          console.log("action is null");
-          this.showHeaderButton = false;
-        } else this.showHeaderButton = true;
-      }
-      if (this.checkedCheckBox.includes(item.id)) {
+      if (this.checkedCheckBox.includes(refNo)) {
         for (index; index < this.checkedCheckBox.length; index++)
-          if (this.checkedCheckBox[index] == item.id)
+          if (this.checkedCheckBox[index] == refNo)
             this.checkedCheckBox.splice(index, 1);
-      } else this.checkedCheckBox.push(item.id);
+      } else this.checkedCheckBox.push(refNo);
 
       console.log(this.checkedCheckBox);
     },
     checkAllCheckBox() {
       let index = 0;
-
       let rowsPerPage = this.perPage;
-
       let shownItems = (this.currentPage - 1) * rowsPerPage;
       // console.log(shownItems)
-
       //if the last page has less than 5 stuff.
       if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
         rowsPerPage = this.items.length - shownItems;
 
-      for (index = 0; index < this.items[0].actions.length; index++) {
-        if (this.items[0].actions[index] == null) this.showHeaderButton = false;
-        else this.showHeaderButton = true;
-      }
+      if (this.items[0].actions == null) this.showHeaderButton = false;
+      else this.showHeaderButton = true;
 
       //if the first page has less than 5 stuff.
       if (this.currentPage == 1 && this.items.length < rowsPerPage)
         rowsPerPage = this.items.length;
-
       // console.log(this.currentPage)
       // console.log(rowsPerPage)
-
       if (!this.checkAll) this.checkAll = true;
       else this.checkAll = false;
-
       this.checkedCheckBox = [];
       if (this.checkAll) {
         for (index = 0; index < rowsPerPage; index++) {
@@ -374,29 +328,16 @@ export default {
         });
       }
     },
-
     myRowHoverHandler(record, index) {
-      console.log(this.items[index].id);
       this.$delete(this.items[index], "_rowVariant");
     },
-
-    editOrder(orderId) {
-      console.log("edit order" + orderId);
-      localStorage.setItem("editOrderId", orderId);
-      this.$router.replace({
-        name: "EditOrderDetails"
-      });
-    },
+    editOrder() {},
     cancelOrder() {
       console.log("order is cancelled");
     },
     onImageClick(orderImageThumbNail) {
-      if (this.tableName == "Orders") {
-        const listOfThumbNailUrl = [];
-        listOfThumbNailUrl.push(orderImageThumbNail);
-
-        eventBus.$emit(this.imageClick, listOfThumbNailUrl);
-      }
+      if (this.tableName == "Orders")
+        eventBus.$emit(this.imageClick, orderImageThumbNail);
     }
   }
 };
