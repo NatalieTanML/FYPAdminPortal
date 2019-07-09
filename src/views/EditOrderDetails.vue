@@ -250,7 +250,7 @@ export default {
       },
   },
   mounted() {
-    const orderId = localStorage.getItem("viewOrderId");
+    const orderId = localStorage.getItem("editOrderId");
 
     this.$store
       .dispatch(ORDER_GET_REQUEST, orderId)

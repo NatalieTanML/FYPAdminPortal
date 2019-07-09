@@ -62,7 +62,7 @@ export default {
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
-        { key: "username", label: "Username", sortable: true },
+        { key: "name", label: "Username", sortable: true },
         { key: "role", label: "Role", sortable: true },
         { key: "createdAt", label: "Created At" },
         { key: "createdBy", label: "Created By" },
@@ -105,7 +105,7 @@ export default {
          else
          this.items[index].isEnabled = "No"
 
-         this.items[index].actions = "Edit";
+         this.items[index].actions = ["Edit"];
          }
           })
           .catch(error => {

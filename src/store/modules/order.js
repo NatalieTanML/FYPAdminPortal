@@ -106,7 +106,7 @@ const actions = {
     },
     [UPDATE_RECIPIENT]: ({commit}, jsonData) => {
         return new Promise ((resolve, reject) =>{
-            apiCall ({url: api_routes.update_recipient, data: jsonData, method: "put"})
+            apiCall ({url: api_routes.order.update_recipient, data: jsonData, method: "put"})
             .then (resp =>{
                 resolve(resp)
             })
