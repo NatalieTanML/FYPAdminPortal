@@ -58,13 +58,13 @@
 </template>
 
 <script>
+import OrderHub from "@/services/orderHub.js";
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
 import { GET_ALL_ORDERS, UPDATE_DELIVERYMAN } from "@/store/actions/order";
 import { GET_ALL_DELIVERYMEN } from "@/store/actions/user";
-//import * as signalR from "@aspnet/signalr";
 
 export default {
   components: {
@@ -74,8 +74,14 @@ export default {
   },
   data() {
     return {
+      connection: null,
       actionButtonClick: "Assign One to Deliveryman",
+<<<<<<< HEAD
       headerButtonClick: ["Assign Many to Deliveryman"],
+=======
+      headerButton: [{id: 1, title: "Assign to Deliveryman"}],
+      headerButtonClick: ["Assign to Deliveryman"],
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
       id: "",
       items: [],
       fields: [
@@ -89,7 +95,6 @@ export default {
       deliveryman: [],
       allOrders: [],
       allDeliverymen: [],
-      connection: null
     };
   },
 
@@ -304,14 +309,8 @@ export default {
       }
     }
   },
-  created() {
-    // create a connection to the hub
-    this.connection = new this.$signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:44393/order-hub")
-      .configureLogging(this.$signalR.LogLevel.Error)
-      .build();
-  },
-  mounted() {
+  
+  async mounted() {
     eventBus.$on(this.actionButtonClick, id => {
       this.id = id;
       this.$bvModal.show("delivery-routes-modal");
@@ -338,8 +337,12 @@ export default {
       // }
 
     });
+<<<<<<< HEAD
 
     // eventBus.$on(this.headerButtonClick, () => {
+=======
+    // eventBus.$on(this.headerButtonClick[0], () => {
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
     //   console.log("Header button clicked");
     // });
     this.$store
@@ -392,26 +395,41 @@ export default {
       .catch(error => {
         alert(error);
       });
-    // establish hub methods first
+
+    // Establish hub connection
+    this.connection = await OrderHub.connectToOrderHub();
+    this.connection
+      .start()
+      .then(() => {
+        console.log("Connection to hub started");
+      })
+      .catch(err => console.log(err));
+
+    // Establish hub methods 
     this.connection.on("OneOrder", order => {
       console.log("OneOrder called");
       console.log(order);
       this.refreshTable();
     });
+
     this.connection.on("MultipleOrders", orders => {
       console.log("MultipleOrders called");
       console.log(orders);
       this.refreshTable();
     });
-    // Connect to hub
-    this.connection
-      .start()
-      .then(response => {
-        console.log("Connection to hub started");
-      })
-      .catch(err => {
-        console.error("Connection failed", err.toString());
-      });
+    // // Connect to hub
+    // this.connection
+    //   .start()
+    //   .then(response => {
+    //     console.log("Connection to hub started");
+    //   })
+    //   .catch(err => {
+    //     console.error("Connection failed", err.toString());
+    //   });
+  },
+
+  async beforeDestroy() {
+    this.connection.stop();
   }
 };
 </script>

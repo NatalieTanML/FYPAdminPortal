@@ -19,7 +19,7 @@
           <Table
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
-            headerButton="Add User"
+            :headerButton="headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
           ></Table>
@@ -56,12 +56,13 @@ export default {
   },
   data() {
     return {
-      headerButtonClick: "Add One User",
+      headerButtonClick: ["Add User"],
+      headerButton: [{id: 1, title: "Add User"}],
       actionButtonClick: "Edit One User",
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
-        { key: "username", label: "Username", sortable: true },
+        { key: "name", label: "Username", sortable: true },
         { key: "role", label: "Role", sortable: true },
         { key: "createdAt", label: "Created At" },
         { key: "createdBy", label: "Created By" },
@@ -82,7 +83,7 @@ export default {
     },
   },
   mounted() {
-    eventBus.$on(this.headerButtonClick, () => {
+    eventBus.$on(this.headerButtonClick[0], () => {
       this.$router.replace({ name: "AddUser" });
     });
 
@@ -104,7 +105,7 @@ export default {
          else
          this.items[index].isEnabled = "No"
 
-         this.items[index].actions = "Edit";
+         this.items[index].actions = ["Edit"];
          }
           })
           .catch(error => {

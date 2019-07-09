@@ -118,6 +118,7 @@ export default {
   },
   data() {
     return {
+<<<<<<< HEAD
       form: {
         quantityOption: "Increase",
         quantityValue: null,
@@ -130,6 +131,13 @@ export default {
       products: "",
       tableName: "Resource Management",
       id: "",
+=======
+      headerButtonClick: ["Add Resource"],
+      headerButton: [{id: 1, title: "Add Resource"}],
+      actionButtonClick: "Resource Action Buttons",
+      products: "",
+      tableName: "Resource Management",
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
       items: [],
       quantityOptions: ["Increase", "Reduce"],
       fields: [
@@ -164,6 +172,7 @@ export default {
       this.$router.replace({ name: "AddResource" });
     });
 
+<<<<<<< HEAD
     eventBus.$on(this.actionButtonClick, jsonData => {
       if (jsonData.actionButton == "Edit")
         this.$router.replace({ name: "UpdateResource" });
@@ -179,6 +188,12 @@ export default {
         this.$v.$reset();
         this.$bvModal.show("manageQuantity");
       }
+=======
+    eventBus.$on(this.actionButtonClick, (jsonData) => {
+   
+        if(jsonData.actionButton == "Edit")
+     this.$router.replace({ name: "UpdateResource" });
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
     });
 
     this.$store
@@ -261,6 +276,15 @@ export default {
             ];
             x++;
           }
+<<<<<<< HEAD
+=======
+            
+          
+          this.items[x].actions = ["Edit","Add"];
+          x= x+1;
+        }
+         
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
         }
       })
       .catch(error => {

@@ -59,7 +59,11 @@
                 <b-dropdown id="dropdown-header" variant="transparent" no-caret class="mb-1 mydropdown">
             <template slot="button-content">  <i class="fas fa-ellipsis-v fa-sm"></i></template>
                  
+<<<<<<< HEAD
                   <b-dropdown-item-button v-on:click="editOrder()" aria-describedby="dropdown-header-label">
+=======
+                  <b-dropdown-item-button v-on:click="editOrder(row.item.id)" aria-describedby="dropdown-header-label">
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
                     Edit Order
                   </b-dropdown-item-button>
                   <b-dropdown-item-button  v-b-modal.cancelOrder  aria-describedby="dropdown-header-label">
@@ -158,7 +162,11 @@
       return {
         totalRows: 1,
         currentPage: 1,
+<<<<<<< HEAD
         perPage: 20,
+=======
+        perPage: 5,
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
         pageOptions: [5, 10, 15, 20, 25],
        
         sortDesc: false,
@@ -365,7 +373,16 @@
           });
         }
       },
+<<<<<<< HEAD
       editOrder() {
+=======
+      editOrder(orderId) {
+        console.log("edit order" +orderId)
+      localStorage.setItem("editOrderId", orderId);
+        this.$router.replace({
+            name: "EditOrderDetails"
+          });
+>>>>>>> 54bb6c9169d015f23c1c10b7b40eab4444c3bd54
 
       },
       cancelOrder() {

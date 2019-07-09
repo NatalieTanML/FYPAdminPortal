@@ -21,6 +21,7 @@ export const api_routes = {
     get_presigned_url : 'api/s3/url',
     update_recipient : 'api/orders/recipient',
   },
+  
   product: {
     get_all: 'api/products/',
     get_one: 'api/products/',

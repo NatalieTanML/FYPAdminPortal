@@ -94,26 +94,26 @@ export default {
     };
      
 
-        // this.$store
-        //   .dispatch(SIGN_IN, userStr)
-        //   .then(response => {
-        //     console.log(response)
-        //     if (!response.user.changePassword) {
-        //       this.$router.replace({ name: "ChangePassword" });
-        //     } else {
-        //       this.message("success", "You have logged in");
-        //       this.$router.replace({ name: "SummaryOfOrders" });
-        //     }
-        //   })
-        //   .catch(error => {
-        //     this.$store
-        //       .dispatch(USER_LOGOUT)
-        //     console.log(error);
-        //     this.message("danger", error.response.data.message);
-        //   });
+        this.$store
+          .dispatch(SIGN_IN, userStr)
+          .then(response => {
+            console.log(response)
+            if (!response.user.changePassword) {
+              this.$router.replace({ name: "ChangePassword" });
+            } else {
+              this.message("success", "You have logged in");
+              this.$router.replace({ name: "SummaryOfOrders" });
+            }
+          })
+          .catch(error => {
+            this.$store
+              .dispatch(USER_LOGOUT)
+            console.log(error);
+            this.message("danger", error.response.data.message);
+          });
 
-        this.$store.dispatch(BYPASSLOGIN)
-        this.$router.replace({ name: "SummaryOfOrders" });
+        // this.$store.dispatch(BYPASSLOGIN)
+        // this.$router.replace({ name: "SummaryOfOrders" });
 
 
     },
