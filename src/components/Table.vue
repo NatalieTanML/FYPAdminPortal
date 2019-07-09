@@ -330,6 +330,7 @@ export default {
     },
     myRowHoverHandler(record, index) {
       console.log(this.items[index].id);
+      this.$delete(this.items[index], "_rowVariant");
     },
     editOrder() {},
     cancelOrder() {

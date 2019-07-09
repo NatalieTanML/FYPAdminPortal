@@ -76,7 +76,7 @@ export default {
     return {
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
-      headerButton: [{id: 1, title: "Assign to Deliveryman"}],
+      headerButton: [{ id: 1, title: "Assign to Deliveryman" }],
       headerButtonClick: ["Assign to Deliveryman"],
       id: "",
       items: [],
@@ -90,7 +90,7 @@ export default {
       selected: null,
       deliveryman: [],
       allOrders: [],
-      allDeliverymen: [],
+      allDeliverymen: []
     };
   },
 
@@ -303,9 +303,25 @@ export default {
             });
         }
       }
+    },
+
+    highlightRows(orders) {
+      let idsToUpdate = [];
+      for (var i = 0; i < orders.length; i++) {
+        idsToUpdate.push(orders[i].orderId);
+      }
+      console.log("idsToUpdate", idsToUpdate);
+      for (var e = 0; e < idsToUpdate.length; e++) {
+        let idToUpdate = idsToUpdate[e];
+        for (var x = 0; x < this.items.length; x++) {
+          if (idToUpdate == this.items[x].id) {
+            this.$set(this.items[x], "_rowVariant", "primary");
+          }
+        }
+      }
     }
   },
-  
+
   async mounted() {
     eventBus.$on(this.actionButtonClick, id => {
       this.$bvModal.show("delivery-routes-modal");
@@ -367,34 +383,21 @@ export default {
 
     // Establish hub connection
     this.connection = await OrderHub.connectToOrderHub();
+
+    // Establish hub methods
+    this.connection.on("MultipleOrders", orders => {
+      console.log("MultipleOrders called");
+      console.log(orders);
+      this.refreshTable();
+      this.highlightRows(orders);
+    });
+
     this.connection
       .start()
       .then(() => {
         console.log("Connection to hub started");
       })
       .catch(err => console.log(err));
-
-    // Establish hub methods 
-    this.connection.on("OneOrder", order => {
-      console.log("OneOrder called");
-      console.log(order);
-      this.refreshTable();
-    });
-
-    this.connection.on("MultipleOrders", orders => {
-      console.log("MultipleOrders called");
-      console.log(orders);
-      this.refreshTable();
-    });
-    // // Connect to hub
-    // this.connection
-    //   .start()
-    //   .then(response => {
-    //     console.log("Connection to hub started");
-    //   })
-    //   .catch(err => {
-    //     console.error("Connection failed", err.toString());
-    //   });
   },
 
   async beforeDestroy() {

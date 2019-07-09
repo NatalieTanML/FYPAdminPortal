@@ -76,6 +76,7 @@ import {
   UPDATE_ORDER_STATUS,
   GET_PRESIGNED_URL
 } from "@/store/actions/order";
+import { setInterval, clearInterval, setTimeout } from "timers";
 
 export default {
   components: {
@@ -86,6 +87,7 @@ export default {
   },
   data() {
     return {
+      polling: null,
       connection: null,
       //have multiple buttons
       headerButtonClick: ["Update Order Status", "Download Images"],
@@ -155,6 +157,10 @@ export default {
 
   computed: {},
 
+  created() {
+    this.pollData();
+  },
+
   async mounted() {
     this.$store
       .dispatch(GET_ALL_STATUS)
@@ -167,7 +173,7 @@ export default {
           this.typesOfTabs[x] = response[x - 1].statusName;
 
         //had to hardcode the last tab string.
-        this.typesOfTabs[x] = response[x - 1].statusName;
+        // this.typesOfTabs[x] = response[x - 1].statusName;
         this.getAllOrders();
       })
       .catch(error => {
@@ -210,12 +216,18 @@ export default {
       console.log("OneOrder called");
       console.log(order);
       this.getAllOrders();
+      setTimeout(() => {
+        this.highlightOneRow(order);
+      }, 1000);
     });
 
     this.connection.on("MultipleOrders", orders => {
       console.log("MultipleOrders called");
       console.log(orders);
       this.getAllOrders();
+      setTimeout(() => {
+        this.highlightRows(orders);
+      }, 1000);
     });
 
     // start the connection
@@ -229,6 +241,7 @@ export default {
 
   async beforeDestroy() {
     this.connection.stop();
+    clearInterval(this.polling);
   },
 
   methods: {
@@ -422,7 +435,6 @@ export default {
           this.message("danger", error);
         });
     },
-
     downloadURI(urls, interval) {
       var url = urls.pop();
       var a = document.createElement("a");
@@ -433,6 +445,33 @@ export default {
       if (urls.length == 0) {
         clearInterval(interval);
       }
+    },
+    highlightOneRow(order) {
+      for (var x = 0; x < this.items.length; x++) {
+        if (order.orderId == this.items[x].id) {
+          this.$set(this.items[x], "_rowVariant", "primary");
+        }
+      }
+    },
+    highlightRows(orders) {
+      let idsToUpdate = [];
+      for (var i = 0; i < orders.length; i++) {
+        idsToUpdate.push(orders[i].orderId);
+      }
+      console.log("idsToUpdate", idsToUpdate);
+      for (var e = 0; e < idsToUpdate.length; e++) {
+        let idToUpdate = idsToUpdate[e];
+        for (var x = 0; x < this.sortItems.length; x++) {
+          if (idToUpdate == this.items[x].id) {
+            this.$set(this.items[x], "_rowVariant", "primary");
+          }
+        }
+      }
+    },
+    pollData() {
+      this.polling = setInterval(() => {
+        this.getAllOrders();
+      }, 60000);
     }
   }
 };
