@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 export const api_routes = {
-
   user: {
     sign_in: 'api/users/signin',
     sign_up: 'api/users/signup',
@@ -12,9 +11,16 @@ export const api_routes = {
     change_password: 'api/users/changepassword'
   },
   order: {
-    get:'api/orders/1'
+    get: 'api/orders/1'
+  },
+  product: {
+    create: 'api/products',
+    get_one: 'api/products/'
+  },
+  s3: {
+    upload: 'api/s3/product',
+    delete: 'api/s3/delete'
   }
-
 };
 
 export const apiCall = ({ url, method, ...args }) =>
@@ -24,7 +30,7 @@ export const apiCall = ({ url, method, ...args }) =>
     if (token)
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
 
-    
+
     try {
       axios({
         method: method || 'get',

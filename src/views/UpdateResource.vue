@@ -3,34 +3,23 @@
     <SideBar></SideBar>
     <div id="content-wrapper">
       <div id="content">
-        <!-- Topbar -->
         <DashboardHeader title="Resource Management - Update Resource"></DashboardHeader>
-          <!-- Topbar Navbar -->
-        
+
         <b-container fluid>
           <b-row class="bg-white text-left" align-h="center">
-            <b-col cols="8" class="my-5">
+            <b-col cols="10" class="my-5">
               <h4 class="text-uppercase">General</h4>
-              <hr class="mb-5">
+              <hr class="mb-5" />
 
               <b-form class="resource-form">
                 <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                <b-form-group
-                  id="productId"
-                  label-cols-sm="3"
-                  label="Product ID"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input id="productId" value="SKU_123"></b-form-input>
-                </b-form-group>
-
                 <b-form-group
                   id="productName"
                   label-cols-sm="3"
                   label="Product Name"
                   label-for="input-horizontal"
                 >
-                  <b-form-input id="productName" value="Key Chain"></b-form-input>
+                  <b-form-input id="productName" v-model="form.name"></b-form-input>
                 </b-form-group>
 
                 <b-form-group
@@ -39,7 +28,59 @@
                   label="Price"
                   label-for="input-horizontal"
                 >
-                  <b-form-input id="price" value="$5.90"></b-form-input>
+                  <b-form-input id="price" v-model="form.price"></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                  id="imageWidth"
+                  label-cols-sm="3"
+                  label="Width"
+                  label-for="input-horizontal"
+                >
+                  <b-form-input id="imageWidth" v-model="form.imageWidth"></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                  id="imageHeight"
+                  label-cols-sm="3"
+                  label="Height"
+                  label-for="input-horizontal"
+                >
+                  <b-form-input id="imageHeight" v-model="form.imageHeight"></b-form-input>
+                </b-form-group>
+
+                <b-form-group
+                  id="startDate"
+                  label-cols-sm="3"
+                  label="Start Date"
+                  label-for="input-horizontal"
+                >
+                  <datepicker
+                    id="startDate"
+                    :value="datePicker.date"
+                    :bootstrap-styling="datePicker.style"
+                    :format="datePicker.format"
+                    :placeholder="datePicker.placeHolder"
+                    v-model="form.effectiveStartDate"
+                    required
+                  ></datepicker>
+                </b-form-group>
+
+                <b-form-group
+                  id="endDate"
+                  label-cols-sm="3"
+                  label="End Date"
+                  label-for="input-horizontal"
+                >
+                  <datepicker
+                    id="endDate"
+                    :value="datePicker.date"
+                    :bootstrap-styling="datePicker.style"
+                    :format="datePicker.format"
+                    :placeholder="datePicker.placeHolder"
+                    v-model="form.effectiveEndDate"
+                    required
+                  ></datepicker>
                 </b-form-group>
 
                 <b-form-group
@@ -48,33 +89,11 @@
                   label="Description"
                   label-for="input-horizontal"
                 >
-                  <b-form-textarea
-                    id="description"
-                    rows="6"
-                    value="Customisable key chain for your loved ones"
-                  ></b-form-textarea>
-                </b-form-group>
-
-                <b-form-group
-                  id="currentQuantity"
-                  label-cols-sm="3"
-                  label="Current Qty"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input id="currentQuantity" value="100"></b-form-input>
-                </b-form-group>
-
-                <b-form-group
-                  id="minimumQuantity"
-                  label-cols-sm="3"
-                  label="Min. Qty"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input id="minimumQuantity" value="20"></b-form-input>
+                  <b-form-textarea id="description" rows="6" v-model="form.description"></b-form-textarea>
                 </b-form-group>
 
                 <h4 class="text-uppercase mt-5">Discount</h4>
-                <hr class="mb-5">
+                <hr class="mb-5" />
 
                 <b-container class="px-0">
                   <div class="table-wrapper">
@@ -95,16 +114,18 @@
                       </b-row>
                     </div>
 
-                    <b-table responsive striped :items="items" :fields="fields">
-                      <template slot="actions">
+                    <b-table responsive striped :items="discountDetails" :fields="discountFields">
+                      <template slot="actions" slot-scope="row">
                         <b-button
-                          v-b-modal.addDiscount
+                          @click="editDiscountInfo(row.item, row.index)"
+                          v-b-modal.editDiscount
                           size="sm"
                           class="px-4"
                           variant="primary"
                         >Edit</b-button>
                         <b-button
-                          v-b-modal.addDiscount
+                          @click="deleteDiscountInfo(row.index)"
+                          v-b-modal.deleteDiscount
                           size="sm"
                           class="px-3 ml-3"
                           variant="danger"
@@ -114,189 +135,143 @@
                   </div>
                 </b-container>
 
-                <!-- modal dialog -->
-                <b-modal id="addDiscount" title="Add Discount" @ok="handleDiscount">
+                <!-- modal dialog for add discount -->
+                <b-modal
+                  id="addDiscount"
+                  title="Discount"
+                  @ok="handleAddDiscount"
+                  @close="cancelDiscountDialog"
+                  @cancel="cancelDiscountDialog"
+                >
+                  <DiscountForm v-model="this.form"></DiscountForm>
+                </b-modal>
+
+                <!-- modal dialog for edit discount -->
+                <b-modal
+                  id="editDiscount"
+                  title="Discount"
+                  @ok="handleEditDiscount"
+                  @close="cancelDiscountDialog"
+                  @cancel="cancelDiscountDialog"
+                >
+                  <DiscountForm v-model="this.form"></DiscountForm>
+                </b-modal>
+
+                <!-- modal dialog for delete discount -->
+                <b-modal
+                  id="deleteDiscount"
+                  title="Discount"
+                  @ok="handleDeleteDiscount"
+                >Are you sure you want to delete this discount?</b-modal>
+
+                <h4 class="text-uppercase mt-5">Variation</h4>
+                <hr class="mb-5" />
+
+                <b-button
+                  class="px-4"
+                  v-b-modal.addVarient
+                  @click="openVarientModal"
+                >+ Add Varient Option</b-button>
+
+                <!-- modal dialog for varient option -->
+                <b-modal
+                  id="addVarient"
+                  size="lg"
+                  title="Varient Options"
+                  ref="varientModal"
+                  @ok="handleVarientSubmit"
+                  @cancel="cancel"
+                  @close="cancel"
+                >
                   <form @submit.stop.prevent="submitDiscount">
-                    <div class="radio-button">
-                      <b-form-group
-                        id="discountType"
-                        label-cols-sm="3"
-                        label="Type"
-                        label-for="input-horizontal"
-                      >
-                        <b-form-radio-group
-                          id="discountType"
-                          class="individual-button"
-                          buttons
-                          button-variant="outline-secondary"
-                          v-model="form.discount"
-                          :options="discountOptions"
-                        ></b-form-radio-group>
-                      </b-form-group>
-                    </div>
-
-                    <b-form-group
-                      id="discountValue"
-                      label-cols-sm="3"
-                      label="Value"
-                      label-for="input-horizontal"
-                    >
-                      <b-form-input id="discountValue"></b-form-input>
-                    </b-form-group>
-
-                    <b-form-group
-                      id="discountStartDate"
-                      label-cols-sm="3"
-                      label="Start Date"
-                      label-for="input-horizontal"
-                    >
-                      <datepicker
-                        id="discountStartDate"
-                        :value="datePicker.date"
-                        :bootstrap-styling="datePicker.style"
-                        :format="datePicker.format"
-                        :placeholder="datePicker.placeHolder"
-                        required
-                      ></datepicker>
-                    </b-form-group>
-
-                    <b-form-group
-                      id="discountEndDate"
-                      label-cols-sm="3"
-                      label="End Date"
-                      label-for="input-horizontal"
-                    >
-                      <datepicker
-                        id="discountEndDate"
-                        :value="datePicker.date"
-                        :bootstrap-styling="datePicker.style"
-                        :format="datePicker.format"
-                        :placeholder="datePicker.placeHolder"
-                        required
-                      ></datepicker>
-                    </b-form-group>
+                    <VarientOption
+                      v-model="varientSections"
+                      @addVarient="addVarient"
+                      @addValue="addValue"
+                      @removeValue="removeValue"
+                      @deleteType="deleteType"
+                    ></VarientOption>
                   </form>
                 </b-modal>
 
-                <h4 class="text-uppercase mt-5">Variant</h4>
-                <hr class="mb-5">
-
-                <b-form-group
-                  id="variantName"
-                  label-cols-sm="3"
-                  label="Name"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input id="variantName" value="Key chain with wooden frame"></b-form-input>
-                </b-form-group>
-
-                <b-form-group
-                  id="variantCategory"
-                  label-cols-sm="3"
-                  label="Category"
-                  label-for="input-horizontal"
-                >
-                  <!-- 
-                    1) label is used to display the option value
-                    2) trackby is used to uniquely identify the option values
-                    3) name property is unique across all options, so it can be used as track-by value
-                    4) add the label and trackby
-                  -->
-                  <multiselect
-                    id="variantCategory"
-                    v-model="form.category"
-                    deselect-label="Can't remove this value"
-                    placeholder
-                    :options="existingCategory"
-                    label="label"
-                    track-by="label"
-                    @select="selectCategory"
-                    :searchable="false"
-                    :allow-empty="false"
-                  ></multiselect>
-
-                  <b-button class="mt-4" v-b-modal.categoryModal>Add Category</b-button>
-                </b-form-group>
-
-                <b-form-group
-                  id="variantOption"
-                  label-cols-sm="3"
-                  label="Option"
-                  label-for="input-horizontal"
-                >
-                  <multiselect
-                    id="variantOption"
-                    v-model="form.option"
-                    placeholder
-                    :options="existingOptions"
-                    :taggable="true"
-                    tag-placeholder="Press enter to create a new option"
-                    @tag="addOptionToExistingCategory"
-                    :allow-empty="false"
-                  ></multiselect>
-                </b-form-group>
-
-                <!-- modal dialog -->
-                <b-modal id="categoryModal" title="Add Category" @ok="handleCategory">
-                  <form @submit.stop.prevent="submitNewCategory">
-                    <b-form-group
-                      id="newCategory"
-                      label-cols-sm="3"
-                      label="Name"
-                      label-for="input-horizontal"
-                    >
-                      <b-form-input id="newCategory" v-model="newCategoryValue"></b-form-input>
-                    </b-form-group>
-
-                    <b-form-group
-                      id="newOption"
-                      label-cols-sm="3"
-                      label="Option"
-                      label-for="input-horizontal"
-                    >
-                      <multiselect
-                        id="newOption"
-                        v-model="newOptionValues"
-                        placeholder
-                        :options="newOptions"
-                        :multiple="true"
-                        :searchable="true"
-                        :preserve-search="true"
-                        :close-on-select="false"
-                        :clear-on-select="false"
-                        :taggable="true"
-                        tag-placeholder="Press enter to create a new option"
-                        @tag="addOptionToNewCategory"
-                        :allow-empty="false"
-                      ></multiselect>
-                    </b-form-group>
-                  </form>
-                </b-modal>
-
-                <b-form-group
-                  id="dropzone"
-                  label-cols-sm="3"
-                  label="Image"
-                  label-for="input-horizontal"
-                >
-                  <vue-dropzone
-                    id="dropzone"
-                    ref="myVueDropzone"
-                    :options="dropOptions"
-                    :useCustomSlot="true"
-                    @vdropzone-complete="afterComplete"
-                    @vdropzone-file-added="handleMoreThumbnail"
-                    @vdropzone-removed-file="handleMoreThumbnail"
-                  >
-                    <div class="dropzone-custom-content">
-                      <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                      <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
-                      <div class="subtitle">or click to add your image</div>
-                      <div class="more" ref="more" v-if="addImageIndicator">+</div>
+                <b-container class="px-0" fluid>
+                  <div class="table-wrapper">
+                    <div class="table-title">
+                      <b-row class="mx-auto">
+                        <b-col col-sm="3" class="text-left">
+                          <h5>Variants</h5>
+                        </b-col>
+                      </b-row>
                     </div>
-                  </vue-dropzone>
-                </b-form-group>
+
+                    <!-- Varient Table -->
+                    <b-table responsive striped :items="varientDetails" :fields="varientFields">
+                      <!-- research what is template and slot-scope -->
+                      <template slot="actions" slot-scope="row">
+                        <b-button
+                          @click="varientInfo(row.item, row.index)"
+                          v-b-modal.editVarient
+                          size="sm"
+                          class="px-4"
+                          variant="primary"
+                        >Edit</b-button>
+                      </template>
+                    </b-table>
+                    <!-- @shown="displayDropZone" -->
+                    <b-modal
+                      id="editVarient"
+                      ref="editVarientModal"
+                      title="Edit Varient"
+                      @ok="editVarientTableDialog"
+                      @cancel="cancelEditVarientTableDialog"
+                      @close="cancelEditVarientTableDialog"
+                    >
+                      <form @submit.stop.prevent="submitDiscount">
+                        <b-form-group label="SKU Number">
+                          <b-form-input id="productSKU" v-model="form.varient.SKUNumber"></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group label="Option Type">
+                          <b-form-input id="optionType" v-model="form.varient.type" disabled></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group label="Option Value">
+                          <b-form-input id="optionValue" v-model="form.varient.value" disabled></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group label="Current Qty">
+                          <b-form-input id="currentQuantity" v-model="form.varient.currentQuantity"></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group label="Min. Qty">
+                          <b-form-input id="minimumQuantity" v-model="form.varient.minimumQuantity"></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group label="Image">
+                          <vue-dropzone
+                            id="dropzone"
+                            ref="myVueDropzone"
+                            :options="dropOptions"
+                            :useCustomSlot="true"
+                            @vdropzone-file-added="addFileToDropzone"
+                            @vdropzone-removed-file="deleteFileFromDropzone"
+                            @vdropzone-duplicate-file="duplicateFileCheck"
+                            :destroyDropzone="false"
+                            :duplicateCheck="true"
+                          >
+                            <div class="dropzone-custom-content">
+                              <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                              <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
+                              <div class="subtitle">or click to add your image</div>
+                            </div>
+                          </vue-dropzone>
+                        </b-form-group>
+                      </form>
+                    </b-modal>
+                  </div>
+                </b-container>
               </b-form>
+
               <!-- <notifications/> -->
               <div class="text-right">
                 <b-button @click="submit" variant="primary" class="mr-3 px-4">Save</b-button>
@@ -311,15 +286,23 @@
 </template>
 
 <script>
-// 4. Change search button to a different color (instagram)
-// 5. Optional change field length
-// https://www.smashingmagazine.com/2018/03/ux-contact-forms-essentials-conversions/
-// notification
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import vueDropzone from "vue2-dropzone";
 import Multiselect from "vue-multiselect";
 import Datepicker from "vuejs-datepicker";
+import VarientOption from "@/components/VarientOption";
+import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as asingle module
+import differencewith from "lodash.differencewith";
+import isequal from "lodash.isequal";
+import moment from "moment";
+import DiscountForm from "@/components/DiscountForm";
+import {
+  UPLOAD_PRODUCT_IMAGES,
+  DELETE_PRODUCT_IMAGES,
+  UPLOAD_AND_DELETE_PRODUCT_IMAGES,
+  GET_ONE_PRODUCT
+} from "@/store/actions/product";
 
 export default {
   components: {
@@ -327,150 +310,844 @@ export default {
     DashboardHeader,
     vueDropzone,
     Multiselect,
-    Datepicker
+    Datepicker,
+    VarientOption,
+    DiscountForm
   },
+
   data() {
     return {
-      datePicker: {
-        style: true,
-        format: "dd/MM/yyyy",
-        placeHolder: "dd/mm/yyyy"
+      form: {
+        name: "",
+        price: null, // null or string?
+        imageHeight: null,
+        imageWidth: null,
+        effectiveStartDate: "",
+        effectiveEndDate: "",
+        description: "",
+        discount: {
+          effectiveStartDate: "",
+          effectiveEndDate: "",
+          discountValue: null,
+          discountType: "",
+          isPercentage: false
+        },
+        varient: {
+          SKUNumber: null,
+          varientName: "",
+          currentQuantity: null,
+          minimumQuantity: null,
+          type: "",
+          value: "",
+          files: [],
+          productImages: []
+        }
       },
 
-      fields: [
-        { key: "Discount", label: "Discount" },
-        { key: "Start", label: "Start Date" },
-        { key: "End", label: "End Date" },
+      discountFields: [
+        { key: "discountValue", label: "Discount" },
+        { key: "effectiveStartDate", label: "Start Date" },
+        { key: "effectiveEndDate", label: "End Date" },
+        { key: "discountType", label: "Discount Type" },
         { key: "actions", label: "Actions" }
       ],
 
-      items: [
-        { Discount: "10%", Start: "20/12/2019", End: "26/12/2019" },
-        { Discount: "25%", Start: "30/12/2019", End: "01/01/2020" },
-        { Discount: "89%", Start: "05/01/2020", End: "10/01/2020" }
-      ],
+      discountDetails: [],
 
-      existingCategory: [
+      datePicker: {
+        style: true,
+        format: "yyyy-MM-dd"
+      },
+
+      varientId: 0,
+
+      // This is from varient Option
+      varientSections: [
         {
-          label: "Frame",
-          options: ["Metal", "Wood", "Padded"]
-        },
-        {
-          label: "Color",
-          options: ["Red", "Blue", "Green"]
+          type: "",
+          values: [
+            {
+              varientId: 0,
+              individualValue: ""
+            }
+          ]
         }
       ],
 
-      existingOptions: [],
+      hasUserEditVarient: false,
+      originalVarient: [],
 
-      /*
-       * newOptions --> Display a list of new options if user decides to create *
-       * newOptionValues --> Display a list of options that user selected in the dropdown
-       * newCategoryValue --> New category name that the user entered
-       */
-      newOptions: [],
-      newOptionValues: [],
-      newCategoryValue: "",
+      varientDetails: [],
+      discountIndex: null,
+      selectedVarientIndex: null,
+      deletedImageKeys: [],
 
-      discountOptions: ["Percentage", "Fixed"],
+      varientFields: [
+        { key: "SKUNumber", label: "SKU" },
+        { key: "type", label: "Type" },
+        { key: "value", label: "Value" },
+        { key: "currentQuantity", label: "Current Qty" },
+        { key: "minimumQuantity", label: "Min Qty" },
+        { key: "Image", label: "Image" },
+        { key: "actions", label: "Actions" }
+      ],
 
       /* This is similar to configuration options in dropzone.js */
       dropOptions: {
         url: "https://httpbin.org/post",
         acceptedFiles: "image/*",
+        // maxFiles: 1,
         addRemoveLinks: true,
+        autoProcessQueue: false,
         thumbnailWidth: 160,
         thumbnailHeight: 160
       },
-
-      addImageIndicator: false,
-
-      form: {
-        email: "",
-        name: "",
-        // why need to provide object? maybel because the label accepts only label key?
-        category: { label: "Frame" },
-        option: "Wooden",
-        discount: ""
-      }
+      isFileDuplicate: false,
+      loader: false
     };
   },
 
   mounted() {
-    var file = {
-      size: 160,
-      type: "image/jpeg"
-    };
-    // https://stackoverflow.com/questions/40491506/vue-js-dynamic-images-not-working
-    var url = require("../assets/child.jpeg");
-    this.$refs.myVueDropzone.manuallyAddFile(file, url);
+    this.$store
+      .dispatch(GET_ONE_PRODUCT, 19)
+      .then(response => {
+        console.dir(response);
+        // Still need to have a file objeect that contains the name, size and type
+        // Task: display the rest of the data, image count and update without file added
+        // add in extra field to productimages array lo
+        // validation
+        // either map or foreach try
+        this.varientDetails = response.options.map((option, index) => {
+          return {
+            SKUNumber: option.skuNumber,
+            type: option.optionType,
+            value: option.optionValue,
+            optionId: option.optionId,
+            currentQuantity: option.currentQuantity,
+            minimumQuantity: option.minimumQuantity,
+            productImages: option.productImages,
+            varientId: index
+          };
+        });
+
+        let map = new Map();
+        // https://stackoverflow.com/questions/48672314/modifying-an-array-of-objects-to-group-into-a-nested-parent-child-array-of-obj
+        response.options.forEach(({ optionType, optionValue }, index) => {
+          map.has(optionType) ||
+            map.set(optionType, { type: optionType, values: [] });
+          map
+            .get(optionType)
+            .values.push({ varientId: index, individualValue: optionValue });
+        });
+
+        // Returns a new Iterator object that contains the values
+        // for each element in the Map object in insertion order.
+        this.varientSections = [...map.values()];
+        this.hasUserEditVarient = true;
+
+        console.log(this.varientSections);
+
+        this.form.name = response.productName;
+        this.form.price = response.price;
+        this.form.imageHeight = response.imageHeight;
+        this.form.imageWidth = response.imageWidth;
+        this.form.effectiveStartDate = response.effectiveStartDate;
+        this.form.effectiveEndDate = response.effectiveEndDate;
+        this.form.description = response.description;
+
+        this.discountDetails = response.discountPrice.map(discount => {
+          // Add a new property called discount type
+          let discountTypeProp = {
+            discountType: discount.isPercentage ? "Percentage" : "Fixed"
+          };
+
+          discount.effectiveStartDate = moment(
+            discount.effectiveStartDate
+          ).format("YYYY-MM-DD");
+          discount.effectiveEndDate = moment(discount.effectiveEndDate).format(
+            "YYYY-MM-DD"
+          );
+
+          // Assign new propertiy and return
+          return Object.assign(discount, discountTypeProp);
+        });
+      })
+      .catch(error => {
+        console.dir(error);
+        alert("error");
+      });
   },
 
   methods: {
-    // https://www.raymondcamden.com/2017/12/05/building-related-selects-with-vuejs
-    selectCategory(selectedCategory) {
-      // Once you select a new category, reset the previous options
-      this.form.option = "";
-      this.existingOptions = selectedCategory.options;
+    handleAddDiscount() {
+      let discount = this.form.discount;
+      console.log(discount);
+      this.formatDiscountDate(discount);
+      if (discount.discountType === "Percentage") {
+        discount.isPercentage = true;
+      } else {
+        discount.isPercentage = false;
+      }
+      console.log(discount);
+      this.discountDetails.push(discount);
+      this.form.discount = clonedeep({});
     },
 
-    addOptionToExistingCategory(newOptions) {
-      this.existingOptions.push(newOptions);
-      this.form.option = newOptions;
+    cancelDiscountDialog() {
+      // Reset the discount object when user exits the add discount dialog
+      this.form.discount = clonedeep({});
     },
 
-    addOptionToNewCategory(newOptions) {
-      this.newOptions.push(newOptions);
-      this.newOptionValues.push(newOptions);
+    // This method is invoked when the edit button is clicked on the discount table
+    editDiscountInfo(discount, index) {
+      // https://stackoverflow.com/questions/44925125/vue-js-dont-bind-an-object-when-copying-it-to-another-data-attribute
+      // If you use this.form.discount = discount. When user type, it will reflect at the table
+      this.form.discount = Object.assign({}, discount);
+      this.discountIndex = index;
     },
 
-    handleCategory() {
-      const newCategoryAndOptions = {
-        label: this.newCategoryValue,
-        options: this.newOptionValues
-      };
-      this.existingCategory.push(newCategoryAndOptions);
-      console.log(this.existingCategory);
+    handleEditDiscount() {
+      let discount = this.form.discount;
+      let index = this.discountIndex;
+      this.formatDiscountDate(discount);
+      if (discount.discountType === "Percentage") {
+        discount.isPercentage = true;
+      } else {
+        discount.isPercentage = false;
+      }
 
-      // Once everything is done, I will reset the category and options
-      this.newCategoryValue = "";
-      this.newOptions = [];
-      this.newOptionValues = [];
+      this.$set(this.discountDetails, index, discount);
+      // this.discountDetails[this.discountIndex] = Object.assign({}, discount);
+      // this.discountDetails[this.discountIndex] = this.form.discount;
+
+      console.log(this.currentDiscountRowSelected);
+      console.log(this.form.discount);
+      console.log(this.discountDetails);
+
+      // Once updated, remove the values in the field
+      this.form.discount = clonedeep({});
     },
 
-    afterComplete(file) {
-      console.log(file);
+    deleteDiscountInfo(index) {
+      this.discountIndex = index;
     },
 
-    handleMoreThumbnail() {
-      this.addImageIndicator = true;
-      /*
-       * this.$nextTick() will execute the following code after the next DOM update cycle
-       * I use this because, once the addImageIndicator has been set to true, the div
-       * with a class of "more" will appear at the screen, this will cause the DOM to be updated.
-       * Once the update has been done, I will append this div to the dropzone element
-       */
-      this.$nextTick(() => {
-        if (this.addImageIndicator) {
-          let dropzone = this.$refs.myVueDropzone.dropzone;
-          dropzone.files.length > 0
-            ? dropzone.element.appendChild(this.$refs.more)
-            : dropzone.element.removeChild(this.$refs.more);
+    handleDeleteDiscount() {
+      this.discountDetails.splice(this.discountIndex, 1);
+    },
+
+    formatDiscountDate(discount) {
+      discount.effectiveStartDate = moment(
+        this.form.discount.effectiveStartDate
+      ).format("YYYY-MM-DD");
+      discount.effectiveEndDate = moment(
+        this.form.discount.effectiveEndDate
+      ).format("YYYY-MM-DD");
+    },
+
+    // https://jsfiddle.net/Wuzix/qs6t9L7x/
+    // https://zaengle.com/blog/using-v-model-on-nested-vue-components
+    // https://stackoverflow.com/questions/47311936/v-model-and-child-components/47312172
+    //https://stackoverflow.com/questions/40410332/vuejs-access-child-components-data-from-parent
+    // https://stackoverflow.com/questions/40915436/vuejs-update-parent-data-from-child-component
+    addVarient() {
+      let varientId = ++this.varientId;
+
+      this.varientSections.push({
+        type: "",
+        values: [
+          {
+            varientId,
+            individualValue: ""
+          }
+        ]
+      });
+      console.log(this.varientSections);
+    },
+
+    addValue(varientIndex) {
+      let varientId = ++this.varientId;
+      this.varientSections[varientIndex].values.push({
+        varientId,
+        individualValue: ""
+      });
+      console.log(this.varientSections);
+    },
+
+    removeValue(varientIndex, valueIndex) {
+      this.varientSections[varientIndex].values.splice(valueIndex, 1);
+    },
+
+    deleteType(index) {
+      this.varientSections.splice(index, 1);
+    },
+
+    handleVarientSubmit(bvModalEvt) {
+      bvModalEvt.preventDefault();
+      this.handleSubmit();
+    },
+
+    handleSubmit() {
+      if (this.hasUserEditVarient) {
+        let updatedVarientDetails = [];
+        this.varientSections.forEach(varientSection => {
+          let type = varientSection.type;
+          varientSection.values.forEach(value => {
+            let obj = {
+              varientId: value.varientId,
+              type,
+              value: value.individualValue
+            };
+            updatedVarientDetails.push(obj);
+          });
+        });
+
+        var subset = function(arr) {
+          return arr.map(obj => {
+            return {
+              type: obj.type,
+              value: obj.value,
+              varientId: obj.varientId
+            };
+          });
+        };
+
+        // Subset the type, value and varientId property from both arrays so that they
+        // can be used for comparison
+        var varientDetailTypeAndValue = subset(this.varientDetails);
+        var updatedVarientDetailTypeAndValue = subset(updatedVarientDetails);
+
+        console.log(varientDetailTypeAndValue);
+        console.log(updatedVarientDetailTypeAndValue);
+
+        // #1 Inspect and compare varientDetail (old) with updatedVarientDetail (new)
+        var difference1 = differencewith(
+          varientDetailTypeAndValue,
+          updatedVarientDetailTypeAndValue,
+          isequal
+        );
+
+        // #2 Compare updatedVarientDetail (new) with varientDetail (old)
+        var difference2 = differencewith(
+          updatedVarientDetailTypeAndValue,
+          varientDetailTypeAndValue,
+          isequal
+        );
+
+        console.log(difference1);
+        console.log(difference2);
+
+        // Check to see if user have updated the current varient type or value
+        // by comparing the varientId present in both arrays (difference 1 and 2)
+        let sameTypeAndValues = difference2.filter(o1 =>
+          difference1.some(o2 => o1.varientId === o2.varientId)
+        );
+
+        console.log(sameTypeAndValues);
+        console.log(this.varientDetails);
+
+        if (sameTypeAndValues.length > 0) {
+          sameTypeAndValues.forEach((updateObject, index) => {
+            // If user make an update, find out which fields were updated
+            // by checking with the varient Id
+            const foundIndex = this.varientDetails.findIndex(
+              el => el.varientId === updateObject.varientId
+            );
+
+            if (foundIndex > -1) {
+              this.varientDetails[foundIndex].type = updateObject.type;
+              this.varientDetails[foundIndex].value = updateObject.value;
+              // Set a temporary property called "update" to prevent this particular object
+              // from being sliced and pushed
+              this.varientDetails[foundIndex].update = true;
+            }
+          });
         }
+
+        console.log(this.varientDetails);
+
+        // A difference means that users have deleted varient object(s)
+        // Hence, we must remove it from varientDetails array
+        if (difference1.length > 0) {
+          difference1.forEach(differenceObj => {
+            // Check to see if product exist
+            var index = this.varientDetails.findIndex(
+              obj =>
+                obj.type === differenceObj.type &&
+                obj.value === differenceObj.value &&
+                obj.varientId === differenceObj.varientId &&
+                // Do not retrieve the index where update is true,
+                // this is to prevent the updated object from being sliced
+                obj.update != true
+            );
+
+            // If it exist, slice it
+            if (index != -1) {
+              this.varientDetails.splice(index, 1);
+            }
+          });
+        }
+
+        // A difference means that user have added new varient object(s). Hence,
+        // we must add it to varientDetails array
+        if (difference2.length > 0) {
+          console.log(this.varientDetails);
+          console.log(difference2);
+          difference2.forEach((differenceObj, index) => {
+            console.log(differenceObj);
+            var index = this.varientDetails.findIndex(
+              obj =>
+                obj.type === differenceObj.type &&
+                obj.value === differenceObj.value &&
+                obj.varientId === differenceObj.varientId
+            );
+            // If found, no need to push
+            if (index > -1) {
+            } else {
+              this.varientDetails.push(differenceObj);
+            }
+          });
+        }
+
+        // Once everything is done, we will remove the temporary "update" property
+        this.varientDetails.forEach(obj => {
+          if (obj.update != undefined) {
+            delete obj.update;
+          }
+        });
+      } else {
+        this.varientSections.forEach(varientSection => {
+          let type = varientSection.type;
+          varientSection.values.forEach(value => {
+            let obj = {
+              varientId: value.varientId,
+              type,
+              value: value.individualValue
+            };
+            this.varientDetails.push(obj);
+          });
+        });
+        console.log(this.varientDetails);
+      }
+
+      this.hasUserEditVarient = true;
+
+      //https://stackoverflow.com/questions/49943140/validating-form-inside-a-modal-with-vuelidate-and-bootstrap-vue
+      this.$nextTick(() => {
+        this.$refs.varientModal.hide();
       });
     },
 
-    handleDiscount() {
-      alert("hi");
+    cancel() {
+      console.log(this.varientDetails);
+      // If user previously never save any varient options,
+      // reset the values when the modal dialog is cancelled
+      if (this.varientDetails.length === 0) {
+        this.varientSections = [
+          {
+            type: "",
+            values: [""]
+          }
+        ];
+      } else {
+        console.log("revert back to previous changes");
+        console.log(this.varientSections);
+        if (this.hasUserEditVarient) {
+          this.varientSections = clonedeep(this.originalVarient);
+        }
+      }
     },
 
+    openVarientModal() {
+      console.log("hasuserEditvarient? " + this.hasUserEditVarient);
+      console.log(this.varientSections);
+      if (this.hasUserEditVarient) {
+        // Use lodash to deep clone the array so that it does not contain reference to original array
+        this.originalVarient = clonedeep(this.varientSections);
+        console.log("open variant model ");
+        console.log(this.originalVarient);
+      }
+    },
+
+    // This method is invoked when the edit button is clicked on the varient table
+    varientInfo(varient, index) {
+      this.selectedVarientIndex = index;
+
+      if (varient.SKUNumber == null) {
+        this.form.varient.type = varient.type;
+        this.form.varient.value = varient.value;
+      } else {
+        this.form.varient = clonedeep(varient);
+        // this.form.varient = Object.assign(this.form.varient, varient);
+        console.log(this.form.varient);
+
+        setTimeout(() => {
+          this.form.varient.productImages.forEach(file => {
+            console.log(file);
+            console.log(file.imageUrl);
+
+            var fileProperty = {
+              name: "hi",
+              size: 1111,
+              type: "image/png"
+            };
+
+            this.$refs.myVueDropzone.manuallyAddFile(
+              fileProperty,
+              file.imageUrl
+            );
+          });
+        }, 100);
+      }
+    },
+
+    // This method is invoked once the user click the OK button on the edit varient modal dialog
+    editVarientTableDialog(bvModalEvt) {
+      bvModalEvt.preventDefault();
+
+      let index = this.selectedVarientIndex;
+      console.log(index);
+
+      console.log(this.form.varient.files);
+      console.log(this.varientDetails);
+      console.log(this.varientDetails[index].files);
+
+      // Throw this into a new method
+      // Check if user have make any changes to the dropzone. For example
+      // create or remove. If they did, make the changes in S3 as well
+      const fileDifference = differencewith(
+        this.form.varient.files,
+        this.varientDetails[index].files
+      );
+      console.log(fileDifference);
+
+      // If both api calls are running, I will call the this.updateVarient() once
+      // both of the calls are done
+      if (fileDifference.length > 0 && this.deletedImageKeys.length > 0) {
+        const formData = new FormData();
+        for (var i = 0; i < fileDifference.length; i++) {
+          formData.append(
+            "imageFiles[" + i + "].ImageFile.File",
+            fileDifference[i]
+          );
+          formData.append(
+            "imageFiles[" + i + "].ImageKey",
+            fileDifference[i].upload.uuid + ".jpg"
+          );
+        }
+        var guids = this.deletedImageKeys;
+        let obj = {
+          formData,
+          guids
+        };
+        console.log(obj);
+        this.$store
+          .dispatch(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
+          .then(response => {
+            console.dir(response);
+            console.dir(response[0]);
+
+            console.log(this.form.varient);
+            console.log(this.form.varient.productImages);
+
+            response[0].productImages.forEach(productImage => {
+              this.form.varient.productImages.push({
+                imageKey: productImage.imageKey,
+                imageUrl: productImage.imageUrl
+              });
+              console.log(this.form.varient);
+              console.log(this.form.varient.productImages);
+            });
+
+            console.log(this.form.varient);
+            console.log(this.form.varient.productImages);
+
+            // Remove keys from the productImages array once s3 deleted the thumbnail
+            // Return the array of all the objects that does not contain the deleted guid
+            this.form.varient.productImages = this.form.varient.productImages.filter(
+              image => !guids.includes(image.imageKey)
+            );
+
+            console.log(this.form.varient);
+            this.updateVarientTable(this.form.varient);
+          });
+      } else {
+        // If have, we need to find out what to add or remove from the s3 bucket
+        // if got filedifference, mean user add an image
+        if (fileDifference.length > 0) {
+          // Call this method add to bucket
+          // and another method to be delete from bucket
+          const formData = new FormData();
+          for (var i = 0; i < fileDifference.length; i++) {
+            formData.append(
+              "imageFiles[" + i + "].ImageFile.File",
+              fileDifference[i]
+            );
+            formData.append(
+              "imageFiles[" + i + "].ImageKey",
+              fileDifference[i].upload.uuid + ".jpg"
+            );
+          }
+
+          for (var pair of formData.entries()) {
+            console.log(pair[0] + ", " + pair[1]);
+          }
+
+          this.$store
+            .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
+            .then(response => {
+              console.dir(response);
+
+              response.productImages.forEach(productImage => {
+                console.log("called");
+                this.form.varient.productImages.push({
+                  imageKey: productImage.imageKey,
+                  imageUrl: productImage.imageUrl
+                });
+                console.log(this.form.varient.productImages);
+              });
+
+              console.log("add done called");
+
+              console.log(this.form.varient);
+              console.log(this.form.varient.productImages);
+
+              this.updateVarientTable(this.form.varient);
+            })
+            .catch(error => {
+              console.dir(error);
+              alert("error");
+            });
+        }
+
+        if (this.deletedImageKeys.length > 0) {
+          console.log(this.deletedImageKeys);
+
+          this.$store
+            .dispatch(DELETE_PRODUCT_IMAGES, this.deletedImageKeys)
+            .then(response => {
+              console.dir(response);
+              console.log(this.form.varient);
+
+              // Remove keys from the productImages array once s3 deleted the thumbnail
+              // Return the array of all the objects that does not contain the deleted guid
+              this.form.varient.productImages = this.form.varient.productImages.filter(
+                image => !this.deletedImageKeys.includes(image.imageKey)
+              );
+
+              // follow his method the json parse shit
+
+              // this.deletedImageKeys = Object.assign([], this.deletedImageKeys);
+              console.log(this.form.varient);
+              console.log("delete done called");
+
+              this.updateVarientTable(this.form.varient);
+            })
+            .catch(error => {
+              console.dir(error);
+              alert("error");
+            });
+        }
+      }
+    },
+
+    updateVarientTable(varient) {
+      console.log("caled");
+      console.log(varient);
+      console.log(this.varientDetails);
+      console.log(this.selectedVarientIndex);
+      let index = this.selectedVarientIndex;
+
+      // https://vuejs.org/v2/guide/reactivity.html#Change-Detection-Caveats
+      // A property must be declared in the data() object for vuejs to detect any changes and be reactive
+      // Since this.varientDetails[index] is an object inside the array, vuejs will not detect changes
+      // and update the dom. Hence, create a fresh object with properties from both the original object
+      // to trigger change
+      // Loop through the array to find out which varient object the user edited.
+      // Once found, update the details based on the varient
+      this.$set(this.varientDetails, index, varient);
+
+      // Once updated, remove the values in the field
+      // We need to create a new copy. If we do know, it will still
+      // reference the old object
+      this.form.varient = clonedeep({
+        SKUNumber: null,
+        varientName: "",
+        currentQuantity: null,
+        minimumQuantity: null,
+        type: "",
+        value: "",
+        files: [],
+        productImages: []
+      });
+
+      this.deletedImageKeys = clonedeep([]);
+
+      console.log(this.varientDetails[index]);
+      console.log(this.form.varient);
+      console.log(this.varientDetails);
+      console.log(this.deletedImageKeys);
+
+      this.$nextTick(() => {
+        this.$refs.editVarientModal.hide();
+      });
+    },
+
+    // This method will be invoked when the cancel or x button is clicked on the varient modal dialog
+    cancelEditVarientTableDialog() {
+      // Remove the values in the field (if any) when the user exits the dialog
+      this.form.varient = clonedeep({
+        SKUNumber: null,
+        varientName: "",
+        currentQuantity: null,
+        minimumQuantity: null,
+        type: "",
+        value: "",
+        files: [],
+        productImages: []
+      });
+      this.$refs.myVueDropzone.removeAllFiles();
+    },
+
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+    },
+
+    duplicateFileCheck(file) {
+      alert("duplicate");
+      this.isFileDuplicate = true;
+    },
+
+    addFileToDropzone(file) {
+      alert("add called");
+      console.log(file);
+
+      if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
+        // this.form.varient.files = Object.assign([], this.form.varient.files);
+        // Add the user upload file into the array
+        console.log("Added file into files array ");
+        this.form.varient.files.push(file);
+        console.dir(this.form.varient.files);
+        console.dir(this.form.varient);
+        console.log(this.varientDetails[this.selectedVarientIndex]);
+      }
+      console.log(this.form.varient);
+      console.log(this.form.varient.files);
+      this.isFileDuplicate = false;
+    },
+
+    deleteFileFromDropzone(file) {
+      console.log(file);
+      if (file.manuallyAdded !== true) {
+        // Remove the deleted file from the array
+        this.form.varient.files = this.form.varient.files.filter(
+          el => el.upload.uuid != file.upload.uuid
+        );
+      } else {
+        console.log(this.form.varient);
+        console.log(this.form.varient.files);
+
+        // I can't test with manually add file or type, cos all the item in the array
+        // have both the same values
+        // If you want to remove manually added file, you can't compare it against uuid
+        // since it does not contain it
+        this.form.varient.files = this.form.varient.files.filter(
+          el => el.name !== file.name && el.size !== file.size
+        );
+
+        console.log(this.form.varient);
+        console.log(this.form.varient.files);
+        console.log(this.varientDetails[this.selectedVarientIndex]);
+
+        // Find out which image was deleted by comparing the uuid from productImages and form.varient.file
+        this.form.varient.productImages.forEach(image => {
+          let parts = image.imageKey.split(".");
+          let uuid = parts[0];
+          console.log(uuid);
+          const index = this.form.varient.files.findIndex(
+            file => file.upload.uuid === uuid
+          );
+          console.log(index);
+          if (index === -1) {
+            this.deletedImageKeys.push(uuid + ".jpg");
+          }
+        });
+
+        console.log(this.form.varient.productImages);
+        console.log(this.varientDetails[this.selectedVarientIndex]);
+      }
+    },
+
+    // handleMaxFileExceeded(file) {
+    //   let dropzone = this.$refs.myVueDropzone.dropzone;
+    //   dropzone.removeFile(file);
+    // },
+
     submit() {
-      console.dir(this.form.category.label);
-      console.dir(this.form.option);
+      const { varientDetails, discountDetails, form } = this;
+
+      form.effectiveStartDate = moment(form.effectiveStartDate).format(
+        "YYYY-MM-DD"
+      );
+      form.effectiveEndDate = moment(form.effectiveEndDate).format(
+        "YYYY-MM-DD"
+      );
+
+      console.log(this.form);
+      console.log(this.varientDetails);
+      console.log(this.discountDetails);
+
+      // this.uploadUserImage();
+
+      // change to edit varient
+      // successful notification
+
+      // this.uploadUserImage();
+      // when user submit, type is true or false
+      // this.message("success", "You have successfully added a new product!");
+      // this.$router.push("/ResourceManagement");
+
+      var productObj = {
+        productName: form.name,
+        description: form.description,
+        Price: form.price,
+        ImageWidth: form.imageWidth,
+        ImageHeight: form.imageHeight,
+        EffectiveStartDate: form.effectiveStartDate,
+        EffectiveEndDate: form.effectiveEndDate,
+        DiscountPrices: discountDetails,
+        options: this.getOptions()
+      };
+
+      console.log(productObj);
+
+      this.$store
+        .dispatch(CREATE_PRODUCT, productObj)
+        .then(response => {
+          console.dir(response);
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+        });
+    },
+
+    getOptions() {
+      return this.varientDetails.map((varient, index) => {
+        return {
+          skuNumber: varient.SKUNumber,
+          optionType: varient.type,
+          optionValue: varient.value,
+          currentQuantity: varient.currentQuantity,
+          minimumQuantity: varient.minimumQuantity,
+          productImages: varient.productImages
+        };
+      });
     }
-  },
-  destroyed() {
-    this.addImageIndicator = false;
   }
 };
 </script>
@@ -491,26 +1168,15 @@ h4 {
   padding: 15px 0px;
 }
 
-/* https://stackoverflow.com/questions/32132711/dropzone-js-checkmark-and-x-icons-show-after-upload */
-#dropzone .dz-success-mark {
-  background: #5fba7d;
-  border-radius: "30px";
+.dz-progress {
+  /* Removes progress bar since we are not uploading it immediately */
+  display: none !important;
 }
 
-.more {
-  display: inline-block;
-  margin: 16px;
-  border: 3px dashed lightgray;
-  width: 160px;
-  height: 160px;
-  box-sizing: border-box;
-  color: lightgray;
-  border-radius: 8px;
-  font-size: 60px;
-  text-align: center;
-  line-height: 160px;
+/* .dz-max-files-reached {
   pointer-events: none;
-}
+  cursor: default;
+} */
 
 .table {
   margin-bottom: 0 !important;
@@ -518,12 +1184,6 @@ h4 {
 
 #add-discount {
   margin-right: 63px;
-}
-
-/* https://stackoverflow.com/questions/19960162/bootstrap-3-modal-fires-and-causes-page-to-shift-to-the-left-momentarily-brows */
-.modal-open .navbar-fixed-top,
-.modal-open .navbar-fixed-bottom {
-  padding-right: 17px;
 }
 
 /* https://github.com/charliekassel/vuejs-datepicker/issues/693 */
@@ -540,14 +1200,5 @@ h4 {
 
 .btn-outline-secondary {
   border-color: #d1d3e2 !important;
-}
-
-/* 
- * By default, the preloaded images will have a style called object-fit: contain
- * to maintain its aspect ratio. Hence the images will appear very small
- * Therefore, I changed the value to "cover" to fill up entire content box
- */
-.dz-image img {
-  object-fit: cover !important;
 }
 </style>

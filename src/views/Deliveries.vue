@@ -6,10 +6,10 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-    
-          <DashboardHeader title="Deliveries"></DashboardHeader>
-          <!-- Topbar Navbar -->
-         
+
+        <DashboardHeader title="Deliveries"></DashboardHeader>
+        <!-- Topbar Navbar -->
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
