@@ -15,9 +15,11 @@
         <!-- Begin Page Content -->
         <div cols="4">
           <Table
+            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
+            v-bind:sortBy="this.sortBy"
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -33,15 +35,22 @@
       <!-- End of Footer -->
     </div>
     <b-modal
+      @ok="getModalDetails"
       ref="showSignatureDialog"
       id="showSignatureDialog"
-      title="Confirm Delivery - Order 12345"
+      :title="this.ordertitle"
     >
       <b-form-group label="Received By">
-        <b-form-input></b-form-input>
+        <b-form-input v-model="recipientName"></b-form-input>
       </b-form-group>
-      <b-form-group label="Receipient's Signature">
-        <VueSignaturePad class="pad" width="100%" height="200px" ref="signaturePad"/>
+      <b-form-group label="recipient's Signature">
+        <VueSignaturePad
+          :options="{onBegin: () => {$refs.signaturePad.resizeCanvas()}}"
+          class="pad"
+          width="100%"
+          height="200px"
+          ref="signaturePad"
+        />
       </b-form-group>
     </b-modal>
   </div>
@@ -55,6 +64,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
+import { GET_ALL_ORDERS, UPDATE_RECIPIENT } from "@/store/actions/order";
 
 export default {
   components: {
@@ -68,73 +78,128 @@ export default {
       noOfTabs: 0,
       selectedTab: 0,
       pad: null,
-
+      sortBy: "date",
+      ordertitle: null,
+      orderId: null,
       actionButtonClick: "Delivery Signature",
-
-      items: [
-        {
-          refNo: "123456",
-          date: "22/04/19",
-          item: "A5 Photo",
-          hotel: "Resorts World Sentosa",
-          actions: "Delivered"
-        },
-        {
-          refNo: "123457",
-          date: "24/04/19",
-          item: "Keychain",
-          hotel: "Siloso Beach Resort",
-          actions: "Delivered"
-        },
-        {
-          refNo: "123458",
-          date: "25/04/19",
-          item: "ID Card",
-          hotel: "ONE°15 Marina Sentosa Cove",
-          actions: "Delivered"
-        },
-        {
-          refNo: "123459",
-          date: "05/05/19",
-          item: "A5 Photo + Frame",
-          hotel: "Le Méridien Singapore",
-          actions: "Delivered"
-        }
-      ],
+      forceRender: false,
+      recipientName: null,
+      items: [],
       fields: [
-        { key: "refNo", label: "Ref. No", sortable: true },
-        { key: "date", label: "Date", sortable: true },
-        { key: "item", label: "Item", sortable: true },
-        { key: "hotel", label: "Hotel", sortable: true },
-        { key: "actions", label: "Actions" }
+        {
+          key: "refNo",
+          label: "Ref. No",
+          sortable: true
+        },
+        {
+          key: "date",
+          label: "Date",
+          sortable: true
+        },
+        {
+          key: "items",
+          label: "Item",
+          sortable: true
+        },
+        {
+          key: "address",
+          label: "Address",
+          sortable: true
+        },
+        {
+          key: "actions",
+          label: "Actions"
+        }
       ]
     };
   },
 
   methods: {
-    changeBackgroundColor(id) {
-      this.noOfTabs = this.$refs.tabs.childElementCount;
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+      // this.$snack[method](config)
+    },
 
-      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
+    getModalDetails() {
+      console.log(this.recipientName);
 
-      this.selectedTab = id;
-      var index;
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 
-      for (index = 0; index < this.Tabs.length; index++) {
-        if (id != this.Tabs[index].id)
-          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
+      if (!isEmpty) {
+        const base64 = data.substring(22);
+        console.log(base64);
+
+        const jsonData = {
+          orderIds: [this.orderId],
+          recipient: {
+            ReceivedBy: this.recipientName,
+            RecipientSignature: base64
+          }
+        };
+        console.log(jsonData);
+
+        this.$store
+          .dispatch(UPDATE_RECIPIENT, jsonData)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error);
+          });
       }
+
+      this.recipientName = null;
+      this.ordertite = null;
+      this.orderId = null;
     }
   },
   mounted() {
-    eventBus.$on(this.actionButtonClick, () => {
+    eventBus.$on(this.actionButtonClick, itemId => {
+      this.ordertitle = "Order : " + itemId;
+      this.orderId = itemId;
       this.$bvModal.show("showSignatureDialog");
-
-      // https://stackoverflow.com/questions/37465289/how-to-set-timeout-in-a-vuejs-method
-      setTimeout(() => {
-        this.$refs.signaturePad.resizeCanvas();
-      }, 1);
     });
+
+    this.$store
+      .dispatch(GET_ALL_ORDERS)
+      .then(response => {
+        let x;
+        for (x = 0; x < response.length; x++) {
+          if (response[x].status == "Out for Delivery") {
+            var addressOrHotel = null;
+
+            if (response[x].address.hotel.hotelName != null)
+              addressOrHotel = response[x].address.hotel.hotelName;
+            else
+              addressOrHotel =
+                response[x].address.addressLine1 +
+                ", " +
+                response[x].address.addressLine2;
+
+            this.items[x] = {
+              id: response[x].orderId,
+              refNo: response[x].referenceNo,
+              date: new Date(
+                Date.parse(response[x].createdAt)
+              ).toLocaleString(),
+              items: response[x].orderItems,
+              address: addressOrHotel,
+              actions: ["Delivered"]
+            };
+          }
+        }
+        if (this.forceRender) this.forceRender = false;
+        else this.forceRender = true;
+      })
+      .catch(error => {
+        console.dir(error);
+        this.message("danger", error);
+      });
   }
 };
 </script>

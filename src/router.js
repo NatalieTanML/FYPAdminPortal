@@ -13,7 +13,11 @@ import AddResource from "./views/AddResource";
 import UpdateResource from "./views/UpdateResource";
 import UpdateUser from "./views/UpdateUser";
 import OrderDetails from "./views/OrderDetails";
+import EditOrderDetails from "./views/EditOrderDetails"
 import ErrorPage from "./views/Error";
+
+
+import {eventBus} from "@/eventBus";
 
 
 
@@ -150,6 +154,15 @@ let router = new Router({
       }
     },
     {
+      path: "/EditOrderDetails",
+      name: "EditOrderDetails",
+      component: EditOrderDetails,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
       path: "/Error",
       name: "Error",
       component: ErrorPage,
@@ -268,6 +281,41 @@ localStorage.setItem("updateUserId", null);
 //redirect them to usermanagement
 if(to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
  next({ path: '/UserManagement'})
+
+ //if admin leaves the orderdetails page, orderdetails page will reset.
+if(to.name != "OrderDetails" && localStorage.getItem("viewOrderId") != null)
+localStorage.setItem("viewOrderId", null);
+
+//if people try to access the orderdetails page by typing in the url, it will just
+//redirect them to summaryofOrders
+if(to.name == "OrderDetails" && localStorage.getItem("viewOrderId") == "null")
+ next({ path: '/SummaryOfOrders'})
+
+//if admin leaves the editorderdetails page, editorderdetails page will reset.
+if(to.name != "EditOrderDetails" && localStorage.getItem("editOrderId") != null)
+localStorage.setItem("editOrderId", null);
+
+//if people try to access the editorderdetails page by typing in the url, it will just
+//redirect them to summaryofOrders
+if(to.name == "EditOrderDetails" && localStorage.getItem("editOrderId") == "null")
+ next({ path: '/SummaryOfOrders'})
+
+if(from.name == "SummaryOfOrders"){
+  //the reason why i have to eventbus.off these variable is because
+  //the eventbus listener will be generated everytime user enters the
+  //summaryoforders page.
+  //https://stackoverflow.com/questions/49484390/eventbus-is-listening-duplicate-events-when-component-is-loaded-multiple-times/49526856
+  //eventbus.once doesnt work because then the button can only be clicked once. then it will be "disabled."
+ 
+  //since summaryoforders have multiple headers, need to reset each listender for the headers.
+ let index;
+ for(index = 0; index < SummaryOfOrders.data().headerButtonClick.length; index++){
+ eventBus.$off(SummaryOfOrders.data().headerButtonClick)
+  }
+ eventBus.$off(SummaryOfOrders.data().actionButtonClick)
+ eventBus.$off(SummaryOfOrders.data().imageClick)
+
+}
 
 
  })

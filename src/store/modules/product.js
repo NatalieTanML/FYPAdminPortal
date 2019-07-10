@@ -16,21 +16,40 @@ import {
     UPDATE_ONE_PRODUCT_ERROR,
     DELETE_PRODUCT,
     DELETE_PRODUCT_SUCCESS,
-    DELETE_PRODUCT_ERROR
+    DELETE_PRODUCT_ERROR,
+    UPDATE_STOCK,
 } from "@/store/actions/product"
 
 import { apiCall, api_routes } from "@/utils/api";
 
 const state = {
     addImage: null,
-    deleteGuids: null
+    deleteGuids: null,
+    product: [],
 }
 
 const getters = {
 
 }
 
+
 const actions = {
+    [GET_ALL_PRODUCTS]: ({ commit }) => {
+        console.log("GET_ALL_PRODUCTS called")
+        return new Promise((resolve, reject) => {
+            commit(GET_ALL_PRODUCTS);
+            apiCall({ url: api_routes.product.get_all, method: "get" })
+                .then(resp => {
+                    console.dir(resp)
+
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                })
+        })
+    },
+
     [UPLOAD_PRODUCT_IMAGES]: ({ commit }, formData) => {
         let addImage;
         if (state.addImage !== null) {
@@ -46,7 +65,6 @@ const actions = {
                     resolve(resp);
                 })
                 .catch(err => {
-                    reject(err);
                 })
         })
     },
@@ -65,7 +83,6 @@ const actions = {
                     resolve(resp);
                 })
                 .catch(err => {
-                    reject(err);
                 })
         })
     },
@@ -101,6 +118,21 @@ const actions = {
                     resolve(resp);
                 })
                 .catch(err => {
+                })
+        })
+    },
+    [UPDATE_STOCK]: ({ commit }, data) => {
+        console.log("UPDATE_STOCK called")
+        return new Promise((resolve, reject) => {
+            commit(UPDATE_STOCK);
+            apiCall({ url: api_routes.product.update_stock + data[0] + "/" + data[1], method: "put" })
+                .then(resp => {
+                    console.dir(resp)
+
+                    resolve(resp);
+                })
+                .catch(err => {
+
                     reject(err);
                 })
         })

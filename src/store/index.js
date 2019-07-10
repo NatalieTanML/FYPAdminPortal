@@ -12,7 +12,7 @@ export default new Vuex.Store({
   modules: {
     order,
     user,
-    product
+    product,
   },
   strict: debug
 });

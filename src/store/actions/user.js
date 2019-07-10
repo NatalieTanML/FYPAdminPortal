@@ -25,3 +25,5 @@ export const CHANGEOWNPASSWORD_ERROR = "CHANGEOWNPASSWORD_ERROR"
 export const RESETUSERPASSWORD = "RESETUSERPASSWORD";
 export const RESETUSERPASSWORD_ERROR = "RESETUSERPASSWORD_ERROR";
 //the bypasslogin method lets you become the admin if you are creating your account for the first time.
+export const GET_ALL_DELIVERYMEN = "GET_ALL_DELIVERYMEN";
+

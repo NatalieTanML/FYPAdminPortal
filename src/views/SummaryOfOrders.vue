@@ -6,11 +6,10 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-          
-          <DashboardHeader title="Orders"></DashboardHeader>
-          <!-- Topbar Navbar -->
-         
-        
+
+        <DashboardHeader title="Orders"></DashboardHeader>
+        <!-- Topbar Navbar -->
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -25,6 +24,7 @@
                   v-bind:key="tab.id"
                   v-bind:title="tab.title"
                   v-bind:isDark="tab.isDark"
+                  v-bind:noOfRows="tab.noOfRows"
                   @click.native="onTabChange(tab.id)"
                 ></DashboardTabs>
               </ul>
@@ -34,7 +34,17 @@
         <!-- /.container-fluid -->
 
         <div cols="4">
-          <Table :key="this.forceRender" v-bind:fields="this.fields" v-bind:items="this.sortItems"></Table>
+          <Table
+            :key="this.forceRender"
+            v-bind:fields="this.fields"
+            v-bind:items="this.sortItems"
+            v-bind:headerButtonClick="this.headerButtonClick"
+            v-bind:actionButtonClick="this.actionButtonClick"
+            v-bind:enableCheckbox="this.enableCheckbox"
+            tableName="Orders"
+            :imageClick="this.imageClick"
+            :headerButton="this.headerButton"
+          ></Table>
         </div>
         <!-- End of Main Content -->
       </div>
@@ -54,10 +64,19 @@
 </template>
 
 <script>
+import OrderHub from "@/services/orderHub.js";
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
+import { eventBus } from "@/eventBus";
+import {
+  GET_ALL_ORDERS,
+  GET_ALL_STATUS,
+  UPDATE_ORDER_STATUS,
+  GET_PRESIGNED_URL
+} from "@/store/actions/order";
+import { setInterval, clearInterval, setTimeout } from "timers";
 
 export default {
   components: {
@@ -68,203 +87,391 @@ export default {
   },
   data() {
     return {
+      polling: null,
+      connection: null,
+      //have multiple buttons
+      headerButtonClick: ["Update Order Status", "Download Images"],
+      headerButton: [
+        {
+          id: 1,
+          title: "Update Order Status"
+        },
+        {
+          id: 2,
+          title: "Download Images"
+        }
+      ],
+      actionButtonClick: "Update One Order Status",
+      imageClick: "On Order Image Click",
       forceRender: true,
       noOfTabs: 0,
+      enableCheckbox: true,
       selectedTab: 0,
-      typesOfTabs: [
-        "All",
-        "Ordered",
-        "Awaiting Print",
-        "Printed",
-        "Delivering",
-        "Completed",
-        "Cancelled"
-      ],
-      Tabs: null,
-
+      arrayOfNumberOfRows: [],
+      typesOfTabs: [],
+      Tabs: [],
+      presignedUrl: "",
       sortItems: [],
-
       items: [],
       fields: [
-        { key: "refNo", label: "Ref. No", sortable: true },
-        { key: "date", label: "Date", sortable: true },
-        { key: "item", label: "Item", sortable: true },
-        { key: "image", label: "Image" },
-        { key: "quantity", label: "Qty", sortable: true },
-        { key: "status", label: "Status", sortable: true },
-        { key: "actions", label: "Actions" }
+        {
+          key: "checkbox",
+          label: ""
+        },
+        {
+          key: "refNo",
+          label: "Ref. No",
+          sortable: true
+        },
+        {
+          key: "date",
+          label: "Date",
+          sortable: true
+        },
+        {
+          key: "items",
+          label: "Item",
+          sortable: true
+        },
+        {
+          key: "images",
+          label: "Image"
+        },
+        {
+          key: "quantity",
+          label: "Qty",
+          sortable: true
+        },
+        {
+          key: "status",
+          label: "Status",
+          sortable: true
+        },
+        {
+          key: "actions",
+          label: "Actions"
+        }
       ]
     };
   },
 
   computed: {},
 
-  mounted() {
-    const { typesOfTabs } = this;
-    (this.Tabs = [
-      { title: typesOfTabs[0], id: 0, isDark: false },
-      { title: typesOfTabs[1], id: 1, isDark: false },
-      { title: typesOfTabs[2], id: 2, isDark: false },
-      { title: typesOfTabs[3], id: 3, isDark: false },
-      { title: typesOfTabs[4], id: 4, isDark: false },
-      { title: typesOfTabs[5], id: 5, isDark: false }
-    ]),
-      (this.items = [
-        {
-          refNo: "123456",
-          date: "22/04/19",
-          item: "A5 Photo",
-          image: "image",
-          quantity: "2",
-          status: "Awaiting Print",
-          actions: "Print"
-        },
-        {
-          refNo: "123457",
-          date: "24/04/19",
-          item: "Keychain",
-          image: "image",
-          quantity: "1",
-          status: "Delivering",
-          actions: "Completed"
-        },
-        {
-          refNo: "123458",
-          date: "25/04/19",
-          item: "ID Card",
-          image: "image",
-          quantity: "2",
-          status: "Delivering",
-          actions: "Completed"
-        },
-        {
-          refNo: "123459",
-          date: "05/05/19",
-          item: "A5 Photo + Frame",
-          image: "image",
-          quantity: "2",
-          status: "Delivered",
-          actions: "Archive"
-        },
-        {
-          refNo: "123458",
-          date: "28/04/19",
-          item: "A5 Photo + Black Frame",
-          image: "image",
-          quantity: "1",
-          status: "Printed",
-          actions: "Deliver"
-        },
-        {
-          refNo: "123459",
-          date: "14/05/19",
-          item: "Keychain (Black)",
-          image: "image",
-          quantity: "2",
-          status: "Cancelled",
-          actions: "Archive"
-        },
-        {
-          refNo: "123460",
-          date: "30/05/19",
-          item: "Name Tag (Black)",
-          image: "image",
-          quantity: "1",
-          status: "Cancelled",
-          actions: "Archive"
-        },
-        {
-          refNo: "123461",
-          date: "30/05/19",
-          item: "Name Tag (Red)",
-          image: "image",
-          quantity: "1",
-          status: "Awaiting Print",
-          actions: "Print"
-        },
-        {
-          refNo: "123462",
-          date: "13/05/19",
-          item: "A4 Photo + Red Frame",
-          image: "image",
-          quantity: "3",
-          status: "Ordered",
-          actions: "Accept"
-        },
-        {
-          refNo: "123463",
-          date: "14/05/19",
-          item: "Keychain",
-          image: "image",
-          quantity: "2",
-          status: "Ordered",
-          actions: "Accept"
-        },
-        {
-          refNo: "123464",
-          date: "23/04/19",
-          item: "Keychain + A5 Photo",
-          image: "image",
-          quantity: "2",
-          status: "Completed",
-          actions: "Archive"
-        },
-        {
-          refNo: "123465",
-          date: "26/04/19",
-          item: "A5 Photo",
-          image: "image",
-          quantity: "1",
-          status: "Ordered",
-          actions: "Accept"
-        },
-        {
-          refNo: "123466",
-          date: "16/04/19",
-          item: "A3 Photo",
-          image: "image",
-          quantity: "2",
-          status: "Delivering",
-          actions: "Completed"
-        }
-      ]);
+  created() {
+    this.pollData();
+  },
 
-    this.sortItems = this.items;
+  async mounted() {
+    this.$store
+      .dispatch(GET_ALL_STATUS)
+      .then(response => {
+        //standardize the typesOfTabs
+        //set up default tabs.
+        let x = 1;
+        this.typesOfTabs[0] = "All";
+        for (x; x < response.length; x++)
+          this.typesOfTabs[x] = response[x - 1].statusName;
 
-    this.onTabChange(0);
+        //had to hardcode the last tab string.
+        // this.typesOfTabs[x] = response[x - 1].statusName;
+        this.getAllOrders();
+      })
+      .catch(error => {
+        console.dir(error);
+        this.message("danger", error);
+      });
+
+    eventBus.$on(this.headerButtonClick[0], orderIds => {
+      this.updateStatusTabsAndTable(orderIds);
+    });
+
+    eventBus.$on(this.actionButtonClick, orderIds => {
+      this.updateStatusTabsAndTable(orderIds);
+    });
+
+    eventBus.$on(this.imageClick, thumbNailUrl => {
+      //because controller only accepts a list of url
+      const listOfThumbNailUrl = [];
+      listOfThumbNailUrl.push(thumbNailUrl);
+
+      this.$store
+        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
+        .then(response => {
+          console.log(response);
+          this.downloadURI(response.imgUrls[0], "a");
+          // this.presignedUrl = response.imgUrls[0];
+          // this.$bvModal.show("viewPresignedImage");
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    });
+
+    // Establish hub connection
+    this.connection = await OrderHub.connectToOrderHub();
+
+    // Establish hub methods
+    this.connection.on("OneOrder", order => {
+      console.log("OneOrder called");
+      console.log(order);
+      this.getAllOrders();
+      setTimeout(() => {
+        this.highlightOneRow(order);
+      }, 1000);
+    });
+
+    this.connection.on("MultipleOrders", orders => {
+      console.log("MultipleOrders called");
+      console.log(orders);
+      this.getAllOrders();
+      setTimeout(() => {
+        this.highlightRows(orders);
+      }, 1000);
+    });
+
+    // start the connection
+    this.connection
+      .start()
+      .then(() => {
+        console.log("Connection to hub started");
+      })
+      .catch(err => console.log(err));
+  },
+
+  async beforeDestroy() {
+    this.connection.stop();
+    clearInterval(this.polling);
   },
 
   methods: {
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+      // this.$snack[method](config)
+    },
+    getAllOrders() {
+      console.log("getAllOrders called");
+      this.$store
+        .dispatch(GET_ALL_ORDERS)
+        .then(response => {
+          let x = 0;
+          for (x; x < response.length; x++) {
+            //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
+            //item: response[x].orderItems[0].options[0].product.productName,
+            this.items[x] = {
+              id: response[x].orderId,
+              refNo: response[x].referenceNo,
+              date: response[x].createdAt.substring(0, 10),
+              items: response[x].orderItems,
+              images: response[x].orderItems,
+              quantity: response[x].orderItems,
+              status: response[x].status,
+              actions: this.getAction(response[x].status)
+            };
+          }
+
+          //creating checkbox.
+          let index;
+          for (index = 0; this.items.length > index; index++)
+            this.items[index].checkbox = "checkbox";
+
+          //for counting the amount of rows in each tab.
+          this.setUpTabs();
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
     onTabChange(id) {
       //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
       //reason why i don't use const ^ is because when the data is displayed,
       //it will become read-only.
-
+      console.log("on tab change is called");
       this.sortItems = [];
       //change background color for the tab
-      this.noOfTabs = this.$refs.tabs.childElementCount;
 
+      //will have an error if you remove this if statement.
+      //because the html section will run first, then it will cause an error
+      //because the tabs have not been created.
+      if (this.$refs.tabs != undefined)
+        this.noOfTabs = this.$refs.tabs.childElementCount;
       if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
-
       this.selectedTab = id;
       var index;
-
       for (index = 0; index < this.Tabs.length; index++) {
         if (id != this.Tabs[index].id)
           if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
       }
       //manipulate table data after changing tab color
-
       let sortBy = this.typesOfTabs[id];
-
-      for (index = 0; index < this.items.length; index++)
+      console.log(sortBy);
+      for (index = 0; index < this.items.length; index++) {
         if (sortBy === this.items[index].status)
           this.sortItems.push(this.items[index]);
-
-      if (sortBy === "All") this.sortItems = this.items;
-
+        if (sortBy == "All") this.sortItems.push(this.items[index]);
+      }
+      // if (sortBy === "All") this.sortItems = this.items;
+      //to disable checkbox is All tabs are selected
+      if (sortBy == "All") this.enableCheckbox = false;
+      else this.enableCheckbox = true;
+      //forceRender resets all the variable in the table.
+      //like the array list of orderids that will be used to update the status
+      //of the products.
       if (this.forceRender) this.forceRender = false;
       else this.forceRender = true;
+    },
+
+    setUpTabs() {
+      let x;
+      let index;
+      let numberOfRows = 0;
+      this.arrayOfNumberOfRows = [];
+      //index is 1 so as to skip the All tab. then i push a 0 on the first
+      //number of the arrayofNumberOfRows.
+      this.arrayOfNumberOfRows.push(null);
+      for (index = 1; index < this.typesOfTabs.length; index++) {
+        numberOfRows = 0;
+        for (x = 0; x < this.items.length; x++) {
+          if (this.items[x].status == this.typesOfTabs[index]) numberOfRows++;
+        }
+        this.arrayOfNumberOfRows.push(numberOfRows);
+        //set up tabs after getting all the items and what
+      }
+      let typesOfTabs = this.typesOfTabs;
+      //set up actions based on the type of tabs
+      //you can generate the actions in the previous for loop. but i feel that
+      //the code will be extra messy.
+      //reset tab.
+
+      this.Tabs = [];
+      for (x = 0; x < typesOfTabs.length; x++)
+        //initialize the tabs to get title, id and isDark.
+        this.Tabs[x] = {
+          title: typesOfTabs[x],
+          id: x,
+          isDark: false,
+          noOfRows: this.arrayOfNumberOfRows[x]
+        };
+      //selects current tabs.
+      //if no tab is selected, the default will be 0
+      this.onTabChange(this.selectedTab);
+    },
+    getAction(status) {
+      if (status == "Received") return "Accept Order";
+      else if (status == "Awaiting Printing") return "Print";
+      else if (status == "Printed") return "Deliver";
+      else if (status == "Out for Delivery") return "Delivered";
+      else if (status == "Completed") return null;
+      else if (status == "Delivery Failed") return "Re-Deliver";
+      else if (status == "Cancelled") return null;
+      else return null;
+    },
+    updateStatusTabsAndTable(orderIds) {
+      //isSuccessful will always be true unless the admin presses on the dropdown at the
+      //end of the row and click cancel order
+      const isSuccessful = true;
+
+      const jsonData = {
+        orderIds: orderIds,
+        isSuccessful: isSuccessful
+      };
+      this.$store
+        .dispatch(UPDATE_ORDER_STATUS, jsonData)
+        .then(response => {
+          this.message("success", "Order Status(es) is updated successfully!");
+          console.log(response);
+          let updatedOrders = response.orders;
+          let x;
+          for (x = 0; x < this.items.length; x++) {
+            updatedOrders.forEach((oneUpdatedOrder, index) => {
+              if (this.items[x].id == oneUpdatedOrder.orderId) {
+                this.items[x].status = oneUpdatedOrder.statusName;
+                this.items[x].actions = this.getAction(
+                  oneUpdatedOrder.statusName
+                );
+              }
+            });
+          }
+          //reset the tabs.
+          this.setUpTabs();
+          //there is a few lines in the router.js where i reset the eventbus listener too
+          //do take note of that.
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
+    downloadImages(listOfThumbNailUrl) {
+      console.log("downloadImages : " + listOfThumbNailUrl);
+      this.$store
+        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
+        .then(response => {
+          console.log(response);
+          let index;
+          var interval = setInterval(download, 300, response.imgUrls);
+          function download(urls) {
+            var url = urls.pop();
+            console.log(url);
+            var a = document.createElement("a");
+            a.setAttribute("href", url);
+            a.setAttribute("download", "");
+            a.setAttribute("target", "_blank");
+            a.click();
+            if (urls.length == 0) {
+              clearInterval(interval);
+            }
+          }
+          // this.presignedUrl = response.imgUrls[0];
+          // this.$bvModal.show("viewPresignedImage");
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
+    downloadURI(urls, interval) {
+      var url = urls.pop();
+      var a = document.createElement("a");
+      a.setAttribute("href", url);
+      a.setAttribute("download", "");
+      a.setAttribute("target", "_blank");
+      a.click();
+      if (urls.length == 0) {
+        clearInterval(interval);
+      }
+    },
+    highlightOneRow(order) {
+      for (var x = 0; x < this.items.length; x++) {
+        if (order.orderId == this.items[x].id) {
+          this.$set(this.items[x], "_rowVariant", "primary");
+        }
+      }
+    },
+    highlightRows(orders) {
+      let idsToUpdate = [];
+      for (var i = 0; i < orders.length; i++) {
+        idsToUpdate.push(orders[i].orderId);
+      }
+      console.log("idsToUpdate", idsToUpdate);
+      for (var e = 0; e < idsToUpdate.length; e++) {
+        let idToUpdate = idsToUpdate[e];
+        for (var x = 0; x < this.sortItems.length; x++) {
+          if (idToUpdate == this.items[x].id) {
+            this.$set(this.items[x], "_rowVariant", "primary");
+          }
+        }
+      }
+    },
+    pollData() {
+      this.polling = setInterval(() => {
+        this.getAllOrders();
+      }, 60000);
     }
   }
 };
