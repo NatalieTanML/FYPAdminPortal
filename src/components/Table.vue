@@ -87,7 +87,7 @@
                   </template>
 
                   <b-dropdown-item-button
-                    v-on:click="editOrder()"
+                    v-on:click="editOrder(row.item.id)"
                     aria-describedby="dropdown-header-label"
                   >Edit Order</b-dropdown-item-button>
                   <b-dropdown-item-button
@@ -328,7 +328,11 @@ export default {
     myRowHoverHandler(record, index) {
       this.$delete(this.items[index], "_rowVariant");
     },
-    editOrder() {},
+    editOrder(orderid) {
+      localStorage.setItem("editOrderId", orderid);
+       this.$router.replace({name:'EditOrderDetails'});
+      
+    },
     cancelOrder() {
       console.log("order is cancelled");
     },
