@@ -5,7 +5,10 @@ import {
     UPDATE_DELIVERYMAN,
     UPDATE_ORDER_STATUS,
     GET_PRESIGNED_URL,
-    UPDATE_RECIPIENT
+    UPDATE_RECIPIENT,
+    GET_ALL_HOTELS,
+    UPDATE_ORDER,
+    GET_ALL_DELIVERY_TYPES
 } from "@/store/actions/order";
 
 
@@ -115,7 +118,41 @@ const actions = {
             })
         })
 
-    }
+    },
+    [GET_ALL_HOTELS]: ({commit}) => {
+        return new Promise ((resolve, reject) =>{
+            apiCall ({url: api_routes.order.getHotels, method: "get"})
+            .then (resp =>{
+                resolve(resp)
+            })
+            .catch(err =>{
+                reject(err);
+            })
+        })
+        },
+        [UPDATE_ORDER]: ({commit}, jsonData) => {
+            return new Promise ((resolve, reject) =>{
+                apiCall ({url: api_routes.order.updateOrder, data: jsonData, method: "put"})
+                .then (resp =>{
+                    resolve(resp)
+                })
+                .catch(err =>{
+                    reject(err);
+                })
+            })
+            },
+            [GET_ALL_DELIVERY_TYPES]: ({commit}) => {
+                return new Promise ((resolve, reject) =>{
+                    apiCall ({url: api_routes.order.getAllDeliveryTypes, method: "get"})
+                    .then (resp =>{
+                        resolve(resp)
+                    })
+                    .catch(err =>{
+                        reject(err);
+                    })
+                })
+                },
+
 }
 
 

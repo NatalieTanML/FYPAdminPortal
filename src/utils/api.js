@@ -20,11 +20,15 @@ export const api_routes = {
     update_order_status : "api/orders/status",
     get_presigned_url : 'api/s3/url',
     update_recipient : 'api/orders/recipient',
+    getHotels: "/api/hotels/",
+    updateOrder: "/api/orders/",
+    getAllDeliveryTypes: "api/orders/getAllDeliveryTypes"
   },
   
   product: {
     get_all: 'api/products/',
-    
+    get_one: 'api/products/',
+    update_stock:'api/products/stock/',
   },
 
 
