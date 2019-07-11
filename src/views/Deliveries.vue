@@ -20,6 +20,7 @@
             v-bind:headerButtonClick="this.headerButtonClick"
             v-bind:enableCheckbox="this.enableCheckbox"
             :headerButton="this.headerButton"
+            tableName="Deliveries"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
             v-bind:sortBy="this.sortBy"
@@ -85,6 +86,7 @@ export default {
       ordertitle: null,
       orderId: null,
       enableCheckbox : true,
+
       headerButtonClick: ["Update Order Status"],
       headerButton: [
         {
@@ -97,6 +99,10 @@ export default {
       recipientName: null,
       items: [],
       fields: [
+         {
+           key: "checkbox",
+          label: ""
+        },
         {
           key: "refNo",
           label: "Ref. No",
@@ -192,7 +198,7 @@ export default {
                 ", " +
                 response[x].address.addressLine2;
 
-            this.items[x] = {
+            this.items.push({
               id: response[x].orderId,
               refNo: response[x].referenceNo,
               date: new Date(
@@ -201,7 +207,7 @@ export default {
               items: response[x].orderItems,
               address: addressOrHotel,
               actions: ["Delivered"]
-            };
+            });
           }
         }
         if (this.forceRender) this.forceRender = false;

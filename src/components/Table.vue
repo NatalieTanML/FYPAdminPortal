@@ -26,7 +26,11 @@
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
                   class="float-right"
-               v-if="tableName != 'Orders' || ((checkedCheckBox.length != 0) &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))">{{oneHeaderButton.title}}
+               v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))) ||
+                 (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
+                >
+                {{oneHeaderButton.title}}
                 </b-button>
               </div>
             </b-col>
@@ -311,6 +315,7 @@ export default {
              console.log(this.checkedCheckBox)
     },
     checkAllCheckBox() {
+      console.log(this.items)
         let index = 0
         let rowsPerPage = this.perPage
         let shownItems = (this.currentPage - 1) * rowsPerPage
