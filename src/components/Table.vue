@@ -76,18 +76,26 @@
                  </div>
 
               <div style="display: inline-block;margin-left:5px" v-if="tableName == 'Orders'">
-                <b-dropdown id="dropdown-header" variant="transparent" no-caret class="mb-1 mydropdown">
-            <template slot="button-content">  <i class="fas fa-ellipsis-v fa-sm"></i></template>
-                 
-                  <b-dropdown-item-button v-on:click="editOrder()" aria-describedby="dropdown-header-label">
-                    Edit Order
-                  </b-dropdown-item-button>
-                  <b-dropdown-item-button  v-b-modal.cancelOrder  aria-describedby="dropdown-header-label">
-                    Cancel Order
-                  </b-dropdown-item-button>
+                <b-dropdown
+                  id="dropdown-header"
+                  variant="transparent"
+                  no-caret
+                  class="mb-1 mydropdown"
+                >
+                  <template slot="button-content">
+                    <i class="fas fa-ellipsis-v fa-sm"></i>
+                  </template>
+
+                  <b-dropdown-item-button
+                    v-on:click="editOrder()"
+                    aria-describedby="dropdown-header-label"
+                  >Edit Order</b-dropdown-item-button>
+                  <b-dropdown-item-button
+                    v-b-modal.cancelOrder
+                    aria-describedby="dropdown-header-label"
+                  >Cancel Order</b-dropdown-item-button>
                 </b-dropdown>
               </div>
-             
             </template>
 
             <template slot="refNo" slot-scope="row">
