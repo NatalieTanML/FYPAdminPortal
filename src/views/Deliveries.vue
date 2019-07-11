@@ -17,6 +17,9 @@
           <Table
             :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
+            v-bind:headerButtonClick="this.headerButtonClick"
+            v-bind:enableCheckbox="this.enableCheckbox"
+            :headerButton="this.headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
             v-bind:sortBy="this.sortBy"
@@ -81,6 +84,14 @@ export default {
       sortBy: "date",
       ordertitle: null,
       orderId: null,
+      enableCheckbox : true,
+      headerButtonClick: ["Update Order Status"],
+      headerButton: [
+        {
+          id: 1,
+          title: "Update Order Status"
+        },
+      ],
       actionButtonClick: "Delivery Signature",
       forceRender: false,
       recipientName: null,

@@ -26,8 +26,8 @@
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
                   class="float-right"
-                  v-if="tableName != 'Orders' ||(checkedCheckBox.length != 0 && tableName == 'Orders')"
-                >{{oneHeaderButton.title}}</b-button>
+               v-if="tableName != 'Orders' || ((checkedCheckBox.length != 0) &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))">{{oneHeaderButton.title}}
+                </b-button>
               </div>
             </b-col>
           </b-row>
@@ -200,7 +200,8 @@ export default {
       sortDirection: "asc",
       filter: null,
       checkedCheckBox: [],
-      checkAll: false
+      checkAll: false,
+      showHeaderButton: true,
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -284,52 +285,67 @@ export default {
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
-        const orderIds = [];
-        orderIds.push(item.id);
-
-        eventBus.$emit(this.actionButtonClick, orderIds);
+   
+        eventBus.$emit(this.actionButtonClick, item);
       } else eventBus.$emit(this.actionButtonClick, item.id);
       //id is the row's item's id
     },
-    onCheckBoxCheck(refNo) {
-      let index = 0;
+    onCheckBoxCheck(item) {
 
-      if (this.checkedCheckBox.includes(refNo)) {
-        for (index; index < this.checkedCheckBox.length; index++)
-          if (this.checkedCheckBox[index] == refNo)
-            this.checkedCheckBox.splice(index, 1);
-      } else this.checkedCheckBox.push(refNo);
+    let index = 0;
 
-      console.log(this.checkedCheckBox);
+       if(item.actions[0] == null)
+        this.showHeaderButton = false;
+        else
+        this.showHeaderButton = true;
+
+        console.log(this.showHeaderButton)
+
+        if (this.checkedCheckBox.includes(item.id)) {
+            for (index; index < this.checkedCheckBox.length; index++)
+                if (this.checkedCheckBox[index] == item.id)
+              this.checkedCheckBox.splice(index, 1)
+        } else
+          this.checkedCheckBox.push(item.id)
+
+             console.log(this.checkedCheckBox)
     },
     checkAllCheckBox() {
-      let index = 0;
-      let rowsPerPage = this.perPage;
-      let shownItems = (this.currentPage - 1) * rowsPerPage;
-      // console.log(shownItems)
-      //if the last page has less than 5 stuff.
-      if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
-        rowsPerPage = this.items.length - shownItems;
+        let index = 0
+        let rowsPerPage = this.perPage
+        let shownItems = (this.currentPage - 1) * rowsPerPage
+        // console.log(shownItems)
+        //if the last page has less than 5 stuff.
+        if (((this.items.length - shownItems) < rowsPerPage) && this.currentPage != 1)
+          rowsPerPage = this.items.length - shownItems
+  
+      console.log(this.items[0].actions)
 
-      if (this.items[0].actions == null) this.showHeaderButton = false;
-      else this.showHeaderButton = true;
+        if(this.items[0].actions[0] == null)
+        this.showHeaderButton = false;
+        else
+        this.showHeaderButton = true;
 
-      //if the first page has less than 5 stuff.
-      if (this.currentPage == 1 && this.items.length < rowsPerPage)
-        rowsPerPage = this.items.length;
-      // console.log(this.currentPage)
-      // console.log(rowsPerPage)
-      if (!this.checkAll) this.checkAll = true;
-      else this.checkAll = false;
-      this.checkedCheckBox = [];
-      if (this.checkAll) {
-        for (index = 0; index < rowsPerPage; index++) {
-          this.checkedCheckBox[index] = this.items[shownItems + index].id;
+        console.log(this.showHeaderButton)
+          
+        //if the first page has less than 5 stuff.
+        if (this.currentPage == 1 && this.items.length < rowsPerPage)
+          rowsPerPage = this.items.length
+        // console.log(this.currentPage)
+        // console.log(rowsPerPage)
+        if (!this.checkAll)
+          this.checkAll = true;
+        else
+          this.checkAll = false;
+        this.checkedCheckBox = [];
+        if (this.checkAll) {
+          for (index = 0; index < rowsPerPage; index++) {
+            this.checkedCheckBox[index] = this.items[shownItems + index].id;
+          }
         }
-      }
-      console.log(this.checkAll);
-      console.log(this.checkedCheckBox);
-    },
+        console.log(this.checkAll)
+        console.log(this.checkedCheckBox)
+      },
     myRowClickHandler(record, index) {
       if (this.tableName == "Orders") {
         console.log(this.items);

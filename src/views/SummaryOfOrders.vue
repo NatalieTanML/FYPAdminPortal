@@ -57,6 +57,27 @@
         </div>
       </footer>
       <!-- End of Footer -->
+
+      <b-modal
+      @ok="getModalDetails"
+      ref="showSignatureDialog"
+      id="showSignatureDialog"
+      :title="this.ordertitle"
+    >
+      <b-form-group label="Received By">
+        <b-form-input v-model="recipientName"></b-form-input>
+      </b-form-group>
+      <b-form-group label="recipient's Signature">
+        <VueSignaturePad
+          :options="{onBegin: () => {$refs.signaturePad.resizeCanvas()}}"
+          class="pad"
+          width="100%"
+          height="200px"
+          ref="signaturePad"
+        />
+      </b-form-group>
+    </b-modal>
+
     </div>
   </div>
 
@@ -74,7 +95,8 @@ import {
   GET_ALL_ORDERS,
   GET_ALL_STATUS,
   UPDATE_ORDER_STATUS,
-  GET_PRESIGNED_URL
+  GET_PRESIGNED_URL,
+  UPDATE_RECIPIENT
 } from "@/store/actions/order";
 import { setInterval, clearInterval, setTimeout } from "timers";
 
@@ -111,6 +133,9 @@ export default {
       typesOfTabs: [],
       Tabs: [],
       presignedUrl: "",
+      recipientName: null,
+      ordertitle: null,
+      orderId: null,
       sortItems: [],
       items: [],
       fields: [
@@ -189,8 +214,19 @@ export default {
           this.downloadImages(listOfThumbNailUrl);
       });
 
-    eventBus.$on(this.actionButtonClick, orderIds => {
-      this.updateStatusTabsAndTable(orderIds);
+    eventBus.$on(this.actionButtonClick, item => {
+
+        const orderIds = [];
+        orderIds.push(item.id);
+
+        if(item.actions == "Delivered")
+        {
+              this.ordertitle = "Order : " + item.id;
+      this.orderId = item.id;
+      this.$bvModal.show("showSignatureDialog");
+        }
+    else
+     this.updateStatusTabsAndTable(orderIds);
     });
 
     eventBus.$on(this.imageClick, thumbNailUrl => {
@@ -376,7 +412,19 @@ export default {
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
           this.message("success", "Order Status(es) is updated successfully!");
-          console.log(response);
+          this.updateCurrentOrders(response);
+          //reset the tabs.
+          this.setUpTabs();
+          //there is a few lines in the router.js where i reset the eventbus listener too
+          //do take note of that.
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
+    updateCurrentOrders(response){
+      //update current items's statuses and actions 
           let updatedOrders = response.orders;
           let x;
           for (x = 0; x < this.items.length; x++) {
@@ -389,15 +437,7 @@ export default {
               }
             });
           }
-          //reset the tabs.
-          this.setUpTabs();
-          //there is a few lines in the router.js where i reset the eventbus listener too
-          //do take note of that.
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error);
-        });
+
     },
     downloadImages(listOfThumbNailUrl) {
       console.log("downloadImages : " + listOfThumbNailUrl);
@@ -464,6 +504,43 @@ export default {
       this.polling = setInterval(() => {
         this.getAllOrders();
       }, 60000);
+    },
+        getModalDetails() {
+      console.log(this.recipientName);
+
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+
+      if (!isEmpty) {
+        const base64 = data.substring(22);
+        console.log(base64);
+
+        const jsonData = {
+          orderIds: [this.orderId],
+          recipient: {
+            ReceivedBy: this.recipientName,
+            RecipientSignature: base64
+          }
+        };
+        console.log(jsonData);
+
+        this.$store
+          .dispatch(UPDATE_RECIPIENT, jsonData)
+          .then(response => {
+              this.message("success", "Order Status(es) is updated successfully!");
+          this.updateCurrentOrders(response);
+          //reset the tabs.
+          this.setUpTabs();
+          
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error);
+          });
+      }
+
+      this.recipientName = null;
+      this.ordertite = null;
+      this.orderId = null;
     }
   }
 };
