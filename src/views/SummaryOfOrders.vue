@@ -185,27 +185,19 @@ export default {
       this.updateStatusTabsAndTable(orderIds);
     });
 
+      eventBus.$on(this.headerButtonClick[1], (listOfThumbNailUrl) => {
+          this.downloadImages(listOfThumbNailUrl);
+      });
+
     eventBus.$on(this.actionButtonClick, orderIds => {
       this.updateStatusTabsAndTable(orderIds);
     });
 
     eventBus.$on(this.imageClick, thumbNailUrl => {
       //because controller only accepts a list of url
-      const listOfThumbNailUrl = [];
-      listOfThumbNailUrl.push(thumbNailUrl);
-
-      this.$store
-        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
-        .then(response => {
-          console.log(response);
-          this.downloadURI(response.imgUrls[0], "a");
-          // this.presignedUrl = response.imgUrls[0];
-          // this.$bvModal.show("viewPresignedImage");
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error);
-        });
+         const listOfThumbNailUrl = []
+         listOfThumbNailUrl.push(thumbNailUrl);
+        this.downloadImages(listOfThumbNailUrl);
     });
 
     // Establish hub connection

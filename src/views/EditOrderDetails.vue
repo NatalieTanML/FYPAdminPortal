@@ -551,7 +551,7 @@ export default {
               })
         .catch(error => {
           console.dir(error);
-         
+          this.message("danger", error);
         });
         },
         getDeliveryTypeId(){

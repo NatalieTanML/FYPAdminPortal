@@ -261,8 +261,25 @@ export default {
           this.checkedCheckBox = [];
           this.checkAll = false;
         } else if (this.headerButton[1].title == clickedHeaderTitle) {
-          eventBus.$emit(this.headerButton[1]);
-        }
+       const listOfThumbNailUrl = []
+                let index;
+                for(index = 0; index < this.items.length; index++){
+                this.checkedCheckBox.forEach((checkedItemId) => {
+                  console.log(checkedItemId)
+                if (this.items[index].id == checkedItemId) {
+                     console.log(this.items[index])
+                 this.items[index].items.forEach((eachItemInOrder)=>{
+                   listOfThumbNailUrl.push(eachItemInOrder.orderImageKey)
+                 })
+                }
+                })
+                
+              
+              }
+                  console.log(listOfThumbNailUrl)
+                 eventBus.$emit(this.headerButtonClick[1],listOfThumbNailUrl);
+              }
+        
       } else eventBus.$emit(this.headerButtonClick[0]);
     },
     onActionButtonClick(item) {
