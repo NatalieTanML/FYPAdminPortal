@@ -3240,10 +3240,10 @@
   
   .collapsing {
     position: relative;
-    /* height: 0; */
+    height: 0;
     overflow: hidden;
-    /* -webkit-transition: width 1s ease; */
-    /* transition: width 1s ease; */
+    -webkit-transition: none;
+    transition: none;
   }
   
   @media (prefers-reduced-motion: reduce) {
@@ -11237,8 +11237,8 @@
     }
     .sidebar .nav-item .collapsing {
       display: block;
-      /* -webkit-transition: width 1s ease;
-      transition: width 1s ease; */
+      -webkit-transition: none;
+      transition: none;
     }
     .sidebar .nav-item .collapse,
     .sidebar .nav-item .collapsing {

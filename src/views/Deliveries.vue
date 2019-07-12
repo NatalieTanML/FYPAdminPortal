@@ -40,6 +40,8 @@
     </div>
     <b-modal
       @ok="getModalDetails"
+      @close="resetDetails"
+      @cancel="resetDetails"
       ref="showSignatureDialog"
       id="showSignatureDialog"
       :title="this.ordertitle"
@@ -84,7 +86,7 @@ export default {
       pad: null,
       sortBy: "date",
       ordertitle: null,
-      orderId: null,
+      orderIds: [],
       enableCheckbox : true,
 
       headerButtonClick: ["Update Order Status"],
@@ -140,18 +142,21 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
+    resetDetails(){
+   this.recipientName = null;
+          this.ordertitle = null;
+          this.orderids = [];
+    },
 
     getModalDetails() {
-      console.log(this.recipientName);
 
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 
       if (!isEmpty) {
         const base64 = data.substring(22);
-        console.log(base64);
 
         const jsonData = {
-          orderIds: [this.orderId],
+          orderIds: this.orderIds,
           recipient: {
             ReceivedBy: this.recipientName,
             RecipientSignature: base64
@@ -163,6 +168,12 @@ export default {
           .dispatch(UPDATE_RECIPIENT, jsonData)
           .then(response => {
             console.log(response);
+           
+          this.updateCurrentOrders(response);
+            this.message("success", "Order(s) status has been updated");
+          this.recipientName = null;
+          this.ordertitle = null;
+          this.orderids = [];
           })
           .catch(error => {
             console.dir(error);
@@ -170,15 +181,36 @@ export default {
           });
       }
 
-      this.recipientName = null;
-      this.ordertite = null;
-      this.orderId = null;
-    }
+     
+    },
+     updateCurrentOrders(response){
+      //update current items's statuses and actions 
+          let updatedOrders = response.orders;
+          let x;
+          for (x = 0; x < this.items.length; x++) {
+            updatedOrders.forEach((oneUpdatedOrder, index) => {
+              if (this.items[x].id == oneUpdatedOrder.orderId) {
+                this.items.splice(x,1);
+              }
+            });
+          }
+            if (this.forceRender) this.forceRender = false;
+        else this.forceRender = true;
+     }
   },
   mounted() {
+
+     eventBus.$on(this.headerButtonClick[0], listOfOrderIds => {
+     
+      this.ordertitle = "Multiple Orders" ;
+      this.orderIds = listOfOrderIds
+      this.$bvModal.show("showSignatureDialog");
+    });
+
     eventBus.$on(this.actionButtonClick, itemId => {
+      console.log("item id "+itemId)
       this.ordertitle = "Order : " + itemId;
-      this.orderId = itemId;
+      this.orderIds.push(itemId);
       this.$bvModal.show("showSignatureDialog");
     });
 
@@ -187,7 +219,11 @@ export default {
       .then(response => {
         let x;
         for (x = 0; x < response.length; x++) {
-          if (response[x].status == "Out for Delivery") {
+          //if order is out for delivery, only the assigned delivery man can see their own
+          //deliveries. Admin can see the deliveries also.
+          if (response[x].status == "Out for Delivery" && 
+          ((response[x].deliveryManId == this.$store.getters.userId)) || 
+          (this.$store.getters.userRole == "Admin" && response[x].status == "Out for Delivery")) {
             var addressOrHotel = null;
 
             if (response[x].address.hotel.hotelName != null)

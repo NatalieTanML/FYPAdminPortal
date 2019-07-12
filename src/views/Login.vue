@@ -107,7 +107,9 @@ export default {
             this.$router.replace({ name: "ChangePassword" });
           } else {
             this.message("success", "You have logged in");
-            this.$router.replace({ name: "SummaryOfOrders" });
+            if (this.$store.getters.userRole != "Delivery")
+              this.$router.replace({ name: "SummaryOfOrders" });
+            else this.$router.replace({ name: "Deliveries" });
           }
         })
         .catch(error => {

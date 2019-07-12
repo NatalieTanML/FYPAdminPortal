@@ -71,7 +71,15 @@
 
 <script>
 export default {
-  name: "SideBar"
+  name: "SideBar",
+  data(){
+      return{
+        userRole: "",
+      }
+  },
+  mounted(){
+    this.userRole = this.$store.getters.userRole;
+  }
 };
 </script>
 

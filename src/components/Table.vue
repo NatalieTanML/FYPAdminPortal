@@ -280,12 +280,15 @@ export default {
                   listOfThumbNailUrl.push(eachItemInOrder.orderImageKey);
                 });
               }
-            });
+            }
           }
-          console.log(listOfThumbNailUrl);
-          eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
-        }
-      } else eventBus.$emit(this.headerButtonClick[0]);
+      } else if (this.tableName == "Deliveries") {
+         eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
+          this.checkedCheckBox = [];
+          this.checkAll = false;
+      }
+      else eventBus.$emit(this.headerButtonClick);
+      }
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
