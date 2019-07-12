@@ -134,6 +134,7 @@ export default {
       Tabs: [],
       presignedUrl: "",
       recipientName: null,
+      userRole: null,
       ordertitle: null,
       orderId: null,
       sortItems: [],
@@ -187,15 +188,20 @@ export default {
   },
 
   async mounted() {
+   this.userRole = this.$store.getters.userRole
+
     this.$store
       .dispatch(GET_ALL_STATUS)
       .then(response => {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
+      
+
         this.typesOfTabs[0] = "All";
         for (x; x < response.length; x++)
-          this.typesOfTabs[x] = response[x - 1].statusName;
+        if(this.userRoleIsAllowedToSeeThisTabOrItem(response[x - 1].statusName))
+          this.typesOfTabs.push(response[x - 1].statusName);
 
         //had to hardcode the last tab string.
         // this.typesOfTabs[x] = response[x - 1].statusName;
@@ -281,8 +287,21 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
+    userRoleIsAllowedToSeeThisTabOrItem(tabName){
+      if(this.userRole == "Admin")
+      return true
+      else if (this.userRole == "Store"){
+            if(tabName == "Received" || tabName == "Awaiting Printing" )
+            return true;
+            else
+            return false;
+      }
+    },
+    
     getAllOrders() {
       console.log("getAllOrders called");
+      this.items = [];
+
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
@@ -290,7 +309,8 @@ export default {
           for (x; x < response.length; x++) {
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
-            this.items[x] = {
+            if(this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status))
+            this.items.push({
               id: response[x].orderId,
               refNo: response[x].referenceNo,
               date: response[x].createdAt.substring(0, 10),
@@ -299,7 +319,7 @@ export default {
               quantity: response[x].orderItems,
               status: response[x].status,
               actions: [this.getAction(response[x].status)]
-            };
+            });
           }
 
           //creating checkbox.
@@ -429,7 +449,7 @@ export default {
           let x;
           for (x = 0; x < this.items.length; x++) {
             updatedOrders.forEach((oneUpdatedOrder, index) => {
-              if (this.items[x].id == oneUpdatedOrder.orderId) {
+              if (this.items[x].id == oneUpdatedOrder.orderId && this.userRoleIsAllowedToSeeThisTabOrItem(oneUpdatedOrder.statusName)) {
                 this.items[x].status = oneUpdatedOrder.statusName;
                 this.items[x].actions = [this.getAction(
                   oneUpdatedOrder.statusName
@@ -493,7 +513,7 @@ export default {
       console.log("idsToUpdate", idsToUpdate);
       for (var e = 0; e < idsToUpdate.length; e++) {
         let idToUpdate = idsToUpdate[e];
-        for (var x = 0; x < this.sortItems.length; x++) {
+        for (var x = 0; x < this.items.length; x++) {
           if (idToUpdate == this.items[x].id) {
             this.$set(this.items[x], "_rowVariant", "primary");
           }
@@ -506,13 +526,11 @@ export default {
       }, 60000);
     },
         getModalDetails() {
-      console.log(this.recipientName);
 
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 
       if (!isEmpty) {
         const base64 = data.substring(22);
-        console.log(base64);
 
         const jsonData = {
           orderIds: [this.orderId],

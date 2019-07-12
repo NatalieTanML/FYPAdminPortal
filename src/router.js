@@ -201,9 +201,14 @@ localStorage.setItem("previousPathName", from.name);
 //if people try to go to the login page after they logged in,
 //they will be redirected to summaryoforders
  if(store.getters.isAuthenticated && to.path == '/Login' && store.getters.changePassword){
-  console.log("first if")
+ 
+  if(store.getters.userRole == "Admin" || store.getters.userRole == "Store" )
   next({
     path: '/SummaryOfOrders',
+  })
+  else
+  next({
+    path: '/Deliveries',
   })
 }
 
@@ -219,45 +224,52 @@ localStorage.setItem("previousPathName", from.name);
  
 
 //start of validation pages that needs authentication.
+//if user is authenticated, it will validate whether the page he is going is
+//allowed, or else it will just route him back to login page.
 else if( to.matched.some(record => record.meta.needAuthentication) && store.getters.isAuthenticated ){
  
+  //validate pages which user needs to change his password before he can access the page.
+  //example: he has logged in, but has not change his password, he will be redirected to the
+  //change password page.
   if(to.matched.some(record => record.meta.needNewPassword)){
+
+    //if user needs to change password.
   if( !store.getters.changePassword && to.path != '/ChangePassword'){
        next({
           path: '/ChangePassword',
           //params: { nextUrl: to.fullPath }
       })
   }
+  else if(store.getters.userRole != null){ //check for roles.
+
+    if(store.getters.userRole == "Admin")
+      next()
+    else if(store.getters.userRole == "Store"){ 
+      if(to.path == '/SummaryOfOrders' || to.path == '/ResourceManagement' || to.path == '/OrderDetails' || to.path == '/Login' ||  to.path == '/ChangePassword')
+      next()
+      else
+      next({
+        path: '/SummaryOfOrders',
+      })
+    }
+    else if(store.getters.userRole == "Delivery"){
+       if( to.path == '/Deliveries'  || to.path == '/Login' ||  to.path == '/ChangePassword')
+      next()
+      else
+      { 
+      next({
+      path: '/Deliveries'
+      })
+    }
+    }
+    else
+    next()
+    }
+
   else
   next()
 }
 
-else if(store.getters.userRole != null){ //check for roles.
-
-if(store.getters.userRole == "Admin")
-  next()
-else if(store.getters.userRole == "Store"){
-  if(to.path == '/SummaryOfOrders' || to.path == '/ResourceManagement' || to.path == '/Login')
-  next()
-  else
-  next({
-    path: '/SummaryOfOrders',
-  })
-}
-else if(store.getters.userRole == "Delivery"){
-   if(to.path == '/SummaryOfOrders' || to.path == '/Deliveries' || to.path == '/DeliveryRoutes' || to.path == '/Login')
-  next()
-  else
-  { 
-  next({
-  path: '/SummaryOfOrders'
-  })
-}
-}
-else
-next()
-}
-  
 else
 next()
 }
@@ -310,10 +322,20 @@ if(from.name == "SummaryOfOrders"){
   //since summaryoforders have multiple headers, need to reset each listender for the headers.
  let index;
  for(index = 0; index < SummaryOfOrders.data().headerButtonClick.length; index++){
- eventBus.$off(SummaryOfOrders.data().headerButtonClick)
+ eventBus.$off(SummaryOfOrders.data().headerButtonClick[index])
   }
  eventBus.$off(SummaryOfOrders.data().actionButtonClick)
  eventBus.$off(SummaryOfOrders.data().imageClick)
+
+}
+
+
+if(from.name == "Deliveries"){
+
+ eventBus.$off(Deliveries.data().headerButtonClick[0])
+  
+ eventBus.$off(Deliveries.data().actionButtonClick)
+
 
 }
 
