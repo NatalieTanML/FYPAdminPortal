@@ -194,7 +194,6 @@
 <script>
 import { eventBus } from "@/eventBus";
 import { timeout } from "q";
-
 export default {
   data() {
     return {
@@ -225,10 +224,8 @@ export default {
   },
   mounted() {
     this.totalRows = this.items.length;
-
     console.log(this.enableCheckbox);
     //to redraw the hr line.
-
     // if(this.$refs.itemdiv != undefined){
     //   console.log(this.$refs.itemdiv[0].clientWidth)
     // this.arrayOfTdWidth.push((this.$refs.itemdiv[0].clientWidth  + (this.$refs.itemdiv[0].clientWidth * 0.75 )) + 'px')
@@ -239,7 +236,6 @@ export default {
     // console.log(this.mounted)
     // }
   },
-
   computed: {
     sortOptions() {
       // Create an options list from our fields
@@ -253,7 +249,6 @@ export default {
         });
     }
   },
-
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -280,15 +275,16 @@ export default {
                   listOfThumbNailUrl.push(eachItemInOrder.orderImageKey);
                 });
               }
-            }
+            });
           }
+          console.log(listOfThumbNailUrl);
+          eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
+        }
       } else if (this.tableName == "Deliveries") {
-         eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
-          this.checkedCheckBox = [];
-          this.checkAll = false;
-      }
-      else eventBus.$emit(this.headerButtonClick);
-      }
+        eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
+        this.checkedCheckBox = [];
+        this.checkAll = false;
+      } else eventBus.$emit(this.headerButtonClick);
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
@@ -298,18 +294,14 @@ export default {
     },
     onCheckBoxCheck(item) {
       let index = 0;
-
       if (item.actions[0] == null) this.showHeaderButton = false;
       else this.showHeaderButton = true;
-
       console.log(this.showHeaderButton);
-
       if (this.checkedCheckBox.includes(item.id)) {
         for (index; index < this.checkedCheckBox.length; index++)
           if (this.checkedCheckBox[index] == item.id)
             this.checkedCheckBox.splice(index, 1);
       } else this.checkedCheckBox.push(item.id);
-
       console.log(this.checkedCheckBox);
     },
     checkAllCheckBox() {
@@ -323,10 +315,8 @@ export default {
         rowsPerPage = this.items.length - shownItems;
 
       console.log(this.items[0].actions);
-
       if (this.items[0].actions[0] == null) this.showHeaderButton = false;
       else this.showHeaderButton = true;
-
       console.log(this.showHeaderButton);
 
       //if the first page has less than 5 stuff.
@@ -374,6 +364,14 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.multiRowStyle {
+  height: 100px;
+  max-height: 100px;
+  display: block;
+}
+</style>
 
 <style scoped>
 .multiRowStyle {
