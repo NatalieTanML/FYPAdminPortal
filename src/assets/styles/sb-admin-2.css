@@ -3242,8 +3242,8 @@
     position: relative;
     height: 0;
     overflow: hidden;
-    -webkit-transition: height 0.15s ease;
-    transition: height 0.15s ease;
+    -webkit-transition: none;
+    transition: none;
   }
   
   @media (prefers-reduced-motion: reduce) {
@@ -11062,7 +11062,7 @@
   
   .sidebar {
     width: 6.5rem;
-    min-height: 100vh;
+    min-height: 100%;
   }
   
   .sidebar .nav-item {
@@ -11237,8 +11237,8 @@
     }
     .sidebar .nav-item .collapsing {
       display: block;
-      -webkit-transition: height 0.15s ease;
-      transition: height 0.15s ease;
+      -webkit-transition: none;
+      transition: none;
     }
     .sidebar .nav-item .collapse,
     .sidebar .nav-item .collapsing {

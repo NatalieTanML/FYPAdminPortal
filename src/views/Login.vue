@@ -18,7 +18,7 @@
                         type="email"
                         class="form-control form-control-user"
                         placeholder="Enter Email Address..."
-                      >
+                      />
                     </div>
 
                     <div class="form-group">
@@ -27,14 +27,14 @@
                         type="password"
                         class="form-control form-control-user"
                         placeholder="Password"
-                      >
+                      />
                     </div>
 
                     <b-row>
                       <b-col cols="12">
                         <div class="form-group float-left">
                           <div class="custom-control custom-checkbox small">
-                            <input type="checkbox" class="custom-control-input" id="customCheck">
+                            <input type="checkbox" class="custom-control-input" id="customCheck" />
                             <label class="custom-control-label" for="customCheck">Remember Me</label>
                           </div>
                         </div>
@@ -42,9 +42,16 @@
 
                       <b-col>
                         <div>
-                          <a v-on:click="validate" class="btn btn-primary btn-user btn-block">
+                          <!-- <a v-on:click="validate" class="btn btn-primary btn-user btn-block">
                             <span>Login</span>
-                          </a>
+                          </a>-->
+                          <b-button
+                            type="submit"
+                            v-on:click="validate"
+                            @keydown.enter.native="validate"
+                            class="btn btn-primary btn-user btn-block"
+                            variant="primary"
+                          >Login</b-button>
                         </div>
                       </b-col>
                     </b-row>
@@ -61,7 +68,7 @@
 </template>
 
 <script>
-import { SIGN_IN, USER_LOGOUT,BYPASSLOGIN } from "@/store/actions/user";
+import { SIGN_IN, USER_LOGOUT, BYPASSLOGIN } from "@/store/actions/user";
 
 export default {
   data() {
@@ -87,43 +94,33 @@ export default {
     validate() {
       const { email, password } = this;
 
-     const userStr = {
+      const userStr = {
+        email: email,
+        password: password
+      };
 
-      "email" : email,
-      "password" : password
-    };
-     
-
-        this.$store
-          .dispatch(SIGN_IN, userStr)
-          .then(response => {
-            console.log(response)
-            if (!response.user.changePassword) {
-              this.$router.replace({ name: "ChangePassword" });
-            } else {
-              this.message("success", "You have logged in");
-              if(this.$store.getters.userRole != 'Delivery')   
+      this.$store
+        .dispatch(SIGN_IN, userStr)
+        .then(response => {
+          console.log(response);
+          if (!response.user.changePassword) {
+            this.$router.replace({ name: "ChangePassword" });
+          } else {
+            this.message("success", "You have logged in");
+            if (this.$store.getters.userRole != "Delivery")
               this.$router.replace({ name: "SummaryOfOrders" });
-              else
-              this.$router.replace({ name: "Deliveries" });
-            }
-          })
-          .catch(error => {
-            this.$store
-              .dispatch(USER_LOGOUT)
-            console.log(error);
-            this.message("danger", error.response.data.message);
-          });
+            else this.$router.replace({ name: "Deliveries" });
+          }
+        })
+        .catch(error => {
+          this.$store.dispatch(USER_LOGOUT);
+          console.log(error);
+          this.message("danger", error.response.data.message);
+        });
 
-        // this.$store.dispatch(BYPASSLOGIN)
-        // this.$router.replace({ name: "SummaryOfOrders" });
-
-
-    },
-    
-    
-
-  
+      // this.$store.dispatch(BYPASSLOGIN)
+      // this.$router.replace({ name: "SummaryOfOrders" });
+    }
   }
 };
 </script>
@@ -132,8 +129,4 @@ export default {
 body {
   height: 100vh;
 }
-span {
-  color: white;
-}
-
 </style>

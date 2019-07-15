@@ -26,12 +26,10 @@
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
                   class="float-right"
-               v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
+                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))) ||
                  (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
-                >
-                {{oneHeaderButton.title}}
-                </b-button>
+                >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
           </b-row>
@@ -41,7 +39,7 @@
         <div class="card-body">
           <b-table
             show-empty
-            stacked="md"
+            responsive
             :items="items"
             :fields="fields"
             :current-page="currentPage"
@@ -70,21 +68,26 @@
               ></b-form-checkbox>
             </template>
 
-               <template slot="actions" slot-scope="row">
-              
-              <div  v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div  v-if="oneActionButton != null">
-              <b-button type="button" v-on:click="onActionButtonClick(row.item, oneActionButton)" lg="4" class="w-75"
-                variant="primary" size="sm">{{oneActionButton}}</b-button>
-                 </div>
-                 </div>
+            <template slot="actions" slot-scope="row">
+              <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
+                <div v-if="oneActionButton != null" class="text-break">
+                  <b-button
+                    type="button"
+                    v-on:click="onActionButtonClick(row.item, oneActionButton)"
+                    lg="4"
+                    class="w-75 mb-2"
+                    variant="primary"
+                    size="sm"
+                  >{{oneActionButton}}</b-button>
+                </div>
+              </div>
 
-              <div style="display: inline-block;margin-left:5px" v-if="tableName == 'Orders'">
+              <div v-if="tableName == 'Orders'">
                 <b-dropdown
                   id="dropdown-header"
                   variant="transparent"
                   no-caret
-                  class="mb-1 mydropdown"
+                  class="mydropdown float-right"
                 >
                   <template slot="button-content">
                     <i class="fas fa-ellipsis-v fa-sm"></i>
@@ -191,7 +194,6 @@
 <script>
 import { eventBus } from "@/eventBus";
 import { timeout } from "q";
-
 export default {
   data() {
     return {
@@ -205,7 +207,7 @@ export default {
       filter: null,
       checkedCheckBox: [],
       checkAll: false,
-      showHeaderButton: true,
+      showHeaderButton: true
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -222,10 +224,8 @@ export default {
   },
   mounted() {
     this.totalRows = this.items.length;
-
     console.log(this.enableCheckbox);
     //to redraw the hr line.
-
     // if(this.$refs.itemdiv != undefined){
     //   console.log(this.$refs.itemdiv[0].clientWidth)
     // this.arrayOfTdWidth.push((this.$refs.itemdiv[0].clientWidth  + (this.$refs.itemdiv[0].clientWidth * 0.75 )) + 'px')
@@ -236,7 +236,6 @@ export default {
     // console.log(this.mounted)
     // }
   },
-
   computed: {
     sortOptions() {
       // Create an options list from our fields
@@ -250,7 +249,6 @@ export default {
         });
     }
   },
-
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -266,96 +264,77 @@ export default {
           this.checkedCheckBox = [];
           this.checkAll = false;
         } else if (this.headerButton[1].title == clickedHeaderTitle) {
-       const listOfThumbNailUrl = []
-                let index;
-                for(index = 0; index < this.items.length; index++){
-                this.checkedCheckBox.forEach((checkedItemId) => {
-                  console.log(checkedItemId)
-                if (this.items[index].id == checkedItemId) {
-                     console.log(this.items[index])
-                 this.items[index].items.forEach((eachItemInOrder)=>{
-                   listOfThumbNailUrl.push(eachItemInOrder.orderImageKey)
-                 })
-                }
-                })
-                
-              
+          const listOfThumbNailUrl = [];
+          let index;
+          for (index = 0; index < this.items.length; index++) {
+            this.checkedCheckBox.forEach(checkedItemId => {
+              console.log(checkedItemId);
+              if (this.items[index].id == checkedItemId) {
+                console.log(this.items[index]);
+                this.items[index].items.forEach(eachItemInOrder => {
+                  listOfThumbNailUrl.push(eachItemInOrder.orderImageKey);
+                });
               }
-                  console.log(listOfThumbNailUrl)
-                 eventBus.$emit(this.headerButtonClick[1],listOfThumbNailUrl);
-              }
-        
-      }else if (this.tableName == "Deliveries") {
-         eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
-          this.checkedCheckBox = [];
-          this.checkAll = false;
-      }
-      else eventBus.$emit(this.headerButtonClick);
+            });
+          }
+          console.log(listOfThumbNailUrl);
+          eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
+        }
+      } else if (this.tableName == "Deliveries") {
+        eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
+        this.checkedCheckBox = [];
+        this.checkAll = false;
+      } else eventBus.$emit(this.headerButtonClick);
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
-   
         eventBus.$emit(this.actionButtonClick, item);
       } else eventBus.$emit(this.actionButtonClick, item.id);
       //id is the row's item's id
     },
     onCheckBoxCheck(item) {
-
-    let index = 0;
-
-       if(item.actions[0] == null)
-        this.showHeaderButton = false;
-        else
-        this.showHeaderButton = true;
-
-        console.log(this.showHeaderButton)
-
-        if (this.checkedCheckBox.includes(item.id)) {
-            for (index; index < this.checkedCheckBox.length; index++)
-                if (this.checkedCheckBox[index] == item.id)
-              this.checkedCheckBox.splice(index, 1)
-        } else
-          this.checkedCheckBox.push(item.id)
-
-             console.log(this.checkedCheckBox)
+      let index = 0;
+      if (item.actions[0] == null) this.showHeaderButton = false;
+      else this.showHeaderButton = true;
+      console.log(this.showHeaderButton);
+      if (this.checkedCheckBox.includes(item.id)) {
+        for (index; index < this.checkedCheckBox.length; index++)
+          if (this.checkedCheckBox[index] == item.id)
+            this.checkedCheckBox.splice(index, 1);
+      } else this.checkedCheckBox.push(item.id);
+      console.log(this.checkedCheckBox);
     },
     checkAllCheckBox() {
-      console.log(this.items)
-        let index = 0
-        let rowsPerPage = this.perPage
-        let shownItems = (this.currentPage - 1) * rowsPerPage
-        // console.log(shownItems)
-        //if the last page has less than 5 stuff.
-        if (((this.items.length - shownItems) < rowsPerPage) && this.currentPage != 1)
-          rowsPerPage = this.items.length - shownItems
-  
-      console.log(this.items[0].actions)
+      console.log(this.items);
+      let index = 0;
+      let rowsPerPage = this.perPage;
+      let shownItems = (this.currentPage - 1) * rowsPerPage;
+      // console.log(shownItems)
+      //if the last page has less than 5 stuff.
+      if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
+        rowsPerPage = this.items.length - shownItems;
 
-        if(this.items[0].actions[0] == null)
-        this.showHeaderButton = false;
-        else
-        this.showHeaderButton = true;
+      console.log(this.items[0].actions);
+      if (this.items[0].actions[0] == null) this.showHeaderButton = false;
+      else this.showHeaderButton = true;
+      console.log(this.showHeaderButton);
 
-        console.log(this.showHeaderButton)
-          
-        //if the first page has less than 5 stuff.
-        if (this.currentPage == 1 && this.items.length < rowsPerPage)
-          rowsPerPage = this.items.length
-        // console.log(this.currentPage)
-        // console.log(rowsPerPage)
-        if (!this.checkAll)
-          this.checkAll = true;
-        else
-          this.checkAll = false;
-        this.checkedCheckBox = [];
-        if (this.checkAll) {
-          for (index = 0; index < rowsPerPage; index++) {
-            this.checkedCheckBox[index] = this.items[shownItems + index].id;
-          }
+      //if the first page has less than 5 stuff.
+      if (this.currentPage == 1 && this.items.length < rowsPerPage)
+        rowsPerPage = this.items.length;
+      // console.log(this.currentPage)
+      // console.log(rowsPerPage)
+      if (!this.checkAll) this.checkAll = true;
+      else this.checkAll = false;
+      this.checkedCheckBox = [];
+      if (this.checkAll) {
+        for (index = 0; index < rowsPerPage; index++) {
+          this.checkedCheckBox[index] = this.items[shownItems + index].id;
         }
-        console.log(this.checkAll)
-        console.log(this.checkedCheckBox)
-      },
+      }
+      console.log(this.checkAll);
+      console.log(this.checkedCheckBox);
+    },
     myRowClickHandler(record, index) {
       if (this.tableName == "Orders") {
         console.log(this.items);
@@ -373,8 +352,7 @@ export default {
     },
     editOrder(orderid) {
       localStorage.setItem("editOrderId", orderid);
-       this.$router.replace({name:'EditOrderDetails'});
-      
+      this.$router.replace({ name: "EditOrderDetails" });
     },
     cancelOrder() {
       console.log("order is cancelled");
@@ -386,6 +364,14 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.multiRowStyle {
+  height: 100px;
+  max-height: 100px;
+  display: block;
+}
+</style>
 
 <style scoped>
 .multiRowStyle {
