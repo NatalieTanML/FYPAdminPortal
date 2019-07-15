@@ -137,7 +137,7 @@ export default {
       ordertitle: null,
       orderIds: [],
       sortItems: [],
-      updatedOrders : [],
+      updatedOrders: [],
       items: [],
       fields: [
         {
@@ -198,7 +198,7 @@ export default {
         let x = 1;
 
         this.typesOfTabs[0] = "All";
-        for (x; x < response.length; x++)
+        for (x; x < response.length + 1; x++)
           if (
             this.userRoleIsAllowedToSeeThisTabOrItem(response[x - 1].statusName)
           )
@@ -216,26 +216,22 @@ export default {
     eventBus.$on(this.headerButtonClick[0], orderIds => {
       var needsSignature = false;
 
-      this.items.forEach( oneItem =>{
+      this.items.forEach(oneItem => {
         //if at least one item is Out For Delivery, i will prompt the modal dialog.
-      orderIds.forEach(oneOrderId =>{
-        if(oneItem.id == oneOrderId)
-        { 
-          if(oneItem.actions == "Delivered"){
-          needsSignature = true;
-
+        orderIds.forEach(oneOrderId => {
+          if (oneItem.id == oneOrderId) {
+            if (oneItem.actions == "Delivered") {
+              needsSignature = true;
+            }
           }
-        }
-      })
-        
+        });
       });
 
-      if(!needsSignature)
-      this.updateStatusTabsAndTable(orderIds);
-      else{
-          this.orderIds = orderIds
-           this.ordertitle = "Multiple Orders" ;
-            this.$bvModal.show("showSignatureDialog");
+      if (!needsSignature) this.updateStatusTabsAndTable(orderIds);
+      else {
+        this.orderIds = orderIds;
+        this.ordertitle = "Multiple Orders";
+        this.$bvModal.show("showSignatureDialog");
       }
     });
 
@@ -267,20 +263,37 @@ export default {
     // Establish hub methods
     this.connection.on("OneOrder", order => {
       console.log("OneOrder called");
-      console.log(order);
-      let oneOrder = [];
-      oneOrder.push(order);
-      this.highlightRows(oneOrder);
-      this.getAllOrders();
-  
+      console.log("one order : ", order);
+
+      let updatedOrderList = [];
+      orders.forEach(updatedOrder => {
+        updatedOrderList.push({
+          orderId: updatedOrder.orderId,
+          statusId: updatedOrder.statusId,
+          statusName: updatedOrder.status.statusName
+        });
+      });
+
+      this.highlightRows(updatedOrderList);
+      this.updateCurrentOrders(updatedOrderList);
+      this.setUpTabs();
     });
 
     this.connection.on("MultipleOrders", orders => {
       console.log("MultipleOrders called");
-      console.log(orders);
-      this.highlightRows(orders);
-      this.getAllOrders();
-     
+      console.log("multiple order : ", orders);
+      let updatedOrderList = [];
+      orders.forEach(updatedOrder => {
+        updatedOrderList.push({
+          orderId: updatedOrder.orderId,
+          statusId: updatedOrder.statusId,
+          statusName: updatedOrder.status.statusName
+        });
+      });
+
+      this.highlightRows(updatedOrderList);
+      this.updateCurrentOrders(updatedOrderList);
+      this.setUpTabs();
     });
 
     // start the connection
@@ -337,17 +350,9 @@ export default {
                 status: response[x].status,
                 actions: [this.getAction(response[x].status)]
               };
-
-              //if there are any orders that are updated recently, it will highlight the row.
-              var y = 0;
-              if(this.updatedOrders.length > 0)
-              for(y; y< this.updatedOrders.length; y++)
-              if(this.updatedOrders[y] == this.items[x].id)
-              this.$set(this.items[x], "_rowVariant", "primary");
-
           }
           //reset updatedOrders
-          this.updatedOrders = []
+          this.updatedOrders = [];
 
           //creating checkbox.
           let index;
@@ -459,7 +464,7 @@ export default {
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
           this.message("success", "Order Status(es) is updated successfully!");
-          this.updateCurrentOrders(response);
+          this.updateCurrentOrders(response.orders);
           //reset the tabs.
           this.setUpTabs();
           //there is a few lines in the router.js where i reset the eventbus listener too
@@ -470,9 +475,10 @@ export default {
           this.message("danger", error);
         });
     },
-    updateCurrentOrders(response) {
+    updateCurrentOrders(orders) {
       //update current items's statuses and actions
-      let updatedOrders = response.orders;
+      console.log("updated orders : " + orders);
+      let updatedOrders = orders;
       let x;
       for (x = 0; x < this.items.length; x++) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
@@ -536,17 +542,10 @@ export default {
     // },
     highlightRows(orders) {
       for (var i = 0; i < orders.length; i++) {
-        this.updatedOrders.push(orders[i].orderId);
+        for (var y = 0; y < this.items.length; y++)
+          if (orders[i].orderId == this.items[y].id)
+            this.$set(this.items[y], "_rowVariant", "primary");
       }
-      console.log("this.updatedOrders", this.updatedOrders);
-      // for (var e = 0; e < idsToUpdate.length; e++) {
-      //   let idToUpdate = idsToUpdate[e];
-      //   for (var x = 0; x < this.items.length; x++) {
-      //     if (idToUpdate == this.items[x].id) {
-      //       this.$set(this.items[x], "_rowVariant", "primary");
-      //     }
-      //   }
-      // }
     },
     pollData() {
       this.polling = setInterval(() => {
@@ -575,7 +574,7 @@ export default {
               "success",
               "Order Status(es) is updated successfully!"
             );
-            this.updateCurrentOrders(response);
+            this.updateCurrentOrders(response.orders);
             //reset the tabs.
             this.setUpTabs();
           })
@@ -583,9 +582,7 @@ export default {
             console.dir(error);
             this.message("danger", error);
           });
-      }
-      else{
-
+      } else {
       }
 
       this.recipientName = null;
