@@ -75,19 +75,19 @@
                     type="button"
                     v-on:click="onActionButtonClick(row.item, oneActionButton)"
                     lg="4"
-                    class="w-75"
+                    class="w-75 mb-2"
                     variant="primary"
                     size="sm"
                   >{{oneActionButton}}</b-button>
                 </div>
               </div>
 
-              <div style="display: inline-block;margin-left:5px" v-if="tableName == 'Orders'">
+              <div v-if="tableName == 'Orders'">
                 <b-dropdown
                   id="dropdown-header"
                   variant="transparent"
                   no-caret
-                  class="mb-1 mydropdown"
+                  class="mydropdown float-right"
                 >
                   <template slot="button-content">
                     <i class="fas fa-ellipsis-v fa-sm"></i>
