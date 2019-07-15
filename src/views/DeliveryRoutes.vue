@@ -78,8 +78,8 @@ export default {
       actionButtonClick: "Assign One to Deliveryman",
       headerButton: [{ id: 1, title: "Assign to Deliveryman" }],
       headerButtonClick: ["Assign to Deliveryman"],
-      id: "",
-      items: [],
+      id: "" ,
+      items:  [],
       fields: [
         { key: "refNo", label: "Ref. No", sortable: true },
         { key: "region", label: "Region", sortable: true },
@@ -154,7 +154,7 @@ export default {
           return "Ardmore, Bukit Timah, Holland Road, Tanglin";
         if (
           postcode.substring(0, 2) == "28" ||
-          postcode.substring(0, 2) == "29" ||
+          postcode.substring(0, 2) == "29"    ||  
           postcode.substring(0, 2) == "30"
         )
           return "Watten Estate, Novena, Thomson";
