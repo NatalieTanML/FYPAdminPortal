@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import OrderHub from "@/services/orderHub.js";
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
@@ -87,22 +88,22 @@ export default {
       sortBy: "date",
       ordertitle: null,
       orderIds: [],
-      enableCheckbox : true,
+      enableCheckbox: true,
 
       headerButtonClick: ["Update Order Status"],
       headerButton: [
         {
           id: 1,
           title: "Update Order Status"
-        },
+        }
       ],
       actionButtonClick: "Delivery Signature",
       forceRender: false,
       recipientName: null,
       items: [],
       fields: [
-         {
-           key: "checkbox",
+        {
+          key: "checkbox",
           label: ""
         },
         {
@@ -142,14 +143,13 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
-    resetDetails(){
-   this.recipientName = null;
-          this.ordertitle = null;
-          this.orderids = [];
+    resetDetails() {
+      this.recipientName = null;
+      this.ordertitle = null;
+      this.orderids = [];
     },
 
     getModalDetails() {
-
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 
       if (!isEmpty) {
@@ -168,47 +168,78 @@ export default {
           .dispatch(UPDATE_RECIPIENT, jsonData)
           .then(response => {
             console.log(response);
-           
-          this.updateCurrentOrders(response);
+
+            this.updateCurrentOrders(response.orders);
             this.message("success", "Order(s) status has been updated");
-          this.recipientName = null;
-          this.ordertitle = null;
-          this.orderids = [];
+            this.recipientName = null;
+            this.ordertitle = null;
+            this.orderids = [];
           })
           .catch(error => {
             console.dir(error);
             this.message("danger", error);
           });
       }
-
-     
     },
-     updateCurrentOrders(response){
-      //update current items's statuses and actions 
-          let updatedOrders = response.orders;
-          let x;
-          for (x = 0; x < this.items.length; x++) {
-            updatedOrders.forEach((oneUpdatedOrder, index) => {
-              if (this.items[x].id == oneUpdatedOrder.orderId) {
-                this.items.splice(x,1);
-              }
-            });
-          }
-            if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
-     }
-  },
-  mounted() {
+    highlightRows(orders) {
+      for (var i = 0; i < orders.length; i++) {
+        for (var y = 0; y < this.items.length; y++)
+          if (orders[i].orderId == this.items[y].id)
+            this.$set(this.items[y], "_rowVariant", "primary");
+      }
+    },
+    getAddressOrHotelName(response) {
+      console.log("getaddressorhotel", response);
+      var addressOrHotel = null;
 
-     eventBus.$on(this.headerButtonClick[0], listOfOrderIds => {
-     
-      this.ordertitle = "Multiple Orders" ;
-      this.orderIds = listOfOrderIds
+      if (response.address.hotel.hotelName != null)
+        addressOrHotel = response.address.hotel.hotelName;
+      else
+        addressOrHotel =
+          response.address.addressLine1 + ", " + response.address.addressLine2;
+      return addressOrHotel;
+    },
+    updateCurrentOrders(orders) {
+      console.log("updateCurrentOrders : " + JSON.stringify(orders));
+      //update current items's statuses and actions
+      let updatedOrders = orders;
+      let x;
+      for (x = 0; x < this.items.length; x++) {
+        updatedOrders.forEach((oneUpdatedOrder, index) => {
+          //if there are new records of orders that needs to be delivered,
+          //i will populate the table, or else i will take the item out from the
+          //table. this is because i use this method when i update the status from out for delivery to completed
+          //of the order too.
+
+          if (this.items[x].id == oneUpdatedOrder.orderId) {
+            this.items.splice(x, 1);
+          } else if(oneUpdatedOrder.status.statusName == "Out for Delivery"){
+            this.items.push({
+              id: oneUpdatedOrder.orderId,
+              refNo: oneUpdatedOrder.referenceNo,
+              date: new Date(
+                Date.parse(oneUpdatedOrder.createdAt)
+              ).toLocaleString(),
+              items: oneUpdatedOrder.orderItems,
+              address: this.getAddressOrHotelName(oneUpdatedOrder),
+              actions: ["Delivered"]
+            });  
+          }
+        });
+      }
+      if (this.forceRender) this.forceRender = false;
+      else this.forceRender = true;
+    }
+  },
+  async mounted() {
+    eventBus.$on(this.headerButtonClick[0], listOfOrderIds => {
+      this.ordertitle = "Multiple Orders";
+      this.orderIds = listOfOrderIds;
       this.$bvModal.show("showSignatureDialog");
     });
 
     eventBus.$on(this.actionButtonClick, itemId => {
-      console.log("item id "+itemId)
+      console.log("item id " + itemId);
       this.ordertitle = "Order : " + itemId;
       this.orderIds.push(itemId);
       this.$bvModal.show("showSignatureDialog");
@@ -221,18 +252,13 @@ export default {
         for (x = 0; x < response.length; x++) {
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
-          if (response[x].status == "Out for Delivery" && 
-          ((response[x].deliveryManId == this.$store.getters.userId)) || 
-          (this.$store.getters.userRole == "Admin" && response[x].status == "Out for Delivery")) {
-            var addressOrHotel = null;
-
-            if (response[x].address.hotel.hotelName != null)
-              addressOrHotel = response[x].address.hotel.hotelName;
-            else
-              addressOrHotel =
-                response[x].address.addressLine1 +
-                ", " +
-                response[x].address.addressLine2;
+          if (
+            (response[x].status == "Out for Delivery" &&
+              response[x].deliveryManId == this.$store.getters.userId) ||
+            (this.$store.getters.userRole == "Admin" &&
+              response[x].status == "Out for Delivery")
+          ) {
+            var addressOrHotel = this.getAddressOrHotelName(response[x]);
 
             this.items.push({
               id: response[x].orderId,
@@ -253,6 +279,53 @@ export default {
         console.dir(error);
         this.message("danger", error);
       });
+
+    // Establish hub connection
+    this.connection = await OrderHub.connectToOrderHub();
+
+    // Establish hub methods
+    this.connection.on("OneOrder", order => {
+      console.log("OneOrder called");
+      console.log("one order : ", order);
+
+      let updatedOrderList = [];
+      orders.forEach(updatedOrder => {
+        updatedOrderList.push({
+          orderId: updatedOrder.orderId,
+          statusId: updatedOrder.statusId,
+          statusName: updatedOrder.status.statusName
+        });
+      });
+
+      // this.updateCurrentOrders(updatedOrderList);
+    });
+
+    this.connection.on("MultipleOrders", orders => {
+      console.log("MultipleOrders called");
+      console.log("multiple order : ", orders);
+      let updatedOrderList = [];
+      orders.forEach(updatedOrder => {
+        updatedOrderList.push({
+          orderId: updatedOrder.orderId,
+          statusId: updatedOrder.statusId,
+          statusName: updatedOrder.status.statusName
+        });
+      });
+
+      // this.updateCurrentOrders(updatedOrderList);
+    });
+
+    // start the connection
+    this.connection
+      .start()
+      .then(() => {
+        console.log("Connection to hub started");
+      })
+      .catch(err => console.log(err));
+  },
+
+  async beforeDestroy() {
+    this.connection.stop();
   }
 };
 </script>
