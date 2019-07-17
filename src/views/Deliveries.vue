@@ -251,7 +251,7 @@ export default {
       
       updatedOrders.forEach((oneUpdatedOrder, index) => {
       if (oneUpdatedOrder.status == "Out for Delivery") {
-            this.items.push({
+           var itemLength = this.items.push({
               id: oneUpdatedOrder.orderId,
               refNo: oneUpdatedOrder.referenceNo,
               date: new Date(
@@ -262,8 +262,8 @@ export default {
               actions: ["Delivered"]
             });
 
-              // this.$set(this.items[x], "_rowVariant", "primary");
-            // console.log("one new updated item : ", this.items);
+               this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
+             console.log("one new updated item : ", this.items);
           }
                  });
       
