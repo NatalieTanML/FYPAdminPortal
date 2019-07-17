@@ -71,7 +71,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
-import { GET_ALL_ORDERS, UPDATE_RECIPIENT } from "@/store/actions/order";
+import { GET_ALL_ORDERS, UPDATE_RECIPIENT, UPDATE_ORDER_STATUS } from "@/store/actions/order";
 
 export default {
   components: {
@@ -90,11 +90,15 @@ export default {
       orderIds: [],
       enableCheckbox: true,
 
-      headerButtonClick: ["Update Order Status"],
+      headerButtonClick: ["Update Order Status", "Delivery Failed"],
       headerButton: [
         {
           id: 1,
           title: "Update Order Status"
+        },
+         {
+          id: 2,
+          title: "Delivery Failed"
         }
       ],
       actionButtonClick: "Delivery Signature",
@@ -236,6 +240,26 @@ export default {
       this.ordertitle = "Multiple Orders";
       this.orderIds = listOfOrderIds;
       this.$bvModal.show("showSignatureDialog");
+    });
+
+    eventBus.$on(this.headerButtonClick[1], listOfOrderIds => {
+     var isSuccessful = false;
+
+       const jsonData = {
+        orderIds: listOfOrderIds,
+        isSuccessful: isSuccessful
+      };
+      this.$store
+        .dispatch(UPDATE_ORDER_STATUS, jsonData)
+        .then(response => {
+          this.message("success", "Order Status(es) is updated successfully!");
+          this.updateCurrentOrders(response.orders);
+
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
     });
 
     eventBus.$on(this.actionButtonClick, itemId => {

@@ -30,7 +30,7 @@
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
-                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
+                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -298,9 +298,19 @@ export default {
           this.checkAll = false;
         }
       } else if (this.tableName == "Deliveries") {
+
+        if(this.headerButton[0].title == clickedHeaderTitle){
         eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
         this.checkedCheckBox = [];
         this.checkAll = false;
+        }
+
+        else if(this.headerButton[1].title == clickedHeaderTitle){
+           eventBus.$emit(this.headerButton[1].title, this.checkedCheckBox);
+        this.checkedCheckBox = [];
+        this.checkAll = false;
+        }
+
       } else
        eventBus.$emit(this.headerButtonClick);
     },
