@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const api_routes = {
   user: {
@@ -12,13 +12,17 @@ export const api_routes = {
     change_password: 'api/users/changepassword'
   },
   order: {
-    get: 'api/orders/',
-    get_all: 'api/orders/',
-    get_all_status: 'api/orders/getOrderStatus',
+    get: "api/orders/",
+    get_all: "api/orders/",
+    get_multiple: "api/orders/multi",
+    get_all_status: "api/orders/getOrderStatus",
     update_deliveryman: "api/orders/deliveryman",
     update_order_status: "api/orders/status",
-    get_presigned_url: 'api/s3/url',
-    update_recipient: 'api/orders/recipient',
+    get_presigned_url: "api/s3/url",
+    update_recipient: "api/orders/recipient",
+    getHotels: "/api/hotels/",
+    updateOrder: "/api/orders/",
+    getAllDeliveryTypes: "api/orders/getAllDeliveryTypes"
   },
   product: {
     create: 'api/products',
@@ -34,15 +38,14 @@ export const api_routes = {
 
 export const apiCall = ({ url, method, ...args }) =>
   new Promise((resolve, reject) => {
-    let token = localStorage.getItem('token') || '';
-    console.log(url + " " + method)
+    let token = localStorage.getItem("token") || "";
+    console.log(url + " " + method);
     if (token)
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-
+      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 
     try {
       axios({
-        method: method || 'get',
+        method: method || "get",
         url: url,
         ...args
       })
@@ -55,5 +58,4 @@ export const apiCall = ({ url, method, ...args }) =>
     } catch (err) {
       reject(new Error(err));
     }
-
   });

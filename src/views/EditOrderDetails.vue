@@ -64,7 +64,7 @@
                   <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
                 </b-row>
                 <b-row class="b4 mb-2">
-                  <b-col class="b3">Actions</b-col>
+                  <b-col class="b3" v-if="getAction(order.status) != null">Actions</b-col>
                   <b-col class="b3"></b-col>
                   <b-col class="b3"></b-col>
                 </b-row>
@@ -76,6 +76,7 @@
                       class="btnAction"
                       variant="primary"
                       size="sm"
+                      v-if="getAction(order.status) != null"
                     >{{getAction(order.status)}}</b-button>
                   </b-col>
                   <b-col class="b3"></b-col>
@@ -99,7 +100,7 @@
                   <b-col cols="3">
                      <img
                      @click="onImageClick(orderItem.orderImageKey)"
-                     style="height: 100px; max-height: 150px"
+                     style="height: 100px; max-height: 150px; cursor:pointer;"
                     v-bind:src="orderItem.orderImageUrl"
                   />
                   </b-col>
@@ -124,29 +125,131 @@
             <div class="card shadow mb-4">
               <div class="card-header py-3">
                 <h4 class="mb-3">Customer Information</h4>
-
-                <b-row class="b1 mb-2">
+                  <b-row class="b1 mb-2">
                   <b-col>Email Address</b-col>
-                  <b-col>Billing</b-col>
-                  <b-col>Shipping</b-col>
-                  <b-col>Special Request</b-col>
+                  </b-row>
+                  
+                  <b-row class=" mb-2">
+                  <b-col v-if="order.emailString == null">N/A</b-col>
+                  <b-col v-else>{{order.emailString}}</b-col>
+                  </b-row>
+
+                  <b-row class="b1 mb-2">
+
+                  <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
+                <b-form-group label="Country">
+                 <b-input v-model="country"></b-input>
+                </b-form-group>
+                </b-col>
+
+                <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
+                <b-form-group label="State">
+                 <b-input v-model="state"></b-input>
+                </b-form-group>
+                </b-col>
+                  </b-row>
+
+                  
+
+                      <b-form-group  id="input-group-6">
+                          <span  class="b1">Delivery Type : </span>
+                          
+                    <b-form-radio-group
+                      id="input-6"
+                      v-model="selectedDeliveryType"
+                      name="type"
+                      stacked
+                      style="margin-top: 5px"
+                    >
+                    <b-form-radio v-for="deliveryType in deliveryTypes"
+                    v-bind:key="deliveryType.deliveryTypeId"
+                    :value="deliveryType.deliveryTypeName" >
+                        {{deliveryType.deliveryTypeName}} 
+                    </b-form-radio>
+                   
+                    </b-form-radio-group>
+                  </b-form-group>
+         
+         <div v-if="selectedDeliveryType == 'Residential' ">
+                <b-row  class="b1 mb-2">
+
+                <b-col cols="4">
+                <b-form-group label="Postal Code">
+                 <b-input v-model="residential.postalCode"></b-input>
+                </b-form-group>
+                      </b-col>
+
+                <b-col cols="4">
+                <b-form-group label="Address Line 1">
+                 <b-input v-model="residential.addressOne"></b-input>
+                </b-form-group>
+                </b-col>
+
+                <b-col cols="4">
+                <b-form-group label="Address Line 2">
+                 <b-input v-model="residential.addressTwo"></b-input>
+                </b-form-group>
+                </b-col>
+
                 </b-row>
 
-                <b-row>
-                  <b-col cols="3" v-if="order.emailString == null">N/A</b-col>
-                  <b-col cols="3" v-else>{{order.emailString}}</b-col>
-                  <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
-                  <b-col
-                    cols="3"
-                    v-else
-                  >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
-                  <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
-                  <b-col
-                    cols="3"
-                    v-else
-                  >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
-                  <b-col cols="3" v-if="order.request == null">N/A</b-col>
-                  <b-col cols="3" v-else>{{order.request}}</b-col>
+                <b-row  class="b1 mb-2">
+           
+                <b-col cols="4">
+                <b-form-group label="Unit No.">
+                 <b-input v-model="residential.unitNo"></b-input>
+                </b-form-group>
+                      </b-col>
+
+                <b-col cols="4">
+                <b-form-group label="Special Request">
+                 <b-input v-model="specialRequest"></b-input>
+                </b-form-group>
+                </b-col>
+
+              
+
+                </b-row>
+            </div>
+
+                <b-row v-if="selectedDeliveryType == 'Hotel' " class="b1 mb-2">
+                    <b-col cols="4">
+                <b-form-group label="Hotel">
+                  <select
+                        class="form-control dropdown"
+                        id="exampleFormControlSelect1"
+                        @change="onSelectChange($event)"
+                      >
+                        <option
+                        v-if=""
+                          v-for="oneHotel in hotels"
+                         v-bind:key="oneHotel.value"
+                         v-bind:selected="oneHotel.value == selectedHotel.value"
+                          :value="JSON.stringify(oneHotel)"
+                        >{{oneHotel.text}}</option>
+                      </select>
+                </b-form-group>
+                      </b-col>
+
+                <b-col cols="4">
+                <b-form-group label="Room No">
+                 <b-input v-model="hotel.roomNo"></b-input>
+                </b-form-group>
+                </b-col>
+
+                <b-col cols="4">
+                <b-form-group label="Special Request">
+                 <b-input v-model="specialRequest"></b-input>
+                </b-form-group>
+                </b-col>
+                </b-row>
+            
+                <b-row >
+                <b-col>
+                <b-button v-on:click="saveDetails()" variant="primary">Save</b-button>
+              
+                <b-button style="margin-left:1em" variant="secondary">Cancel</b-button>
+                </b-col>
                 </b-row>
               </div>
             </div>
@@ -178,7 +281,11 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
-import { ORDER_GET_REQUEST, GET_PRESIGNED_URL } from "@/store/actions/order";
+import { ORDER_GET_REQUEST,
+         GET_PRESIGNED_URL,
+         GET_ALL_HOTELS,
+         UPDATE_ORDER,
+         GET_ALL_DELIVERY_TYPES } from "@/store/actions/order";
 
 export default {
   components: {
@@ -189,11 +296,48 @@ export default {
     return {
       pad: null,
       order: null,
-      time: ""
+      time: "",
+      selectedDeliveryType: null,
+      hotels: null,
+      specialRequest: null,
+      deliveryTypes: [],
+      selectedHotel: {
+          hotelAddress : null,
+      hotelPostalCode : null,
+      text : null,
+      value : null
+
+      },
+      country: null,
+      state: null,
+      hotel:{
+          id: null,
+          address:null,
+          postalCode:null,
+          roomNo : null,
+      },
+      residential:{
+          addressOne:null,
+          addressTwo:null,
+          unitNo:null,
+          postalCode:null,
+      },
+     
     };
   },
 
+  created(){
+      
+  },
+
   methods: {
+         message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+    },
     
     onImageClick(thumbNailUrl){
       console.log(thumbNailUrl)
@@ -220,15 +364,15 @@ export default {
           clearInterval(interval);
         }
 }
-
-        // this.presignedUrl = response.imgUrls[0];
-        // this.$bvModal.show("viewPresignedImage");
         })
         .catch(error => {
           console.dir(error);
           this.message("danger", error);
         });
 
+    },
+    onSelectChange(event){
+        this.selectedHotel = JSON.parse(event.target.value)
     },
        getAction(status) {
         if (status == "Received")
@@ -248,18 +392,186 @@ export default {
         else
           return null
       },
-  },
-  mounted() {
-    const orderId = localStorage.getItem("editOrderId");
+      getAllDeliveryTypes(){
+ this.$store
+      .dispatch(GET_ALL_DELIVERY_TYPES)
+      .then(response => {
+        this.deliveryTypes = response;
+        console.log(response)
+       
+         })
+        .catch(error => {
+          console.dir(error);
+        this.message("danger", error);
+        });
+      },
+  
+        getAndSetUpOrder(){
+        const orderId = localStorage.getItem("editOrderId");
 
-    this.$store
+         this.$store
       .dispatch(ORDER_GET_REQUEST, orderId)
       .then(response => {
         this.order = response;
+
+         this.specialRequest = response.request
+         this.country = response.address.country
+         this.state = response.address.state
+
+      if(response.address.hotelId != null){
+      this.selectedDeliveryType = "Hotel"
+      this.hotel.id = response.address.hotelId
+      this.hotel.roomNo = response.address.unitNo
+      this.hotel.address = response.address.addressLine1
+
+        const selectedHotelObject = {
+            "hotelAddress" : response.address.hotel.hotelAddress,
+            "hotelPostalCode" : response.address.postalCode,
+            "text" : response.address.hotel.hotelAddress,
+            "value" : response.address.hotelId
+        }
+    //   this.selectedHotel.hotelAddress = response.address.hotel.hotelAddress
+    //   this.selectedHotel.hotelPostalCode = response.address.postalCode
+    //   this.selectedHotel.text = response.address.hotel.hotelAddress
+    //   this.selectedHotel.value = response.address.hotelId
+    this.selectedHotel = selectedHotelObject;
+      }
+      else if(response.address.addressLine1 != null){
+      this.selectedDeliveryType = "Residential"
+      this.residential.addressOne = response.address.addressLine1
+      this.residential.addressTwo = response.address.addressLine2
+      this.residential.postalCode = response.address.postalCode
+      this.residential.unitNo = response.address.unitNo
+      }
+      else
+      this.selectedDeliveryType = "Self Pick-up"
+
+      this.$store
+        .dispatch(GET_ALL_HOTELS)
+        .then(response => {
+            console.log(response)
+          this.hotels = response;
+          this.selectedHotel = this.hotels[0]
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+        });
+
       })
       .catch(error => {
-        alert("error", error.response.data.message);
+ this.message("danger", error);
       });
+        },
+
+        saveDetails(){
+          console.log(this.selectedHotel)
+          
+
+            if(this.selectedDeliveryType == "Hotel"){
+                //jsonData is very similar to the order object.
+            const jsonData ={
+                "Address":{
+                   "AddressLine1": this.selectedHotel.hotelAddress,
+                    "UnitNo": this.hotel.roomNo,
+                    "PostalCode": this.selectedHotel.hotelPostalCode,
+                    "HotelId": this.selectedHotel.value,
+                    "Country": this.country,
+                    "State": this.state
+
+                },
+                "AddressId" : this.order.addressId,
+                "OrderId": this.order.orderId,
+                "DeliveryTypeId": this.getDeliveryTypeId(),
+                "Request": this.specialRequest
+
+            }
+
+           
+
+            this.updateOrder(jsonData);
+
+            }
+            else if(this.selectedDeliveryType == "Residential"){
+                 
+
+           const jsonData ={
+                "Address":{
+                    "AddressLine1": this.residential.addressOne,
+                   "AddressLine2": this.residential.addressTwo,
+                    "UnitNo": this.residential.unitNo,
+                    "PostalCode": this.residential.postalCode,
+                    "HotelId": null,
+                    "Country": this.country,
+                    "State": this.state
+
+                },
+                "AddressId" : this.order.addressId,
+                "OrderId": this.order.orderId,
+                "DeliveryTypeId": this.getDeliveryTypeId(),
+                "Request": this.specialRequest
+
+            }
+              this.updateOrder(jsonData);
+
+            }
+            else{
+                
+           const jsonData ={
+                "Address":{
+                    "AddressLine1": null,
+                   "AddressLine2": null,
+                    "UnitNo": null,
+                    "PostalCode": null,
+                    "HotelId": null,
+                    "Country": this.country,
+                    "State": this.state
+
+                },
+                "AddressId" : null,
+                "OrderId": this.order.orderId,
+                "DeliveryTypeId": this.getDeliveryTypeId(),
+                "Request": null
+
+            }
+
+              this.updateOrder(jsonData);
+            }
+
+        
+       
+        },
+        updateOrder(jsonData){
+            console.log(jsonData)
+              this.$store
+        .dispatch(UPDATE_ORDER, jsonData)
+        .then(response => {
+            console.log(response);
+            this.message("success", "Order Details is updated!");
+              })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+        },
+        getDeliveryTypeId(){
+            let id;
+            this.deliveryTypes
+            .forEach((element, index) => {
+                if(element.deliveryTypeName == this.selectedDeliveryType)
+                id = element.deliveryTypeId
+            });
+        return id;
+        }
+
+  },
+
+  mounted() {
+      this.getAllDeliveryTypes();
+   this.getAndSetUpOrder()
+
+    
+   
   }
 };
 </script>

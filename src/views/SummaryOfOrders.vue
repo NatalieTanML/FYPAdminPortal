@@ -57,6 +57,26 @@
         </div>
       </footer>
       <!-- End of Footer -->
+
+      <b-modal
+        @ok="getModalDetails"
+        ref="showSignatureDialog"
+        id="showSignatureDialog"
+        :title="this.ordertitle"
+      >
+        <b-form-group label="Received By">
+          <b-form-input v-model="recipientName"></b-form-input>
+        </b-form-group>
+        <b-form-group label="recipient's Signature">
+          <VueSignaturePad
+            :options="{onBegin: () => {$refs.signaturePad.resizeCanvas()}}"
+            class="pad"
+            width="100%"
+            height="200px"
+            ref="signaturePad"
+          />
+        </b-form-group>
+      </b-modal>
     </div>
   </div>
 
@@ -72,9 +92,11 @@ import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
 import {
   GET_ALL_ORDERS,
+  GET_MULTIPLE_ORDERS,
   GET_ALL_STATUS,
   UPDATE_ORDER_STATUS,
-  GET_PRESIGNED_URL
+  GET_PRESIGNED_URL,
+  UPDATE_RECIPIENT
 } from "@/store/actions/order";
 import { setInterval, clearInterval, setTimeout } from "timers";
 
@@ -90,7 +112,7 @@ export default {
       polling: null,
       connection: null,
       //have multiple buttons
-      headerButtonClick: ["Update Order Status", "Download Images"],
+      headerButtonClick: ["Update Order Status", "Download Images", "Delivery Failed"],
       headerButton: [
         {
           id: 1,
@@ -99,7 +121,12 @@ export default {
         {
           id: 2,
           title: "Download Images"
-        }
+        },
+         {
+          id: 3,
+          title: "Delivery Failed"
+        },
+        
       ],
       actionButtonClick: "Update One Order Status",
       imageClick: "On Order Image Click",
@@ -111,7 +138,12 @@ export default {
       typesOfTabs: [],
       Tabs: [],
       presignedUrl: "",
+      recipientName: null,
+      userRole: null,
+      ordertitle: null,
+      orderIds: [],
       sortItems: [],
+      updatedOrders: [],
       items: [],
       fields: [
         {
@@ -162,15 +194,21 @@ export default {
   },
 
   async mounted() {
+    this.userRole = this.$store.getters.userRole;
+
     this.$store
       .dispatch(GET_ALL_STATUS)
       .then(response => {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
+
         this.typesOfTabs[0] = "All";
-        for (x; x < response.length; x++)
-          this.typesOfTabs[x] = response[x - 1].statusName;
+        for (x; x < response.length + 1; x++)
+          if (
+            this.userRoleIsAllowedToSeeThisTabOrItem(response[x - 1].statusName)
+          )
+            this.typesOfTabs.push(response[x - 1].statusName);
 
         //had to hardcode the last tab string.
         // this.typesOfTabs[x] = response[x - 1].statusName;
@@ -181,53 +219,110 @@ export default {
         this.message("danger", error);
       });
 
+    
+    //headerButtonClick[0] is Update Status
     eventBus.$on(this.headerButtonClick[0], orderIds => {
-      this.updateStatusTabsAndTable(orderIds);
+      var needsSignature = false;
+
+      this.items.forEach(oneItem => {
+        //if at least one item is Out For Delivery, i will prompt the modal dialog.
+        orderIds.forEach(oneOrderId => {
+          if (oneItem.id == oneOrderId) {
+            if (oneItem.actions == "Delivered") {
+              needsSignature = true;
+            }
+          }
+        });
+      });
+
+      if (!needsSignature)
+      {
+          var isSuccessful = true;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+      }
+      else {
+        this.orderIds = orderIds;
+        this.ordertitle = "Multiple Orders";
+        this.$bvModal.show("showSignatureDialog");
+      }
     });
 
-    eventBus.$on(this.actionButtonClick, orderIds => {
-      this.updateStatusTabsAndTable(orderIds);
+    //headerButtonClick[1] is Download Images
+    eventBus.$on(this.headerButtonClick[1], listOfThumbNailUrl => {
+      this.downloadImages(listOfThumbNailUrl);
+    });
+
+    //headerButtonClick[2] is Delivery Failed
+    eventBus.$on(this.headerButtonClick[2], orderIds => {
+       var isSuccessful = false;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+    });
+
+    eventBus.$on(this.actionButtonClick, item => {
+      const orderIds = [];
+      orderIds.push(item.id);
+
+      if (item.actions == "Delivered") {
+        this.ordertitle = "Order : " + item.id;
+        this.orderIds.push(item.id);
+        this.$bvModal.show("showSignatureDialog");
+      } else{
+          var isSuccessful = true;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+        }
     });
 
     eventBus.$on(this.imageClick, thumbNailUrl => {
       //because controller only accepts a list of url
       const listOfThumbNailUrl = [];
       listOfThumbNailUrl.push(thumbNailUrl);
+      this.downloadImages(listOfThumbNailUrl);
+    });
 
-      this.$store
-        .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
-        .then(response => {
-          console.log(response);
-          this.downloadURI(response.imgUrls[0], "a");
-          // this.presignedUrl = response.imgUrls[0];
-          // this.$bvModal.show("viewPresignedImage");
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error);
-        });
+      eventBus.$on("cancelOrder", orderIds => {
+        console.log("eventbus cancelorder",orderIds)
+        var isSuccessful = false;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
     });
 
     // Establish hub connection
     this.connection = await OrderHub.connectToOrderHub();
 
     // Establish hub methods
-    this.connection.on("OneOrder", order => {
+    this.connection.on("OneOrder", orderId => {
       console.log("OneOrder called");
-      console.log(order);
-      this.getAllOrders();
-      setTimeout(() => {
-        this.highlightOneRow(order);
-      }, 1000);
+      console.log("one order id : ", orderId);
+
+      let updatedOrderList = [];
+
+      // updatedOrderList.push({
+      //   orderId: updatedOrder.orderId,
+      //   statusId: updatedOrder.statusId,
+      //   statusName: updatedOrder.status.statusName
+      // });
+
+      // this.highlightRows(updatedOrderList);
+      // this.updateCurrentOrders(updatedOrderList);
+      // this.setUpTabs();
     });
 
-    this.connection.on("MultipleOrders", orders => {
+    this.connection.on("MultipleOrders", orderIds => {
       console.log("MultipleOrders called");
-      console.log(orders);
-      this.getAllOrders();
-      setTimeout(() => {
-        this.highlightRows(orders);
-      }, 1000);
+      console.log("multiple order id : ", orderIds);
+      this.getMultipleOrders(orderIds);
+
+      let updatedOrderList = [];
+      // orders.forEach(updatedOrder => {
+      //   updatedOrderList.push({
+      //     orderId: updatedOrder.orderId,
+      //     statusId: updatedOrder.statusId,
+      //     statusName: updatedOrder.status.statusName
+      //   });
+      // });
+
+      // this.highlightRows(updatedOrderList);
+      // this.updateCurrentOrders(updatedOrderList);
+      // this.setUpTabs();
     });
 
     // start the connection
@@ -253,26 +348,40 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
+    userRoleIsAllowedToSeeThisTabOrItem(tabName) {
+      if (this.userRole == "Admin") return true;
+      else if (this.userRole == "Store") {
+        if (tabName == "Received" || tabName == "Awaiting Printing")
+          return true;
+        else return false;
+      }
+    },
+
     getAllOrders() {
       console.log("getAllOrders called");
+      this.items = [];
+
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
-          let x = 0;
+          var x = 0;
           for (x; x < response.length; x++) {
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
-            this.items[x] = {
-              id: response[x].orderId,
-              refNo: response[x].referenceNo,
-              date: response[x].createdAt.substring(0, 10),
-              items: response[x].orderItems,
-              images: response[x].orderItems,
-              quantity: response[x].orderItems,
-              status: response[x].status,
-              actions: this.getAction(response[x].status)
-            };
+            if (this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status))
+              this.items[x] = {
+                id: response[x].orderId,
+                refNo: response[x].referenceNo,
+                date: response[x].createdAt.substring(0, 10),
+                items: response[x].orderItems,
+                images: response[x].orderItems,
+                quantity: response[x].orderItems,
+                status: response[x].status,
+                actions: [this.getAction(response[x].status)]
+              };
           }
+          //reset updatedOrders
+          this.updatedOrders = [];
 
           //creating checkbox.
           let index;
@@ -286,6 +395,12 @@ export default {
           console.dir(error);
           this.message("danger", error);
         });
+    },
+    getMultipleOrders(ids) {
+      console.log("getMultipleOrders called");
+      this.$store.dispatch(GET_MULTIPLE_ORDERS, ids).then(response => {
+        console.log(response);
+      });
     },
     onTabChange(id) {
       //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
@@ -371,10 +486,10 @@ export default {
       else if (status == "Cancelled") return null;
       else return null;
     },
-    updateStatusTabsAndTable(orderIds) {
+    updateStatusTabsAndTable(orderIds, isSuccessful) {
       //isSuccessful will always be true unless the admin presses on the dropdown at the
       //end of the row and click cancel order
-      const isSuccessful = true;
+    
 
       const jsonData = {
         orderIds: orderIds,
@@ -384,19 +499,7 @@ export default {
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
           this.message("success", "Order Status(es) is updated successfully!");
-          console.log(response);
-          let updatedOrders = response.orders;
-          let x;
-          for (x = 0; x < this.items.length; x++) {
-            updatedOrders.forEach((oneUpdatedOrder, index) => {
-              if (this.items[x].id == oneUpdatedOrder.orderId) {
-                this.items[x].status = oneUpdatedOrder.statusName;
-                this.items[x].actions = this.getAction(
-                  oneUpdatedOrder.statusName
-                );
-              }
-            });
-          }
+          this.updateCurrentOrders(response.orders);
           //reset the tabs.
           this.setUpTabs();
           //there is a few lines in the router.js where i reset the eventbus listener too
@@ -406,6 +509,25 @@ export default {
           console.dir(error);
           this.message("danger", error);
         });
+    },
+    updateCurrentOrders(orders) {
+      //update current items's statuses and actions
+      console.log("updated orders : " + orders);
+      let updatedOrders = orders;
+      let x;
+      for (x = 0; x < this.items.length; x++) {
+        updatedOrders.forEach((oneUpdatedOrder, index) => {
+          if (
+            this.items[x].id == oneUpdatedOrder.orderId &&
+            this.userRoleIsAllowedToSeeThisTabOrItem(oneUpdatedOrder.statusName)
+          ) {
+            this.items[x].status = oneUpdatedOrder.statusName;
+            this.items[x].actions = [
+              this.getAction(oneUpdatedOrder.statusName)
+            ];
+          }
+        });
+      }
     },
     downloadImages(listOfThumbNailUrl) {
       console.log("downloadImages : " + listOfThumbNailUrl);
@@ -446,32 +568,61 @@ export default {
         clearInterval(interval);
       }
     },
-    highlightOneRow(order) {
-      for (var x = 0; x < this.items.length; x++) {
-        if (order.orderId == this.items[x].id) {
-          this.$set(this.items[x], "_rowVariant", "primary");
-        }
-      }
-    },
+    // highlightOneRow(order) {
+    //   for (var x = 0; x < this.items.length; x++) {
+    //     if (order.orderId == this.items[x].id) {
+    //       this.$set(this.items[x], "_rowVariant", "primary");
+    //     }
+    //   }
+    // },
     highlightRows(orders) {
-      let idsToUpdate = [];
       for (var i = 0; i < orders.length; i++) {
-        idsToUpdate.push(orders[i].orderId);
-      }
-      console.log("idsToUpdate", idsToUpdate);
-      for (var e = 0; e < idsToUpdate.length; e++) {
-        let idToUpdate = idsToUpdate[e];
-        for (var x = 0; x < this.sortItems.length; x++) {
-          if (idToUpdate == this.items[x].id) {
-            this.$set(this.items[x], "_rowVariant", "primary");
-          }
-        }
+        for (var y = 0; y < this.items.length; y++)
+          if (orders[i].orderId == this.items[y].id)
+            this.$set(this.items[y], "_rowVariant", "primary");
       }
     },
     pollData() {
       this.polling = setInterval(() => {
         this.getAllOrders();
       }, 60000);
+    },
+    getModalDetails() {
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+
+      if (!isEmpty) {
+        const base64 = data.substring(22);
+
+        const jsonData = {
+          orderIds: this.orderIds,
+          recipient: {
+            ReceivedBy: this.recipientName,
+            RecipientSignature: base64
+          }
+        };
+        console.log(jsonData);
+
+        this.$store
+          .dispatch(UPDATE_RECIPIENT, jsonData)
+          .then(response => {
+            this.message(
+              "success",
+              "Order Status(es) is updated successfully!"
+            );
+            this.updateCurrentOrders(response.orders);
+            //reset the tabs.
+            this.setUpTabs();
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error);
+          });
+      } else {
+      }
+
+      this.recipientName = null;
+      this.ordertite = null;
+      this.orderIds = [];
     }
   }
 };

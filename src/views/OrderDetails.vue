@@ -64,7 +64,7 @@
                   <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
                 </b-row>
                 <b-row class="b4 mb-2">
-                  <b-col class="b3">Actions</b-col>
+                  <b-col class="b3" v-if="getAction(order.status) != null">Actions</b-col>
                   <b-col class="b3"></b-col>
                   <b-col class="b3"></b-col>
                 </b-row>
@@ -76,6 +76,7 @@
                       class="btnAction"
                       variant="primary"
                       size="sm"
+                      v-if="getAction(order.status) != null"
                     >{{getAction(order.status)}}</b-button>
                   </b-col>
                   <b-col class="b3"></b-col>
@@ -99,7 +100,7 @@
                   <b-col cols="3">
                      <img
                      @click="onImageClick(orderItem.orderImageKey)"
-                     style="height: 100px; max-height: 150px"
+                     style="height: 100px; max-height: 150px; cursor:pointer;"
                     v-bind:src="orderItem.orderImageUrl"
                   />
                   </b-col>

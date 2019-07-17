@@ -78,8 +78,8 @@ export default {
       actionButtonClick: "Assign One to Deliveryman",
       headerButton: [{ id: 1, title: "Assign to Deliveryman" }],
       headerButtonClick: ["Assign to Deliveryman"],
-      id: "",
-      items: [],
+      id: "" ,
+      items:  [],
       fields: [
         { key: "refNo", label: "Ref. No", sortable: true },
         { key: "region", label: "Region", sortable: true },
@@ -154,7 +154,7 @@ export default {
           return "Ardmore, Bukit Timah, Holland Road, Tanglin";
         if (
           postcode.substring(0, 2) == "28" ||
-          postcode.substring(0, 2) == "29" ||
+          postcode.substring(0, 2) == "29"    ||  
           postcode.substring(0, 2) == "30"
         )
           return "Watten Estate, Novena, Thomson";
@@ -279,10 +279,10 @@ export default {
               );
             }
             if (this.allOrders[i].deliveryManId != null) {
-              this.items[i].actions = "Update Deliveryman";
+              this.items[i].actions = ["Update Deliveryman"];
               this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
             } else {
-              this.items[i].actions = "Assign Deliveryman";
+              this.items[i].actions = ["Assign Deliveryman"];
               this.items[i].deliveryman = "Not Assigned";
             }
           }
@@ -353,10 +353,10 @@ export default {
             );
           }
           if (this.allOrders[i].deliveryManId != null) {
-            this.items[i].actions = "Update Deliveryman";
+            this.items[i].actions = ["Update Deliveryman"];
             this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
           } else {
-            this.items[i].actions = "Assign Deliveryman";
+            this.items[i].actions = ["Assign Deliveryman"];
             this.items[i].deliveryman = "Not Assigned";
           }
         }

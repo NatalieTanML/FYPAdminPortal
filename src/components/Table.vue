@@ -26,7 +26,11 @@
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
                   class="float-right"
-                  v-if="tableName != 'Orders' ||(checkedCheckBox.length != 0 && tableName == 'Orders')"
+                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
+                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -37,7 +41,7 @@
         <div class="card-body">
           <b-table
             show-empty
-            stacked="md"
+            responsive
             :items="items"
             :fields="fields"
             :current-page="currentPage"
@@ -67,34 +71,36 @@
             </template>
 
             <template slot="actions" slot-scope="row">
-              <div v-if="row.item.actions != null">
-                <b-button
-                  type="button"
-                  v-on:click="onActionButtonClick(row.item)"
-                  lg="4"
-                  class="w-75"
-                  variant="primary"
-                  size="sm"
-                >{{row.value}}</b-button>
+              <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
+                <div v-if="oneActionButton != null" class="text-break">
+                  <b-button
+                    type="button"
+                    v-on:click="onActionButtonClick(row.item, oneActionButton)"
+                    lg="4"
+                    class="w-75 mb-2"
+                    variant="primary"
+                    size="sm"
+                  >{{oneActionButton}}</b-button>
+                </div>
               </div>
 
-              <div style="display: inline-block;margin-left:5px" v-if="tableName == 'Orders'">
+              <div v-if="tableName == 'Orders'">
                 <b-dropdown
                   id="dropdown-header"
                   variant="transparent"
                   no-caret
-                  class="mb-1 mydropdown"
+                  class="mydropdown float-right"
                 >
                   <template slot="button-content">
                     <i class="fas fa-ellipsis-v fa-sm"></i>
                   </template>
 
                   <b-dropdown-item-button
-                    v-on:click="editOrder()"
+                    v-on:click="editOrder(row.item.id)"
                     aria-describedby="dropdown-header-label"
                   >Edit Order</b-dropdown-item-button>
                   <b-dropdown-item-button
-                    v-b-modal.cancelOrder
+                    v-on:click="showCancelOrderDialog(row.item.id)"
                     aria-describedby="dropdown-header-label"
                   >Cancel Order</b-dropdown-item-button>
                 </b-dropdown>
@@ -180,7 +186,7 @@
     </b-container>
 
     <!-- b-modal for cancel order -->
-    <b-modal @ok="cancelOrder()" id="cancelOrder" title="Cancel Order">
+    <b-modal @ok="cancelOrder()" ref="cancelOrder" title="Cancel Order">
       <p class="my-4">Are you sure you want to cancel this order?</p>
       <!-- <p class="my-4">This action cannot be undone.</p> -->
     </b-modal>
@@ -190,7 +196,13 @@
 <script>
 import { eventBus } from "@/eventBus";
 import { timeout } from "q";
-
+import {
+  GET_ALL_ORDERS,
+  GET_ALL_STATUS,
+  UPDATE_ORDER_STATUS,
+  GET_PRESIGNED_URL,
+  UPDATE_RECIPIENT
+} from "@/store/actions/order";
 export default {
   data() {
     return {
@@ -203,7 +215,11 @@ export default {
       sortDirection: "asc",
       filter: null,
       checkedCheckBox: [],
-      checkAll: false
+      checkAll: false,
+      showHeaderButton: true,
+      showDownloadImageButton: true,
+      showDeliveryFailedButton: true,
+      cancelOrderId: null
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -220,10 +236,8 @@ export default {
   },
   mounted() {
     this.totalRows = this.items.length;
-
     console.log(this.enableCheckbox);
     //to redraw the hr line.
-
     // if(this.$refs.itemdiv != undefined){
     //   console.log(this.$refs.itemdiv[0].clientWidth)
     // this.arrayOfTdWidth.push((this.$refs.itemdiv[0].clientWidth  + (this.$refs.itemdiv[0].clientWidth * 0.75 )) + 'px')
@@ -234,7 +248,6 @@ export default {
     // console.log(this.mounted)
     // }
   },
-
   computed: {
     sortOptions() {
       // Create an options list from our fields
@@ -248,7 +261,6 @@ export default {
         });
     }
   },
-
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -264,31 +276,72 @@ export default {
           this.checkedCheckBox = [];
           this.checkAll = false;
         } else if (this.headerButton[1].title == clickedHeaderTitle) {
-          eventBus.$emit(this.headerButton[1]);
+          const listOfThumbNailUrl = [];
+          let index;
+          for (index = 0; index < this.items.length; index++) {
+            this.checkedCheckBox.forEach(checkedItemId => {
+              console.log(checkedItemId);
+              if (this.items[index].id == checkedItemId) {
+                console.log(this.items[index]);
+                this.items[index].items.forEach(eachItemInOrder => {
+                  listOfThumbNailUrl.push(eachItemInOrder.orderImageKey);
+                });
+              }
+            });
+          }
+          console.log(listOfThumbNailUrl);
+          eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
         }
-      } else eventBus.$emit(this.headerButtonClick[0]);
+        else if (this.headerButton[2].title == clickedHeaderTitle) {
+          eventBus.$emit(this.headerButton[2].title, this.checkedCheckBox);
+          this.checkedCheckBox = [];
+          this.checkAll = false;
+        }
+      } else if (this.tableName == "Deliveries") {
+        eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
+        this.checkedCheckBox = [];
+        this.checkAll = false;
+      } else
+       eventBus.$emit(this.headerButtonClick);
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
-        const orderIds = [];
-        orderIds.push(item.id);
-
-        eventBus.$emit(this.actionButtonClick, orderIds);
+        eventBus.$emit(this.actionButtonClick, item);
       } else eventBus.$emit(this.actionButtonClick, item.id);
       //id is the row's item's id
     },
-    onCheckBoxCheck(refNo) {
+    onCheckBoxCheck(item) {
+      console.log(item);
       let index = 0;
 
-      if (this.checkedCheckBox.includes(refNo)) {
-        for (index; index < this.checkedCheckBox.length; index++)
-          if (this.checkedCheckBox[index] == refNo)
-            this.checkedCheckBox.splice(index, 1);
-      } else this.checkedCheckBox.push(refNo);
+      //reset the conditions so as to re-check the conditions down below.
+      this.showHeaderButton = true;
+      this.showDownloadImageButton = false;
+      this.showDeliveryFailedButton = false;
 
+      if (item.actions[0] == null) {
+        this.showHeaderButton = false;
+      }
+
+      if (item.status == "Received" || item.status == "Awaiting Printing") {
+        this.showDownloadImageButton = true;
+      }
+
+      if (item.status == "Out for Delivery") {
+        this.showDeliveryFailedButton = true;
+      }
+
+      console.log(this.showHeaderButton);
+      if (this.checkedCheckBox.includes(item.id)) {
+        for (index; index < this.checkedCheckBox.length; index++)
+          if (this.checkedCheckBox[index] == item.id)
+            this.checkedCheckBox.splice(index, 1);
+      } else this.checkedCheckBox.push(item.id);
       console.log(this.checkedCheckBox);
     },
     checkAllCheckBox() {
+      console.log(this.items);
+      if(this.items.length > 0){
       let index = 0;
       let rowsPerPage = this.perPage;
       let shownItems = (this.currentPage - 1) * rowsPerPage;
@@ -297,8 +350,26 @@ export default {
       if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
         rowsPerPage = this.items.length - shownItems;
 
-      if (this.items[0].actions == null) this.showHeaderButton = false;
-      else this.showHeaderButton = true;
+      //reset the conditions so as to re-check the conditions down below.
+      this.showHeaderButton = true;
+      this.showDownloadImageButton = false;
+      this.showDeliveryFailedButton = false;
+
+      if (this.items[0].actions[0] == null) {
+        this.showHeaderButton = false;
+      } 
+      
+      if (
+        this.items[0].status == "Received" ||
+        this.items[0].status == "Awaiting Printing"
+      ) {
+        this.showDownloadImageButton = true;
+      }
+      
+      if (this.items[0].status == "Out for Delivery") {
+        this.showDeliveryFailedButton = true;
+      } 
+      console.log(this.showHeaderButton);
 
       //if the first page has less than 5 stuff.
       if (this.currentPage == 1 && this.items.length < rowsPerPage)
@@ -315,6 +386,7 @@ export default {
       }
       console.log(this.checkAll);
       console.log(this.checkedCheckBox);
+      }
     },
     myRowClickHandler(record, index) {
       if (this.tableName == "Orders") {
@@ -331,9 +403,20 @@ export default {
     myRowHoverHandler(record, index) {
       this.$delete(this.items[index], "_rowVariant");
     },
-    editOrder() {},
+    editOrder(orderid) {
+      localStorage.setItem("editOrderId", orderid);
+      this.$router.replace({ name: "EditOrderDetails" });
+    },
+    showCancelOrderDialog(orderId) {
+      //assign the orderId that is to be cancelled and show the modal dialog
+      this.cancelOrderId = orderId;
+      this.$refs["cancelOrder"].show();
+    },
     cancelOrder() {
-      console.log("order is cancelled");
+      //this method is run when the user confirm that he wants
+      //to cancel the order in the modaldialog.
+      var makeArray = [this.cancelOrderId];
+      eventBus.$emit("cancelOrder", makeArray);
     },
     onImageClick(orderImageThumbNail) {
       if (this.tableName == "Orders")
@@ -342,6 +425,14 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.multiRowStyle {
+  height: 100px;
+  max-height: 100px;
+  display: block;
+}
+</style>
 
 <style scoped>
 .multiRowStyle {

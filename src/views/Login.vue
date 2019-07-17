@@ -42,9 +42,16 @@
 
                       <b-col>
                         <div>
-                          <a v-on:click="validate" class="btn btn-primary btn-user btn-block">
+                          <!-- <a v-on:click="validate" class="btn btn-primary btn-user btn-block">
                             <span>Login</span>
-                          </a>
+                          </a>-->
+                          <b-button
+                            type="submit"
+                            v-on:click="validate"
+                            @keydown.enter.native="validate"
+                            class="btn btn-primary btn-user btn-block"
+                            variant="primary"
+                          >Login</b-button>
                         </div>
                       </b-col>
                     </b-row>
@@ -92,46 +99,27 @@ export default {
         password: password
       };
 
-      // this.$store
-      //   .dispatch(SIGN_IN, userStr)
-      //   .then(response => {
-      //     console.log(response);
-      //     if (!response.user.changePassword) {
-      //       this.$router.replace({ name: "ChangePassword" });
-      //     } else {
-      //       this.message("success", "You have logged in");
-      //       this.$router.replace({ name: "SummaryOfOrders" });
-      //     }
-      //   })
-      //   .catch(error => {
-      //     this.$store.dispatch(USER_LOGOUT);
-      //     console.log(error);
-      //     this.message("danger", error.response.data.message);
-      //   });
+      this.$store
+        .dispatch(SIGN_IN, userStr)
+        .then(response => {
+          console.log(response);
+          if (!response.user.changePassword) {
+            this.$router.replace({ name: "ChangePassword" });
+          } else {
+            this.message("success", "You have logged in");
+            if (this.$store.getters.userRole != "Delivery")
+              this.$router.replace({ name: "SummaryOfOrders" });
+            else this.$router.replace({ name: "Deliveries" });
+          }
+        })
+        .catch(error => {
+          this.$store.dispatch(USER_LOGOUT);
+          console.log(error);
+          this.message("danger", error.response.data.message);
+        });
 
       // this.$store.dispatch(BYPASSLOGIN)
       // this.$router.replace({ name: "SummaryOfOrders" });
-
-      // this.$store
-      //   .dispatch(SIGN_IN, userStr)
-      //   .then(response => {
-      //     console.log(response)
-      //     if (!response.user.changePassword) {
-      //       this.$router.replace({ name: "ChangePassword" });
-      //     } else {
-      //       this.message("success", "You have logged in");
-      //       this.$router.replace({ name: "SummaryOfOrders" });
-      //     }
-      //   })
-      //   .catch(error => {
-      //     this.$store
-      //   .dispatch(USER_LOGOUT)
-      //     console.dir(error);
-      //     this.message("danger", error);
-      //   });
-
-      this.$store.dispatch(BYPASSLOGIN);
-      this.$router.replace({ name: "SummaryOfOrders" });
     }
   }
 };
@@ -140,8 +128,5 @@ export default {
 <style scoped>
 body {
   height: 100vh;
-}
-span {
-  color: white;
 }
 </style>
