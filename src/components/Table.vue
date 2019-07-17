@@ -27,8 +27,10 @@
                   variant="primary"
                   class="float-right"
                   v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
-                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&((showHeaderButton && oneHeaderButton.title == 'Update Order Status') || oneHeaderButton.title=='Download Images'))) ||
-                 (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
+                (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
+                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -98,7 +100,7 @@
                     aria-describedby="dropdown-header-label"
                   >Edit Order</b-dropdown-item-button>
                   <b-dropdown-item-button
-                    v-b-modal.cancelOrder
+                    v-on:click="showCancelOrderDialog(row.item.id)"
                     aria-describedby="dropdown-header-label"
                   >Cancel Order</b-dropdown-item-button>
                 </b-dropdown>
@@ -184,7 +186,7 @@
     </b-container>
 
     <!-- b-modal for cancel order -->
-    <b-modal @ok="cancelOrder()" id="cancelOrder" title="Cancel Order">
+    <b-modal @ok="cancelOrder()" ref="cancelOrder" title="Cancel Order">
       <p class="my-4">Are you sure you want to cancel this order?</p>
       <!-- <p class="my-4">This action cannot be undone.</p> -->
     </b-modal>
@@ -194,6 +196,13 @@
 <script>
 import { eventBus } from "@/eventBus";
 import { timeout } from "q";
+import {
+  GET_ALL_ORDERS,
+  GET_ALL_STATUS,
+  UPDATE_ORDER_STATUS,
+  GET_PRESIGNED_URL,
+  UPDATE_RECIPIENT
+} from "@/store/actions/order";
 export default {
   data() {
     return {
@@ -207,7 +216,10 @@ export default {
       filter: null,
       checkedCheckBox: [],
       checkAll: false,
-      showHeaderButton: true
+      showHeaderButton: true,
+      showDownloadImageButton: true,
+      showDeliveryFailedButton: true,
+      cancelOrderId: null
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -280,11 +292,17 @@ export default {
           console.log(listOfThumbNailUrl);
           eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
         }
+        else if (this.headerButton[2].title == clickedHeaderTitle) {
+          eventBus.$emit(this.headerButton[2].title, this.checkedCheckBox);
+          this.checkedCheckBox = [];
+          this.checkAll = false;
+        }
       } else if (this.tableName == "Deliveries") {
         eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
         this.checkedCheckBox = [];
         this.checkAll = false;
-      } else eventBus.$emit(this.headerButtonClick);
+      } else
+       eventBus.$emit(this.headerButtonClick);
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
@@ -293,9 +311,26 @@ export default {
       //id is the row's item's id
     },
     onCheckBoxCheck(item) {
+      console.log(item);
       let index = 0;
-      if (item.actions[0] == null) this.showHeaderButton = false;
-      else this.showHeaderButton = true;
+
+      //reset the conditions so as to re-check the conditions down below.
+      this.showHeaderButton = true;
+      this.showDownloadImageButton = false;
+      this.showDeliveryFailedButton = false;
+
+      if (item.actions[0] == null) {
+        this.showHeaderButton = false;
+      }
+
+      if (item.status == "Received" || item.status == "Awaiting Printing") {
+        this.showDownloadImageButton = true;
+      }
+
+      if (item.status == "Out for Delivery") {
+        this.showDeliveryFailedButton = true;
+      }
+
       console.log(this.showHeaderButton);
       if (this.checkedCheckBox.includes(item.id)) {
         for (index; index < this.checkedCheckBox.length; index++)
@@ -306,6 +341,7 @@ export default {
     },
     checkAllCheckBox() {
       console.log(this.items);
+      if(this.items.length > 0){
       let index = 0;
       let rowsPerPage = this.perPage;
       let shownItems = (this.currentPage - 1) * rowsPerPage;
@@ -314,9 +350,25 @@ export default {
       if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
         rowsPerPage = this.items.length - shownItems;
 
-      console.log(this.items[0].actions);
-      if (this.items[0].actions[0] == null) this.showHeaderButton = false;
-      else this.showHeaderButton = true;
+      //reset the conditions so as to re-check the conditions down below.
+      this.showHeaderButton = true;
+      this.showDownloadImageButton = false;
+      this.showDeliveryFailedButton = false;
+
+      if (this.items[0].actions[0] == null) {
+        this.showHeaderButton = false;
+      } 
+      
+      if (
+        this.items[0].status == "Received" ||
+        this.items[0].status == "Awaiting Printing"
+      ) {
+        this.showDownloadImageButton = true;
+      }
+      
+      if (this.items[0].status == "Out for Delivery") {
+        this.showDeliveryFailedButton = true;
+      } 
       console.log(this.showHeaderButton);
 
       //if the first page has less than 5 stuff.
@@ -334,6 +386,7 @@ export default {
       }
       console.log(this.checkAll);
       console.log(this.checkedCheckBox);
+      }
     },
     myRowClickHandler(record, index) {
       if (this.tableName == "Orders") {
@@ -354,8 +407,16 @@ export default {
       localStorage.setItem("editOrderId", orderid);
       this.$router.replace({ name: "EditOrderDetails" });
     },
+    showCancelOrderDialog(orderId) {
+      //assign the orderId that is to be cancelled and show the modal dialog
+      this.cancelOrderId = orderId;
+      this.$refs["cancelOrder"].show();
+    },
     cancelOrder() {
-      console.log("order is cancelled");
+      //this method is run when the user confirm that he wants
+      //to cancel the order in the modaldialog.
+      var makeArray = [this.cancelOrderId];
+      eventBus.$emit("cancelOrder", makeArray);
     },
     onImageClick(orderImageThumbNail) {
       if (this.tableName == "Orders")

@@ -326,6 +326,7 @@ if(from.name == "SummaryOfOrders"){
   }
  eventBus.$off(SummaryOfOrders.data().actionButtonClick)
  eventBus.$off(SummaryOfOrders.data().imageClick)
+ eventBus.$off("cancelOrder")
 
 }
 
