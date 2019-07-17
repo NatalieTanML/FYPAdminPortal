@@ -244,8 +244,14 @@ export default {
           console.log("one updated order : ", oneUpdatedOrder);
           if (this.items[x].id == oneUpdatedOrder.orderId) {
             this.items.splice(x, 1);
-          } else if (oneUpdatedOrder.status == "Out for Delivery") {
-            this.items[x] = {
+          } 
+        });
+      }
+
+      
+      updatedOrders.forEach((oneUpdatedOrder, index) => {
+      if (oneUpdatedOrder.status == "Out for Delivery") {
+            this.items.push({
               id: oneUpdatedOrder.orderId,
               refNo: oneUpdatedOrder.referenceNo,
               date: new Date(
@@ -254,13 +260,14 @@ export default {
               items: oneUpdatedOrder.orderItems,
               address: this.getAddressOrHotelName(oneUpdatedOrder),
               actions: ["Delivered"]
-            };
+            });
 
-              this.$set(this.items[x], "_rowVariant", "primary");
-            console.log("one new updated item : ", this.items);
+              // this.$set(this.items[x], "_rowVariant", "primary");
+            // console.log("one new updated item : ", this.items);
           }
-        });
-      }
+                 });
+      
+
       if (this.forceRender) this.forceRender = false;
       else this.forceRender = true;
     }

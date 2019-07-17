@@ -312,7 +312,7 @@ export default {
         }
 
       } else
-       eventBus.$emit(this.headerButtonClick);
+       eventBus.$emit(this.headerButtonClick[0]);
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {
