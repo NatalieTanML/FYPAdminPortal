@@ -92,6 +92,7 @@ import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
 import {
   GET_ALL_ORDERS,
+  GET_MULTIPLE_ORDERS,
   GET_ALL_STATUS,
   UPDATE_ORDER_STATUS,
   GET_PRESIGNED_URL,
@@ -261,39 +262,40 @@ export default {
     this.connection = await OrderHub.connectToOrderHub();
 
     // Establish hub methods
-    this.connection.on("OneOrder", order => {
+    this.connection.on("OneOrder", orderId => {
       console.log("OneOrder called");
-      console.log("one order : ", order);
+      console.log("one order id : ", orderId);
 
       let updatedOrderList = [];
-      orders.forEach(updatedOrder => {
-        updatedOrderList.push({
-          orderId: updatedOrder.orderId,
-          statusId: updatedOrder.statusId,
-          statusName: updatedOrder.status.statusName
-        });
-      });
 
-      this.highlightRows(updatedOrderList);
-      this.updateCurrentOrders(updatedOrderList);
-      this.setUpTabs();
+      // updatedOrderList.push({
+      //   orderId: updatedOrder.orderId,
+      //   statusId: updatedOrder.statusId,
+      //   statusName: updatedOrder.status.statusName
+      // });
+
+      // this.highlightRows(updatedOrderList);
+      // this.updateCurrentOrders(updatedOrderList);
+      // this.setUpTabs();
     });
 
-    this.connection.on("MultipleOrders", orders => {
+    this.connection.on("MultipleOrders", orderIds => {
       console.log("MultipleOrders called");
-      console.log("multiple order : ", orders);
-      let updatedOrderList = [];
-      orders.forEach(updatedOrder => {
-        updatedOrderList.push({
-          orderId: updatedOrder.orderId,
-          statusId: updatedOrder.statusId,
-          statusName: updatedOrder.status.statusName
-        });
-      });
+      console.log("multiple order id : ", orderIds);
+      this.getMultipleOrders(orderIds);
 
-      this.highlightRows(updatedOrderList);
-      this.updateCurrentOrders(updatedOrderList);
-      this.setUpTabs();
+      let updatedOrderList = [];
+      // orders.forEach(updatedOrder => {
+      //   updatedOrderList.push({
+      //     orderId: updatedOrder.orderId,
+      //     statusId: updatedOrder.statusId,
+      //     statusName: updatedOrder.status.statusName
+      //   });
+      // });
+
+      // this.highlightRows(updatedOrderList);
+      // this.updateCurrentOrders(updatedOrderList);
+      // this.setUpTabs();
     });
 
     // start the connection
@@ -366,6 +368,12 @@ export default {
           console.dir(error);
           this.message("danger", error);
         });
+    },
+    getMultipleOrders(ids) {
+      console.log("getMultipleOrders called");
+      this.$store.dispatch(GET_MULTIPLE_ORDERS, ids).then(response => {
+        console.log(response);
+      });
     },
     onTabChange(id) {
       //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
