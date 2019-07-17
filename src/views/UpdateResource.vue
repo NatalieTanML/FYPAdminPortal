@@ -184,13 +184,110 @@
                   @close="cancel"
                 >
                   <form @submit.stop.prevent="submitDiscount">
-                    <VarientOption
+                    <form @submit.stop.prevent="submitDiscount">
+                      <div class="container">
+                        <div
+                          v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
+                          :key="varientIndex"
+                        >
+                          <b-row>
+                            <b-col>
+                              <form>
+                                <div class="offset-md-1">
+                                  <div class="row">
+                                    <b-col cols="5">
+                                      <b-form-group label="Type" label-for="varientType">
+                                        <b-form-input
+                                          v-model="varientSection.type.$model"
+                                          id="varientType"
+                                          :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
+                                        ></b-form-input>
+                                        <b-form-invalid-feedback>
+                                          <p v-if="!varientSection.type.required">Type is required</p>
+                                          <p
+                                            v-if="!varientSection.type.isDuplicateType"
+                                          >There is an existing option with the same type</p>
+                                        </b-form-invalid-feedback>
+                                      </b-form-group>
+                                      <p
+                                        class="btn-delete-varient text-danger"
+                                        @click="deleteType(varientIndex)"
+                                      >Delete Type</p>
+                                    </b-col>
+
+                                    <div class="col-6">
+                                      <div
+                                        class="row"
+                                        v-for="(value, valueIndex) in varientSection.values.$each.$iter"
+                                        :key="valueIndex"
+                                      >
+                                        <div class="col-10">
+                                          <b-form-group
+                                            class="hi"
+                                            label="Value"
+                                            label-for="varientValue"
+                                          >
+                                            <b-form-input
+                                              id="varientValue"
+                                              v-model="value.individualValue.$model"
+                                              :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
+                                            ></b-form-input>
+
+                                            <b-form-invalid-feedback>
+                                              <p
+                                                v-if="!value.individualValue.required"
+                                              >Value is required</p>
+                                            </b-form-invalid-feedback>
+                                          </b-form-group>
+                                        </div>
+
+                                        <div class="col-2 col-sm-2">
+                                          <b-button
+                                            v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
+                                            size="sm"
+                                            class="btn-delete-value"
+                                            variant="danger"
+                                            @click="removeValue(varientIndex, valueIndex)"
+                                          >-</b-button>
+                                        </div>
+                                      </div>
+                                      <p
+                                        @click="addValue(varientIndex)"
+                                        class="btn-add-value text-primary"
+                                      >+ Add Another Value</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                            </b-col>
+                          </b-row>
+                        </div>
+                        <b-row>
+                          <b-col class="offset-md-1">
+                            <b-button
+                              variant="outline-primary mt-3"
+                              @click="addVarient()"
+                            >+ Add Varient Option</b-button>
+                          </b-col>
+                        </b-row>
+                        <!-- <pre>{{$v}}</pre> -->
+                      </div>
+                      <!-- <VarientOption
+                      v-model="varientSections"
+                      :v="$v.varientSections.$each"
+                      @addVarient="addVarient"
+                      @addValue="addValue"
+                      @removeValue="removeValue"
+                      @deleteType="deleteType"
+                      ></VarientOption>-->
+                    </form>
+                    <!-- <VarientOption
                       v-model="varientSections"
                       @addVarient="addVarient"
                       @addValue="addValue"
                       @removeValue="removeValue"
                       @deleteType="deleteType"
-                    ></VarientOption>
+                    ></VarientOption>-->
                   </form>
                 </b-modal>
 
@@ -206,7 +303,6 @@
 
                     <!-- Varient Table -->
                     <b-table responsive striped :items="varientDetails" :fields="varientFields">
-                      <!-- research what is template and slot-scope -->
                       <template slot="actions" slot-scope="row">
                         <b-button
                           @click="varientInfo(row.item, row.index)"
@@ -217,7 +313,7 @@
                         >Edit</b-button>
                       </template>
                     </b-table>
-                    <!-- @shown="displayDropZone" -->
+
                     <b-modal
                       id="editVarient"
                       ref="editVarientModal"
@@ -231,12 +327,12 @@
                           <b-form-input id="productSKU" v-model="form.varient.SKUNumber"></b-form-input>
                         </b-form-group>
 
-                        <b-form-group label="Option Type">
-                          <b-form-input id="optionType" v-model="form.varient.type" disabled></b-form-input>
-                        </b-form-group>
-
-                        <b-form-group label="Option Value">
-                          <b-form-input id="optionValue" v-model="form.varient.value" disabled></b-form-input>
+                        <b-form-group label="Varient">
+                          <b-form-input
+                            id="varientCombination"
+                            v-model="form.varient.combination"
+                            disabled
+                          ></b-form-input>
                         </b-form-group>
 
                         <b-form-group label="Current Qty">
@@ -267,6 +363,15 @@
                           </vue-dropzone>
                         </b-form-group>
                       </form>
+
+                      <template slot="modal-footer" slot-scope="{ ok, cancel }">
+                        <!-- Emulate built in modal footer ok and cancel button actions -->
+                        <b-button variant="secondary" @click="cancel()">Cancel</b-button>
+                        <b-button variant="primary" @click="ok()" :disabled="varientSubmitLoader">
+                          <b-spinner small class="mr-2" v-if="varientSubmitLoader"></b-spinner>
+                          <span>Ok</span>
+                        </b-button>
+                      </template>
                     </b-modal>
                   </div>
                 </b-container>
@@ -291,12 +396,12 @@ import DashboardHeader from "@/components/DashboardHeader";
 import vueDropzone from "vue2-dropzone";
 import Multiselect from "vue-multiselect";
 import Datepicker from "vuejs-datepicker";
-import VarientOption from "@/components/VarientOption";
 import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as asingle module
 import differencewith from "lodash.differencewith";
 import isequal from "lodash.isequal";
 import moment from "moment";
 import DiscountForm from "@/components/DiscountForm";
+import { required, minLength } from "vuelidate/lib/validators";
 import {
   UPLOAD_PRODUCT_IMAGES,
   DELETE_PRODUCT_IMAGES,
@@ -311,7 +416,6 @@ export default {
     vueDropzone,
     Multiselect,
     Datepicker,
-    VarientOption,
     DiscountForm
   },
 
@@ -319,7 +423,7 @@ export default {
     return {
       form: {
         name: "",
-        price: null, // null or string?
+        price: null,
         imageHeight: null,
         imageWidth: null,
         effectiveStartDate: "",
@@ -337,8 +441,7 @@ export default {
           varientName: "",
           currentQuantity: null,
           minimumQuantity: null,
-          type: "",
-          value: "",
+          combination: "",
           files: [],
           productImages: []
         }
@@ -352,6 +455,7 @@ export default {
         { key: "actions", label: "Actions" }
       ],
 
+      discountIndex: null,
       discountDetails: [],
 
       datePicker: {
@@ -359,15 +463,15 @@ export default {
         format: "yyyy-MM-dd"
       },
 
-      varientId: 0,
-
       // This is from varient Option
       varientSections: [
         {
           type: "",
           values: [
             {
-              varientId: 0,
+              id: Math.random()
+                .toString(36)
+                .substring(7),
               individualValue: ""
             }
           ]
@@ -378,33 +482,65 @@ export default {
       originalVarient: [],
 
       varientDetails: [],
-      discountIndex: null,
       selectedVarientIndex: null,
       deletedImageKeys: [],
 
       varientFields: [
         { key: "SKUNumber", label: "SKU" },
-        { key: "type", label: "Type" },
-        { key: "value", label: "Value" },
+        {
+          key: "attributes",
+          label: "Varient",
+          thClass: "d-none",
+          tdClass: "d-none"
+        },
+        { key: "combination", label: "Varient" },
         { key: "currentQuantity", label: "Current Qty" },
         { key: "minimumQuantity", label: "Min Qty" },
-        { key: "Image", label: "Image" },
+        { key: "imageCount", label: "Image" },
         { key: "actions", label: "Actions" }
       ],
 
-      /* This is similar to configuration options in dropzone.js */
+      // This is similar to configuration options in dropzone.js
       dropOptions: {
         url: "https://httpbin.org/post",
         acceptedFiles: "image/*",
-        // maxFiles: 1,
         addRemoveLinks: true,
         autoProcessQueue: false,
         thumbnailWidth: 160,
         thumbnailHeight: 160
       },
       isFileDuplicate: false,
-      loader: false
+
+      submitLoader: false,
+      varientSubmitLoader: false
     };
+  },
+
+  validations: {
+    varientSections: {
+      $each: {
+        type: {
+          required,
+          isDuplicateType(type, varient) {
+            let foundDuplicate = this.varientSections.find(
+              obj => obj.type === type && obj.values !== varient.values
+            );
+            if (foundDuplicate) {
+              return false;
+            } else {
+              return true;
+            }
+          }
+        },
+        values: {
+          $each: {
+            individualValue: {
+              required
+            }
+          }
+        }
+      }
+    }
   },
 
   mounted() {
@@ -412,17 +548,34 @@ export default {
       .dispatch(GET_ONE_PRODUCT, 19)
       .then(response => {
         console.dir(response);
-        // Still need to have a file objeect that contains the name, size and type
-        // Task: display the rest of the data, image count and update without file added
-        // add in extra field to productimages array lo
-        // validation
-        // either map or foreach try
+
         this.varientDetails = response.options.map((option, index) => {
           return {
             SKUNumber: option.skuNumber,
-            type: option.optionType,
-            value: option.optionValue,
             optionId: option.optionId,
+            attributes: option.attributes.map(attribute => {
+              return {
+                attributeId: attribute.attributeId,
+                type: attribute.attributeType,
+                values: {
+                  individualValue: attribute.attributeValue
+                }
+              };
+            }),
+            files: option.productImages.map(productImage => {
+              let fileName = productImage.imageKey;
+              let uuid =
+                fileName.substring(0, fileName.lastIndexOf(".")) || fileName;
+              console.log(uuid);
+              return {
+                upload: {
+                  uuid
+                },
+                size: productImage.imageSize,
+                name: productImage.imageKey,
+                type: "image/jpeg"
+              };
+            }),
             currentQuantity: option.currentQuantity,
             minimumQuantity: option.minimumQuantity,
             productImages: option.productImages,
@@ -430,22 +583,50 @@ export default {
           };
         });
 
+        // Validation for value as well
+
         let map = new Map();
-        // https://stackoverflow.com/questions/48672314/modifying-an-array-of-objects-to-group-into-a-nested-parent-child-array-of-obj
-        response.options.forEach(({ optionType, optionValue }, index) => {
-          map.has(optionType) ||
-            map.set(optionType, { type: optionType, values: [] });
-          map
-            .get(optionType)
-            .values.push({ varientId: index, individualValue: optionValue });
+        response.options.forEach(option => {
+          option.attributes.forEach(
+            ({ attributeId, attributeType, attributeValue }) => {
+              map.has(attributeType) ||
+                map.set(attributeType, { type: attributeType, values: [] });
+              map.get(attributeType).values.push(attributeValue);
+            }
+          );
         });
 
-        // Returns a new Iterator object that contains the values
-        // for each element in the Map object in insertion order.
         this.varientSections = [...map.values()];
-        this.hasUserEditVarient = true;
 
-        console.log(this.varientSections);
+        // Remove duplicate values. This can be done by creating
+        // a set object that lets us store only unique values
+        this.varientSections.forEach(varient => {
+          varient.values = Array.from(new Set(varient.values));
+          varient.values = varient.values.map(value => {
+            return {
+              individualValue: value,
+              id: Math.random()
+                .toString(36)
+                .substring(7)
+            };
+
+            console.log(value);
+          });
+        });
+
+        // Should pass in this this.varient sections so that they can understand
+        // Get the combination based on this.varientSections
+        let varientResults = this.getCombinations();
+
+        // Update this.varientDetails to have the same combination and combineId as
+        // varientResults
+        varientResults.forEach((varient, index) => {
+          this.varientDetails[index].combination = varient.combination;
+          this.varientDetails[index].combinedId = varient.combinedId;
+        });
+
+        console.log(varientResults);
+        console.log(this.varientDetails);
 
         this.form.name = response.productName;
         this.form.price = response.price;
@@ -460,7 +641,6 @@ export default {
           let discountTypeProp = {
             discountType: discount.isPercentage ? "Percentage" : "Fixed"
           };
-
           discount.effectiveStartDate = moment(
             discount.effectiveStartDate
           ).format("YYYY-MM-DD");
@@ -471,6 +651,11 @@ export default {
           // Assign new propertiy and return
           return Object.assign(discount, discountTypeProp);
         });
+
+        console.log(response);
+        console.log(this.varientSections);
+        console.log(this.varientDetails);
+        console.log(this.discountDetails);
       })
       .catch(error => {
         console.dir(error);
@@ -493,19 +678,19 @@ export default {
       this.form.discount = clonedeep({});
     },
 
+    // Reset the discount object when user exits the discount dialog
     cancelDiscountDialog() {
-      // Reset the discount object when user exits the add discount dialog
       this.form.discount = clonedeep({});
     },
 
-    // This method is invoked when the edit button is clicked on the discount table
+    // This method is invoked when the edit button is clicked on the "discount table"
     editDiscountInfo(discount, index) {
-      // https://stackoverflow.com/questions/44925125/vue-js-dont-bind-an-object-when-copying-it-to-another-data-attribute
-      // If you use this.form.discount = discount. When user type, it will reflect at the table
+      // Get the index (row) and discount object selected
       this.form.discount = Object.assign({}, discount);
       this.discountIndex = index;
     },
 
+    // This method is invoked when the OK button is clicked on the "modal dialog" (Save the changes)
     handleEditDiscount() {
       let discount = this.form.discount;
       let index = this.discountIndex;
@@ -515,10 +700,8 @@ export default {
       } else {
         discount.isPercentage = false;
       }
-
+      // Update the discount object based on the index in the array
       this.$set(this.discountDetails, index, discount);
-      // this.discountDetails[this.discountIndex] = Object.assign({}, discount);
-      // this.discountDetails[this.discountIndex] = this.form.discount;
 
       console.log(this.currentDiscountRowSelected);
       console.log(this.form.discount);
@@ -533,6 +716,7 @@ export default {
     },
 
     handleDeleteDiscount() {
+      // Delete discount object based on the index
       this.discountDetails.splice(this.discountIndex, 1);
     },
 
@@ -545,19 +729,16 @@ export default {
       ).format("YYYY-MM-DD");
     },
 
-    // https://jsfiddle.net/Wuzix/qs6t9L7x/
-    // https://zaengle.com/blog/using-v-model-on-nested-vue-components
-    // https://stackoverflow.com/questions/47311936/v-model-and-child-components/47312172
-    //https://stackoverflow.com/questions/40410332/vuejs-access-child-components-data-from-parent
-    // https://stackoverflow.com/questions/40915436/vuejs-update-parent-data-from-child-component
     addVarient() {
-      let varientId = ++this.varientId;
-
+      // Assign a unique Id for each value field. This will be used to keep
+      // track of what is added, deleted or updated later on
       this.varientSections.push({
         type: "",
         values: [
           {
-            varientId,
+            id: Math.random()
+              .toString(36)
+              .substring(7),
             individualValue: ""
           }
         ]
@@ -566,9 +747,10 @@ export default {
     },
 
     addValue(varientIndex) {
-      let varientId = ++this.varientId;
       this.varientSections[varientIndex].values.push({
-        varientId,
+        id: Math.random()
+          .toString(36)
+          .substring(7),
         individualValue: ""
       });
       console.log(this.varientSections);
@@ -587,155 +769,81 @@ export default {
       this.handleSubmit();
     },
 
+    // This method is invoked when user clicked on the "OK" button on the varient option modal dialog
     handleSubmit() {
-      if (this.hasUserEditVarient) {
-        let updatedVarientDetails = [];
-        this.varientSections.forEach(varientSection => {
-          let type = varientSection.type;
-          varientSection.values.forEach(value => {
-            let obj = {
-              varientId: value.varientId,
-              type,
-              value: value.individualValue
-            };
-            updatedVarientDetails.push(obj);
-          });
-        });
+      // Calculate and return the combinations for each varient type and value
+      let varientResults = this.getCombinations();
 
-        var subset = function(arr) {
-          return arr.map(obj => {
-            return {
-              type: obj.type,
-              value: obj.value,
-              varientId: obj.varientId
-            };
-          });
-        };
-
-        // Subset the type, value and varientId property from both arrays so that they
-        // can be used for comparison
-        var varientDetailTypeAndValue = subset(this.varientDetails);
-        var updatedVarientDetailTypeAndValue = subset(updatedVarientDetails);
-
-        console.log(varientDetailTypeAndValue);
-        console.log(updatedVarientDetailTypeAndValue);
-
-        // #1 Inspect and compare varientDetail (old) with updatedVarientDetail (new)
-        var difference1 = differencewith(
-          varientDetailTypeAndValue,
-          updatedVarientDetailTypeAndValue,
-          isequal
+      // Find the combination based on the combine Id between this.varientDetails and varientResult
+      // Do note that, this.varientDetails is an array of varient object from the "varient" table
+      varientResults.forEach((varientResult, index) => {
+        let varientDetail = this.varientDetails.find(
+          vd => vd.combinedId === varientResult.combinedId
         );
 
-        // #2 Compare updatedVarientDetail (new) with varientDetail (old)
-        var difference2 = differencewith(
-          updatedVarientDetailTypeAndValue,
-          varientDetailTypeAndValue,
-          isequal
-        );
+        // If the combination is found, update it while retaining
+        // the product details such as sku, quantity and etc (if any)
+        if (varientDetail !== undefined) {
+          let newCombination = varientResult.combination;
+          let newAttributes = varientResult.attributes;
+          varientResult = varientDetail;
 
-        console.log(difference1);
-        console.log(difference2);
-
-        // Check to see if user have updated the current varient type or value
-        // by comparing the varientId present in both arrays (difference 1 and 2)
-        let sameTypeAndValues = difference2.filter(o1 =>
-          difference1.some(o2 => o1.varientId === o2.varientId)
-        );
-
-        console.log(sameTypeAndValues);
-        console.log(this.varientDetails);
-
-        if (sameTypeAndValues.length > 0) {
-          sameTypeAndValues.forEach((updateObject, index) => {
-            // If user make an update, find out which fields were updated
-            // by checking with the varient Id
-            const foundIndex = this.varientDetails.findIndex(
-              el => el.varientId === updateObject.varientId
-            );
-
-            if (foundIndex > -1) {
-              this.varientDetails[foundIndex].type = updateObject.type;
-              this.varientDetails[foundIndex].value = updateObject.value;
-              // Set a temporary property called "update" to prevent this particular object
-              // from being sliced and pushed
-              this.varientDetails[foundIndex].update = true;
-            }
-          });
+          // Update the combination as well as the attributes that contains the type and value
+          varientResult.combination = newCombination;
+          varientResult.attributes = newAttributes;
+          varientResults[index] = varientResult;
         }
+      });
 
-        console.log(this.varientDetails);
-
-        // A difference means that users have deleted varient object(s)
-        // Hence, we must remove it from varientDetails array
-        if (difference1.length > 0) {
-          difference1.forEach(differenceObj => {
-            // Check to see if product exist
-            var index = this.varientDetails.findIndex(
-              obj =>
-                obj.type === differenceObj.type &&
-                obj.value === differenceObj.value &&
-                obj.varientId === differenceObj.varientId &&
-                // Do not retrieve the index where update is true,
-                // this is to prevent the updated object from being sliced
-                obj.update != true
-            );
-
-            // If it exist, slice it
-            if (index != -1) {
-              this.varientDetails.splice(index, 1);
-            }
-          });
-        }
-
-        // A difference means that user have added new varient object(s). Hence,
-        // we must add it to varientDetails array
-        if (difference2.length > 0) {
-          console.log(this.varientDetails);
-          console.log(difference2);
-          difference2.forEach((differenceObj, index) => {
-            console.log(differenceObj);
-            var index = this.varientDetails.findIndex(
-              obj =>
-                obj.type === differenceObj.type &&
-                obj.value === differenceObj.value &&
-                obj.varientId === differenceObj.varientId
-            );
-            // If found, no need to push
-            if (index > -1) {
-            } else {
-              this.varientDetails.push(differenceObj);
-            }
-          });
-        }
-
-        // Once everything is done, we will remove the temporary "update" property
-        this.varientDetails.forEach(obj => {
-          if (obj.update != undefined) {
-            delete obj.update;
-          }
-        });
-      } else {
-        this.varientSections.forEach(varientSection => {
-          let type = varientSection.type;
-          varientSection.values.forEach(value => {
-            let obj = {
-              varientId: value.varientId,
-              type,
-              value: value.individualValue
-            };
-            this.varientDetails.push(obj);
-          });
-        });
-        console.log(this.varientDetails);
-      }
-
-      this.hasUserEditVarient = true;
+      this.varientDetails = varientResults;
+      console.log(this.varientDetails);
 
       //https://stackoverflow.com/questions/49943140/validating-form-inside-a-modal-with-vuelidate-and-bootstrap-vue
       this.$nextTick(() => {
         this.$refs.varientModal.hide();
       });
+    },
+
+    getCombinations() {
+      const getCartesian = function(object) {
+        return Object.entries(object).reduce(
+          (r, [key, value]) => {
+            let temp = [];
+            r.forEach(s =>
+              (Array.isArray(value) ? value : [value]).forEach(w =>
+                (w && typeof w === "object" ? getCartesian(w) : [w]).forEach(
+                  x => temp.push({ ...s, [key]: x })
+                )
+              )
+            );
+            return temp;
+          },
+          [{}]
+        );
+      };
+
+      let varientResults = getCartesian(this.varientSections).map(o => {
+        return {
+          attributes: Object.assign([], o).map(attrs => attrs)
+        };
+      });
+
+      varientResults.forEach(vr => {
+        let combinedId = "";
+        let combination = "";
+        // Loop through each combination to perform the following tasks:
+        // 1. Create a new property called combination (black matte)
+        // 2. Create a new property called combineId, which is a combination
+        // of the unique Id for each combination (hydzmn2b0dd9)
+        vr.attributes.forEach(attri => {
+          combinedId += attri.values.id;
+          combination += attri.values.individualValue + " ";
+        });
+        vr.combinedId = combinedId;
+        vr.combination = combination;
+      });
+
+      return varientResults;
     },
 
     cancel() {
@@ -750,52 +858,47 @@ export default {
           }
         ];
       } else {
-        console.log("revert back to previous changes");
-        console.log(this.varientSections);
-        if (this.hasUserEditVarient) {
-          this.varientSections = clonedeep(this.originalVarient);
-        }
+        this.varientSections = clonedeep(this.originalVarient);
       }
     },
 
     openVarientModal() {
-      console.log("hasuserEditvarient? " + this.hasUserEditVarient);
-      console.log(this.varientSections);
-      if (this.hasUserEditVarient) {
-        // Use lodash to deep clone the array so that it does not contain reference to original array
-        this.originalVarient = clonedeep(this.varientSections);
-        console.log("open variant model ");
-        console.log(this.originalVarient);
-      }
+      // Clone the array so that it does not contain reference to original array
+      this.originalVarient = clonedeep(this.varientSections);
     },
 
-    // This method is invoked when the edit button is clicked on the varient table
+    // This method is invoked when the "edit" button is clicked on the "varient table"
     varientInfo(varient, index) {
       this.selectedVarientIndex = index;
 
       if (varient.SKUNumber == null) {
-        this.form.varient.type = varient.type;
-        this.form.varient.value = varient.value;
+        // Display the combination in the "varient" input field
+        this.form.varient.combination = varient.combination;
       } else {
+        // Get the varient object selected and display images in dropzone (if any)
         this.form.varient = clonedeep(varient);
-        // this.form.varient = Object.assign(this.form.varient, varient);
-        console.log(this.form.varient);
 
         setTimeout(() => {
-          this.form.varient.productImages.forEach(file => {
+          this.form.varient.files.forEach(file => {
+            var index = this.form.varient.productImages.findIndex(
+              image => image.imageKey === file.upload.uuid + ".jpg"
+            );
+
             console.log(file);
             console.log(file.imageUrl);
 
-            var fileProperty = {
-              name: "hi",
-              size: 1111,
-              type: "image/png"
-            };
+            if (index > -1) {
+              var fileProperty = {
+                size: file.size,
+                name: file.name,
+                type: file.type
+              };
 
-            this.$refs.myVueDropzone.manuallyAddFile(
-              fileProperty,
-              file.imageUrl
-            );
+              this.$refs.myVueDropzone.manuallyAddFile(
+                fileProperty,
+                this.form.varient.productImages[index].imageUrl
+              );
+            }
           });
         }, 100);
       }
@@ -815,14 +918,18 @@ export default {
       // Throw this into a new method
       // Check if user have make any changes to the dropzone. For example
       // create or remove. If they did, make the changes in S3 as well
-      const fileDifference = differencewith(
+      let fileDifference = differencewith(
         this.form.varient.files,
         this.varientDetails[index].files
       );
+
+      fileDifference = fileDifference.filter(fd => {
+        return fd.dataURL !== undefined;
+      });
+
       console.log(fileDifference);
 
-      // If both api calls are running, I will call the this.updateVarient() once
-      // both of the calls are done
+      // If files have been deleted / added in the dropzone, the following condition will be called
       if (fileDifference.length > 0 && this.deletedImageKeys.length > 0) {
         const formData = new FormData();
         for (var i = 0; i < fileDifference.length; i++) {
@@ -835,28 +942,22 @@ export default {
             fileDifference[i].upload.uuid + ".jpg"
           );
         }
+
         var guids = this.deletedImageKeys;
         let obj = {
           formData,
           guids
         };
-        console.log(obj);
+
         this.$store
           .dispatch(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
           .then(response => {
-            console.dir(response);
-            console.dir(response[0]);
-
-            console.log(this.form.varient);
-            console.log(this.form.varient.productImages);
-
-            response[0].productImages.forEach(productImage => {
+            response[0].productImages.forEach((productImage, index) => {
               this.form.varient.productImages.push({
                 imageKey: productImage.imageKey,
-                imageUrl: productImage.imageUrl
+                imageUrl: productImage.imageUrl,
+                imageSize: fileDifference[index].size
               });
-              console.log(this.form.varient);
-              console.log(this.form.varient.productImages);
             });
 
             console.log(this.form.varient);
@@ -870,13 +971,16 @@ export default {
 
             console.log(this.form.varient);
             this.updateVarientTable(this.form.varient);
+          })
+          .catch(error => {
+            console.dir(error);
+            alert("error");
+            this.varientSubmitLoader = false;
           });
       } else {
         // If have, we need to find out what to add or remove from the s3 bucket
         // if got filedifference, mean user add an image
         if (fileDifference.length > 0) {
-          // Call this method add to bucket
-          // and another method to be delete from bucket
           const formData = new FormData();
           for (var i = 0; i < fileDifference.length; i++) {
             formData.append(
@@ -898,11 +1002,12 @@ export default {
             .then(response => {
               console.dir(response);
 
-              response.productImages.forEach(productImage => {
+              response.productImages.forEach((productImage, index) => {
                 console.log("called");
                 this.form.varient.productImages.push({
                   imageKey: productImage.imageKey,
-                  imageUrl: productImage.imageUrl
+                  imageUrl: productImage.imageUrl,
+                  imageSize: fileDifference[index].size
                 });
                 console.log(this.form.varient.productImages);
               });
@@ -917,10 +1022,9 @@ export default {
             .catch(error => {
               console.dir(error);
               alert("error");
+              this.varientSubmitLoader = false;
             });
-        }
-
-        if (this.deletedImageKeys.length > 0) {
+        } else if (this.deletedImageKeys.length > 0) {
           console.log(this.deletedImageKeys);
 
           this.$store
@@ -935,11 +1039,7 @@ export default {
                 image => !this.deletedImageKeys.includes(image.imageKey)
               );
 
-              // follow his method the json parse shit
-
-              // this.deletedImageKeys = Object.assign([], this.deletedImageKeys);
               console.log(this.form.varient);
-              console.log("delete done called");
 
               this.updateVarientTable(this.form.varient);
             })
@@ -947,46 +1047,45 @@ export default {
               console.dir(error);
               alert("error");
             });
+        } else {
+          this.updateVarientTable(this.form.varient);
         }
       }
     },
 
     updateVarientTable(varient) {
-      console.log("caled");
-      console.log(varient);
-      console.log(this.varientDetails);
-      console.log(this.selectedVarientIndex);
+      varient.imageCount = varient.productImages.length;
       let index = this.selectedVarientIndex;
 
-      // https://vuejs.org/v2/guide/reactivity.html#Change-Detection-Caveats
-      // A property must be declared in the data() object for vuejs to detect any changes and be reactive
-      // Since this.varientDetails[index] is an object inside the array, vuejs will not detect changes
-      // and update the dom. Hence, create a fresh object with properties from both the original object
-      // to trigger change
       // Loop through the array to find out which varient object the user edited.
       // Once found, update the details based on the varient
-      this.$set(this.varientDetails, index, varient);
+      this.varientDetails = this.varientDetails.map(el => {
+        if (el.combination === varient.combination) {
+          return Object.assign(el, varient);
+        }
+        return el;
+      });
 
       // Once updated, remove the values in the field
-      // We need to create a new copy. If we do know, it will still
-      // reference the old object
-      this.form.varient = clonedeep({
+      this.form.varient = {
         SKUNumber: null,
         varientName: "",
         currentQuantity: null,
         minimumQuantity: null,
+        combination: "",
         type: "",
         value: "",
         files: [],
         productImages: []
-      });
+      };
 
-      this.deletedImageKeys = clonedeep([]);
+      this.deletedImageKeys = [];
 
       console.log(this.varientDetails[index]);
       console.log(this.form.varient);
       console.log(this.varientDetails);
       console.log(this.deletedImageKeys);
+      this.varientSubmitLoader = false;
 
       this.$nextTick(() => {
         this.$refs.editVarientModal.hide();
@@ -995,17 +1094,17 @@ export default {
 
     // This method will be invoked when the cancel or x button is clicked on the varient modal dialog
     cancelEditVarientTableDialog() {
-      // Remove the values in the field (if any) when the user exits the dialog
-      this.form.varient = clonedeep({
+      this.form.varient = {
         SKUNumber: null,
         varientName: "",
         currentQuantity: null,
         minimumQuantity: null,
+        combination: "",
         type: "",
         value: "",
         files: [],
         productImages: []
-      });
+      };
       this.$refs.myVueDropzone.removeAllFiles();
     },
 
@@ -1018,12 +1117,10 @@ export default {
     },
 
     duplicateFileCheck(file) {
-      alert("duplicate");
       this.isFileDuplicate = true;
     },
 
     addFileToDropzone(file) {
-      alert("add called");
       console.log(file);
 
       if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
@@ -1032,11 +1129,8 @@ export default {
         console.log("Added file into files array ");
         this.form.varient.files.push(file);
         console.dir(this.form.varient.files);
-        console.dir(this.form.varient);
-        console.log(this.varientDetails[this.selectedVarientIndex]);
       }
       console.log(this.form.varient);
-      console.log(this.form.varient.files);
       this.isFileDuplicate = false;
     },
 
@@ -1101,15 +1195,9 @@ export default {
       console.log(this.varientDetails);
       console.log(this.discountDetails);
 
-      // this.uploadUserImage();
+      // remove type, value, varient name
 
-      // change to edit varient
-      // successful notification
-
-      // this.uploadUserImage();
-      // when user submit, type is true or false
-      // this.message("success", "You have successfully added a new product!");
-      // this.$router.push("/ResourceManagement");
+      this.submitLoader = true;
 
       var productObj = {
         productName: form.name,
@@ -1129,10 +1217,14 @@ export default {
         .dispatch(CREATE_PRODUCT, productObj)
         .then(response => {
           console.dir(response);
+          this.submitLoader = false;
+          // this.message("success", "You have successfully added a new product!");
+          // this.$router.push("/ResourceManagement");
         })
         .catch(error => {
           console.dir(error);
           alert("error");
+          this.submitLoader = false;
         });
     },
 
@@ -1140,10 +1232,14 @@ export default {
       return this.varientDetails.map((varient, index) => {
         return {
           skuNumber: varient.SKUNumber,
-          optionType: varient.type,
-          optionValue: varient.value,
           currentQuantity: varient.currentQuantity,
           minimumQuantity: varient.minimumQuantity,
+          attributes: varient.attributes.map(atr => {
+            return {
+              attributeType: atr.type,
+              attributeValue: atr.values.individualValue
+            };
+          }),
           productImages: varient.productImages
         };
       });

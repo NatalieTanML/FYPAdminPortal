@@ -2,6 +2,7 @@ import {
     UPLOAD_PRODUCT_IMAGES,
     DELETE_PRODUCT_IMAGES,
     UPLOAD_AND_DELETE_PRODUCT_IMAGES,
+    UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS,
     CREATE_PRODUCT,
     CREATE_PRODUCT_SUCCESS,
     CREATE_PRODUCT_ERROR,
@@ -21,6 +22,14 @@ import {
 } from "@/store/actions/product"
 
 import { apiCall, api_routes } from "@/utils/api";
+
+const getDefaultState = () => {
+    return {
+        addImage: null,
+        deleteGuids: null,
+        product: [],
+    }
+}
 
 const state = {
     addImage: null,
@@ -57,7 +66,11 @@ const actions = {
         } else {
             addImage = formData
         }
-        console.log(addImage)
+
+        for (var pair of addImage.entries()) {
+            console.log(pair[0] + ", " + pair[1]);
+        }
+
         return new Promise((resolve, reject) => {
             apiCall({ url: api_routes.s3.upload, data: addImage, method: 'post' })
                 .then(resp => {
@@ -93,12 +106,14 @@ const actions = {
             guids
         }
         commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
-        let UPLOAD_PRODUCT_IMAGES = dispatch("UPLOAD_PRODUCT_IMAGES", formData);
-        let DELETE_PRODUCT_IMAGES = dispatch("DELETE_PRODUCT_IMAGES", guids);
+
+        let UPLOAD_PRODUCT_IMAGES = dispatch("UPLOAD_PRODUCT_IMAGES");
+        let DELETE_PRODUCT_IMAGES = dispatch("DELETE_PRODUCT_IMAGES");
 
         // https://forum.vuejs.org/t/best-practice-for-handling-multiple-api-calls-inside-vuex-action/49443/2
         return Promise.all([UPLOAD_PRODUCT_IMAGES, DELETE_PRODUCT_IMAGES])
             .then(resp => {
+                commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS)
                 // Both done
                 // The order is preserved regardless of what resolved first
                 // upload, delete
@@ -121,8 +136,8 @@ const actions = {
                 })
         })
     },
+
     [UPDATE_STOCK]: ({ commit }, data) => {
-        console.log("UPDATE_STOCK called")
         return new Promise((resolve, reject) => {
             commit(UPDATE_STOCK);
             apiCall({ url: api_routes.product.update_stock + data[0] + "/" + data[1], method: "put" })
@@ -157,8 +172,12 @@ const mutations = {
         state.addImage = formData;
         state.deleteGuids = guids
         console.log(state.addImage)
-        console.log(state.deleteGuids)
-    }
+    },
+
+    [UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS]: (state) => {
+        Object.assign(state, getDefaultState())
+        console.log(state)
+    },
 }
 
 export default {
