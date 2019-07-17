@@ -112,7 +112,7 @@ export default {
       polling: null,
       connection: null,
       //have multiple buttons
-      headerButtonClick: ["Update Order Status", "Download Images"],
+      headerButtonClick: ["Update Order Status", "Download Images", "Delivery Failed"],
       headerButton: [
         {
           id: 1,
@@ -121,7 +121,12 @@ export default {
         {
           id: 2,
           title: "Download Images"
-        }
+        },
+         {
+          id: 3,
+          title: "Delivery Failed"
+        },
+        
       ],
       actionButtonClick: "Update One Order Status",
       imageClick: "On Order Image Click",
@@ -214,6 +219,8 @@ export default {
         this.message("danger", error);
       });
 
+    
+    //headerButtonClick[0] is Update Status
     eventBus.$on(this.headerButtonClick[0], orderIds => {
       var needsSignature = false;
 
@@ -228,7 +235,11 @@ export default {
         });
       });
 
-      if (!needsSignature) this.updateStatusTabsAndTable(orderIds);
+      if (!needsSignature)
+      {
+          var isSuccessful = true;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+      }
       else {
         this.orderIds = orderIds;
         this.ordertitle = "Multiple Orders";
@@ -236,8 +247,15 @@ export default {
       }
     });
 
+    //headerButtonClick[1] is Download Images
     eventBus.$on(this.headerButtonClick[1], listOfThumbNailUrl => {
       this.downloadImages(listOfThumbNailUrl);
+    });
+
+    //headerButtonClick[2] is Delivery Failed
+    eventBus.$on(this.headerButtonClick[2], orderIds => {
+       var isSuccessful = false;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
     });
 
     eventBus.$on(this.actionButtonClick, item => {
@@ -248,7 +266,10 @@ export default {
         this.ordertitle = "Order : " + item.id;
         this.orderIds.push(item.id);
         this.$bvModal.show("showSignatureDialog");
-      } else this.updateStatusTabsAndTable(orderIds);
+      } else{
+          var isSuccessful = true;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+        }
     });
 
     eventBus.$on(this.imageClick, thumbNailUrl => {
@@ -256,6 +277,12 @@ export default {
       const listOfThumbNailUrl = [];
       listOfThumbNailUrl.push(thumbNailUrl);
       this.downloadImages(listOfThumbNailUrl);
+    });
+
+      eventBus.$on("cancelOrder", orderIds => {
+        console.log("eventbus cancelorder",orderIds)
+        var isSuccessful = false;
+        this.updateStatusTabsAndTable(orderIds, isSuccessful);
     });
 
     // Establish hub connection
@@ -459,10 +486,10 @@ export default {
       else if (status == "Cancelled") return null;
       else return null;
     },
-    updateStatusTabsAndTable(orderIds) {
+    updateStatusTabsAndTable(orderIds, isSuccessful) {
       //isSuccessful will always be true unless the admin presses on the dropdown at the
       //end of the row and click cancel order
-      const isSuccessful = true;
+    
 
       const jsonData = {
         orderIds: orderIds,
