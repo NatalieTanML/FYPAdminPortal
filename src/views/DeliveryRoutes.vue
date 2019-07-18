@@ -17,6 +17,7 @@
           <div>
             <!-- headerButton="Assign Selected to Deliveryman" -->
             <Table
+               :key="this.forceRender"
               v-bind:headerButtonClick="this.headerButtonClick"
               v-bind:actionButtonClick="this.actionButtonClick"
               v-bind:fields="this.fields"
@@ -79,6 +80,7 @@ export default {
       headerButton: [{ id: 1, title: "Assign to Deliveryman" }],
       headerButtonClick: ["Assign to Deliveryman"],
       id: "" ,
+      forceRender: false,
       items:  [],
       fields: [
         { key: "refNo", label: "Ref. No", sortable: true },
@@ -286,6 +288,9 @@ export default {
               this.items[i].deliveryman = "Not Assigned";
             }
           }
+
+             if (this.forceRender) this.forceRender = false;
+            else this.forceRender = true;
         })
         .catch(error => {
           alert(error);
@@ -360,6 +365,9 @@ export default {
             this.items[i].deliveryman = "Not Assigned";
           }
         }
+        
+             if (this.forceRender) this.forceRender = false;
+            else this.forceRender = true;
       })
       .catch(error => {
         alert(error);

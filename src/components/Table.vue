@@ -247,6 +247,7 @@ export default {
   },
   mounted() {
     this.totalRows = this.items.length;
+    console.log("this.totalRows : "+this.totalRows)
     console.log(this.enableCheckbox);
     this.userRole = this.$store.getters.userRole
     //to redraw the hr line.
