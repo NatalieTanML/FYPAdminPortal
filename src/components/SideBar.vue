@@ -61,6 +61,16 @@
         </router-link>
       </li>
 
+        <li class="nav-item"  v-if="userRole == 'Admin' ">
+        <router-link to="HotelManagement">
+          <a class="nav-link">
+            <!-- icon -->
+            <i class="mr-2 fas fa-hotel"></i>
+            <span>Hotel Management</span>
+          </a>
+        </router-link>
+      </li>
+
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block" />
     </ul>
@@ -71,12 +81,12 @@
 <script>
 export default {
   name: "SideBar",
-  data(){
-      return{
-        userRole: "",
-      }
+  data() {
+    return {
+      userRole: ""
+    };
   },
-  mounted(){
+  mounted() {
     this.userRole = this.$store.getters.userRole;
   }
 };

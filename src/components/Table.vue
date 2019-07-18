@@ -230,7 +230,7 @@ export default {
       showDownloadImageButton: true,
       showDeliveryFailedButton: true,
       cancelOrderId: null,
-      userRole: null,
+      userRole: null
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -247,9 +247,9 @@ export default {
   },
   mounted() {
     this.totalRows = this.items.length;
-    console.log("this.totalRows : "+this.totalRows)
+    console.log("this.totalRows : " + this.totalRows);
     console.log(this.enableCheckbox);
-    this.userRole = this.$store.getters.userRole
+    this.userRole = this.$store.getters.userRole;
     //to redraw the hr line.
     // if(this.$refs.itemdiv != undefined){
     //   console.log(this.$refs.itemdiv[0].clientWidth)
@@ -264,14 +264,12 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields
-        .filter(f => f.sortable)
-        .map(f => {
-          return {
-            text: f.label,
-            value: f.key
-          };
-        });
+      return this.fields.filter(f => f.sortable).map(f => {
+        return {
+          text: f.label,
+          value: f.key
+        };
+      });
     }
   },
   methods: {
@@ -304,32 +302,33 @@ export default {
           }
           console.log(listOfThumbNailUrl);
           eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
-        }
-        else if (this.headerButton[2].title == clickedHeaderTitle) {
+        } else if (this.headerButton[2].title == clickedHeaderTitle) {
           eventBus.$emit(this.headerButton[2].title, this.checkedCheckBox);
           this.checkedCheckBox = [];
           this.checkAll = false;
         }
       } else if (this.tableName == "Deliveries") {
-
-        if(this.headerButton[0].title == clickedHeaderTitle){
-        eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
-        this.checkedCheckBox = [];
-        this.checkAll = false;
+        if (this.headerButton[0].title == clickedHeaderTitle) {
+          eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
+          this.checkedCheckBox = [];
+          this.checkAll = false;
+        } else if (this.headerButton[1].title == clickedHeaderTitle) {
+          eventBus.$emit(this.headerButton[1].title, this.checkedCheckBox);
+          this.checkedCheckBox = [];
+          this.checkAll = false;
         }
-
-        else if(this.headerButton[1].title == clickedHeaderTitle){
-           eventBus.$emit(this.headerButton[1].title, this.checkedCheckBox);
-        this.checkedCheckBox = [];
-        this.checkAll = false;
-        }
-
-      } else
-       eventBus.$emit(this.headerButtonClick[0]);
+      } else eventBus.$emit(this.headerButtonClick[0]);
     },
-    onActionButtonClick(item) {
+    onActionButtonClick(item, oneActionButton) {
       if (this.tableName == "Orders") {
         eventBus.$emit(this.actionButtonClick, item);
+      } else if (this.tableName == "Resource Management") {
+        var jsonData = {
+          actionButton: oneActionButton,
+          item: item
+        };
+
+        eventBus.$emit(this.actionButtonClick, jsonData);
       } else eventBus.$emit(this.actionButtonClick, item.id);
       //id is the row's item's id
     },
@@ -364,51 +363,54 @@ export default {
     },
     checkAllCheckBox() {
       console.log(this.items);
-      if(this.items.length > 0){
-      let index = 0;
-      let rowsPerPage = this.perPage;
-      let shownItems = (this.currentPage - 1) * rowsPerPage;
-      // console.log(shownItems)
-      //if the last page has less than 5 stuff.
-      if (this.items.length - shownItems < rowsPerPage && this.currentPage != 1)
-        rowsPerPage = this.items.length - shownItems;
+      if (this.items.length > 0) {
+        let index = 0;
+        let rowsPerPage = this.perPage;
+        let shownItems = (this.currentPage - 1) * rowsPerPage;
+        // console.log(shownItems)
+        //if the last page has less than 5 stuff.
+        if (
+          this.items.length - shownItems < rowsPerPage &&
+          this.currentPage != 1
+        )
+          rowsPerPage = this.items.length - shownItems;
 
-      //reset the conditions so as to re-check the conditions down below.
-      this.showHeaderButton = true;
-      this.showDownloadImageButton = false;
-      this.showDeliveryFailedButton = false;
+        //reset the conditions so as to re-check the conditions down below.
+        this.showHeaderButton = true;
+        this.showDownloadImageButton = false;
+        this.showDeliveryFailedButton = false;
 
-      if (this.items[0].actions[0] == null) {
-        this.showHeaderButton = false;
-      } 
-      
-      if (
-        this.items[0].status == "Received" ||
-        this.items[0].status == "Awaiting Printing"
-      ) {
-        this.showDownloadImageButton = true;
-      }
-      
-      if (this.items[0].status == "Out for Delivery") {
-        this.showDeliveryFailedButton = true;
-      } 
-      console.log(this.showHeaderButton);
-
-      //if the first page has less than 5 stuff.
-      if (this.currentPage == 1 && this.items.length < rowsPerPage)
-        rowsPerPage = this.items.length;
-      // console.log(this.currentPage)
-      // console.log(rowsPerPage)
-      if (!this.checkAll) this.checkAll = true;
-      else this.checkAll = false;
-      this.checkedCheckBox = [];
-      if (this.checkAll) {
-        for (index = 0; index < rowsPerPage; index++) {
-          this.checkedCheckBox[index] = this.items[shownItems + index].id;
+        if (this.items[0].actions[0] == null) {
+          this.showHeaderButton = false;
         }
-      }
-      console.log(this.checkAll);
-      console.log(this.checkedCheckBox);
+
+        if (
+          this.items[0].status == "Received" ||
+          this.items[0].status == "Awaiting Printing"
+        ) {
+          this.showDownloadImageButton = true;
+        }
+
+        if (this.items[0].status == "Out for Delivery") {
+          this.showDeliveryFailedButton = true;
+        }
+        console.log(this.showHeaderButton);
+
+        //if the first page has less than 5 stuff.
+        if (this.currentPage == 1 && this.items.length < rowsPerPage)
+          rowsPerPage = this.items.length;
+        // console.log(this.currentPage)
+        // console.log(rowsPerPage)
+        if (!this.checkAll) this.checkAll = true;
+        else this.checkAll = false;
+        this.checkedCheckBox = [];
+        if (this.checkAll) {
+          for (index = 0; index < rowsPerPage; index++) {
+            this.checkedCheckBox[index] = this.items[shownItems + index].id;
+          }
+        }
+        console.log(this.checkAll);
+        console.log(this.checkedCheckBox);
       }
     },
     myRowClickHandler(record, index) {

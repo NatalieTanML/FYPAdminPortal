@@ -25,15 +25,22 @@ export const api_routes = {
     getAllDeliveryTypes: "api/orders/deliverytypes"
   },
   product: {
-    create: 'api/products',
-    update: 'api/products',
-    get_one: 'api/products/',
-    get_all: 'api/products/',
-    update_stock: 'api/products/stock/'
+    create: "api/products",
+    update: "api/products",
+    get_one: "api/products/",
+    get_all: "api/products/",
+    update_stock: "api/products/stock/"
   },
   s3: {
-    upload: 'api/s3/product',
-    delete: 'api/s3/delete'
+    upload: "api/s3/product",
+    delete: "api/s3/delete"
+  },
+  hotel: {
+    create: "api/hotels/",
+    update: "api/hotels/",
+    get_one: "api/hotels/",
+    get_all: "api/hotels/",
+    delete_one: "api/hotels/"
   }
 };
 
