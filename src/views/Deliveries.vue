@@ -71,7 +71,12 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DashboardTabs from "@/components/DashboardTabs";
 import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
-import { GET_ALL_ORDERS, UPDATE_RECIPIENT } from "@/store/actions/order";
+import {
+  GET_ALL_ORDERS,
+  UPDATE_RECIPIENT,
+  UPDATE_ORDER_STATUS,
+  GET_MULTIPLE_ORDERS
+} from "@/store/actions/order";
 
 export default {
   components: {
@@ -90,11 +95,15 @@ export default {
       orderIds: [],
       enableCheckbox: true,
 
-      headerButtonClick: ["Update Order Status"],
+      headerButtonClick: ["Update Order Status", "Delivery Failed"],
       headerButton: [
         {
           id: 1,
           title: "Update Order Status"
+        },
+        {
+          id: 2,
+          title: "Delivery Failed"
         }
       ],
       actionButtonClick: "Delivery Signature",
@@ -199,8 +208,30 @@ export default {
           response.address.addressLine1 + ", " + response.address.addressLine2;
       return addressOrHotel;
     },
+    getAndUpdateMultipleOrders(ids) {
+      this.$store
+        .dispatch(GET_MULTIPLE_ORDERS, ids)
+        .then(response => {
+          console.log("Get multiple orders : ", response);
+
+          // let updatedOrderList = [];
+          // response.forEach(updatedOrder => {
+          //   updatedOrderList.push({
+          //     orderId: updatedOrder.orderId,
+          //     statusId: updatedOrder.statusId,
+          //     statusName: updatedOrder.status
+          //   });
+          // });
+
+          this.updateCurrentOrders(response);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
     updateCurrentOrders(orders) {
-      console.log("updateCurrentOrders : " + JSON.stringify(orders));
+      console.log("updateCurrentOrders : ", orders);
       //update current items's statuses and actions
       let updatedOrders = orders;
       let x;
@@ -210,11 +241,17 @@ export default {
           //i will populate the table, or else i will take the item out from the
           //table. this is because i use this method when i update the status from out for delivery to completed
           //of the order too.
-
+          console.log("one updated order : ", oneUpdatedOrder);
           if (this.items[x].id == oneUpdatedOrder.orderId) {
             this.items.splice(x, 1);
-          } else if(oneUpdatedOrder.status.statusName == "Out for Delivery"){
-            this.items.push({
+          } 
+        });
+      }
+
+      
+      updatedOrders.forEach((oneUpdatedOrder, index) => {
+      if (oneUpdatedOrder.status == "Out for Delivery") {
+           var itemLength = this.items.push({
               id: oneUpdatedOrder.orderId,
               refNo: oneUpdatedOrder.referenceNo,
               date: new Date(
@@ -223,10 +260,14 @@ export default {
               items: oneUpdatedOrder.orderItems,
               address: this.getAddressOrHotelName(oneUpdatedOrder),
               actions: ["Delivered"]
-            });  
+            });
+
+               this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
+             console.log("one new updated item : ", this.items);
           }
-        });
-      }
+                 });
+      
+
       if (this.forceRender) this.forceRender = false;
       else this.forceRender = true;
     }
@@ -236,6 +277,25 @@ export default {
       this.ordertitle = "Multiple Orders";
       this.orderIds = listOfOrderIds;
       this.$bvModal.show("showSignatureDialog");
+    });
+
+    eventBus.$on(this.headerButtonClick[1], listOfOrderIds => {
+      var isSuccessful = false;
+
+      const jsonData = {
+        orderIds: listOfOrderIds,
+        isSuccessful: isSuccessful
+      };
+      this.$store
+        .dispatch(UPDATE_ORDER_STATUS, jsonData)
+        .then(response => {
+          this.message("success", "Order Status(es) is updated successfully!");
+          this.updateCurrentOrders(response.orders);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
     });
 
     eventBus.$on(this.actionButtonClick, itemId => {
@@ -252,6 +312,10 @@ export default {
         for (x = 0; x < response.length; x++) {
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
+          console.log( response[x].deliveryManId)
+          console.log( this.$store.getters.userId)
+          console.log(response[x].status)
+
           if (
             (response[x].status == "Out for Delivery" &&
               response[x].deliveryManId == this.$store.getters.userId) ||
@@ -284,35 +348,22 @@ export default {
     this.connection = await OrderHub.connectToOrderHub();
 
     // Establish hub methods
-    this.connection.on("OneOrder", order => {
+    this.connection.on("OneOrder", orderId => {
       console.log("OneOrder called");
-      console.log("one order : ", order);
+      console.log("one order id : ", orderId);
 
-      let updatedOrderList = [];
-      orders.forEach(updatedOrder => {
-        updatedOrderList.push({
-          orderId: updatedOrder.orderId,
-          statusId: updatedOrder.statusId,
-          statusName: updatedOrder.status.statusName
-        });
-      });
+      var orderIds = [orderId];
+
+      this.getAndUpdateMultipleOrders(orderIds);
 
       // this.updateCurrentOrders(updatedOrderList);
     });
 
-    this.connection.on("MultipleOrders", orders => {
+    this.connection.on("MultipleOrders", orderIds => {
       console.log("MultipleOrders called");
-      console.log("multiple order : ", orders);
-      let updatedOrderList = [];
-      orders.forEach(updatedOrder => {
-        updatedOrderList.push({
-          orderId: updatedOrder.orderId,
-          statusId: updatedOrder.statusId,
-          statusName: updatedOrder.status.statusName
-        });
-      });
+      console.log("multiple order : ", orderIds);
 
-      // this.updateCurrentOrders(updatedOrderList);
+      this.getAndUpdateMultipleOrders(orderIds);
     });
 
     // start the connection

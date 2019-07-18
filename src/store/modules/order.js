@@ -55,13 +55,14 @@ const actions = {
     });
   },
 
-  [GET_MULTIPLE_ORDERS]: ({ commit }, orderIds) => {
+  [GET_MULTIPLE_ORDERS]: ({ commit }, jsonData) => {
+    console.log("jsondata : ", jsonData);
     return new Promise((resolve, reject) => {
       commit(GET_MULTIPLE_ORDERS);
       apiCall({
         url: api_routes.order.get_multiple,
-        data: orderIds,
-        method: "get"
+        data: jsonData,
+        method: "post"
       })
         .then(resp => {
           resolve(resp);
@@ -101,6 +102,8 @@ const actions = {
     });
   },
   [UPDATE_ORDER_STATUS]: ({ commit }, jsonData) => {
+    console.log("jsondata : ", jsonData);
+
     return new Promise((resolve, reject) => {
       apiCall({
         url: api_routes.order.update_order_status + "/" + jsonData.isSuccessful,

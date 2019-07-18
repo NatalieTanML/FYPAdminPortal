@@ -20,17 +20,18 @@
                 </b-input-group-append>
               </b-input-group>
             </b-col>
-            <b-col>
-              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
+            <b-col >
+              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id" >
                 <b-button
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
+                  style="margin-left: 1em"
                   class="float-right"
                   v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
-                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && oneHeaderButton.title=='Update Order Status'))"
+                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -70,9 +71,13 @@
               ></b-form-checkbox>
             </template>
 
-            <template slot="actions" slot-scope="row">
+            <template slot="actions" slot-scope="row" >
+              <b-row  >
+                <b-col cols="10">
               <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div v-if="oneActionButton != null" class="text-break">
+                <div v-if="oneActionButton != null ||
+                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')
+                 ">
                   <b-button
                     type="button"
                     v-on:click="onActionButtonClick(row.item, oneActionButton)"
@@ -83,13 +88,15 @@
                   >{{oneActionButton}}</b-button>
                 </div>
               </div>
+                </b-col>
 
+              <b-col cols="2">
               <div v-if="tableName == 'Orders'">
                 <b-dropdown
                   id="dropdown-header"
                   variant="transparent"
                   no-caret
-                  class="mydropdown float-right"
+                  class="mydropdown "
                 >
                   <template slot="button-content">
                     <i class="fas fa-ellipsis-v fa-sm"></i>
@@ -105,6 +112,8 @@
                   >Cancel Order</b-dropdown-item-button>
                 </b-dropdown>
               </div>
+              </b-col>
+              </b-row>
             </template>
 
             <template slot="refNo" slot-scope="row">
@@ -130,6 +139,7 @@
                 ref="imagediv"
                 v-for="(oneItem, index) in row.item.items"
                 v-bind:key="oneItem.optionId"
+                style="cursor:pointer;"
               >
                 <!-- <div style="height:60px;max-height:60px;display:block;max-width: 150px">{{oneItem.orderImageUrl}}</div> -->
                 <!-- <hr :style="{width : mounted ? arrayOfTdWidth[1] : '150%'}"  ref="imageshr" v-if="(index + 1 ) != row.item.items.length"> -->
@@ -219,7 +229,8 @@ export default {
       showHeaderButton: true,
       showDownloadImageButton: true,
       showDeliveryFailedButton: true,
-      cancelOrderId: null
+      cancelOrderId: null,
+      userRole: null,
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -237,6 +248,7 @@ export default {
   mounted() {
     this.totalRows = this.items.length;
     console.log(this.enableCheckbox);
+    this.userRole = this.$store.getters.userRole
     //to redraw the hr line.
     // if(this.$refs.itemdiv != undefined){
     //   console.log(this.$refs.itemdiv[0].clientWidth)
@@ -298,11 +310,21 @@ export default {
           this.checkAll = false;
         }
       } else if (this.tableName == "Deliveries") {
+
+        if(this.headerButton[0].title == clickedHeaderTitle){
         eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
         this.checkedCheckBox = [];
         this.checkAll = false;
+        }
+
+        else if(this.headerButton[1].title == clickedHeaderTitle){
+           eventBus.$emit(this.headerButton[1].title, this.checkedCheckBox);
+        this.checkedCheckBox = [];
+        this.checkAll = false;
+        }
+
       } else
-       eventBus.$emit(this.headerButtonClick);
+       eventBus.$emit(this.headerButtonClick[0]);
     },
     onActionButtonClick(item) {
       if (this.tableName == "Orders") {

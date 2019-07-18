@@ -112,7 +112,11 @@ export default {
       polling: null,
       connection: null,
       //have multiple buttons
-      headerButtonClick: ["Update Order Status", "Download Images", "Delivery Failed"],
+      headerButtonClick: [
+        "Update Order Status",
+        "Download Images",
+        "Delivery Failed"
+      ],
       headerButton: [
         {
           id: 1,
@@ -122,11 +126,10 @@ export default {
           id: 2,
           title: "Download Images"
         },
-         {
+        {
           id: 3,
           title: "Delivery Failed"
-        },
-        
+        }
       ],
       actionButtonClick: "Update One Order Status",
       imageClick: "On Order Image Click",
@@ -202,6 +205,7 @@ export default {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
+        console.log(response)
 
         this.typesOfTabs[0] = "All";
         for (x; x < response.length + 1; x++)
@@ -219,7 +223,6 @@ export default {
         this.message("danger", error);
       });
 
-    
     //headerButtonClick[0] is Update Status
     eventBus.$on(this.headerButtonClick[0], orderIds => {
       var needsSignature = false;
@@ -235,12 +238,10 @@ export default {
         });
       });
 
-      if (!needsSignature)
-      {
-          var isSuccessful = true;
+      if (!needsSignature) {
+        var isSuccessful = true;
         this.updateStatusTabsAndTable(orderIds, isSuccessful);
-      }
-      else {
+      } else {
         this.orderIds = orderIds;
         this.ordertitle = "Multiple Orders";
         this.$bvModal.show("showSignatureDialog");
@@ -254,8 +255,8 @@ export default {
 
     //headerButtonClick[2] is Delivery Failed
     eventBus.$on(this.headerButtonClick[2], orderIds => {
-       var isSuccessful = false;
-        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+      var isSuccessful = false;
+      this.updateStatusTabsAndTable(orderIds, isSuccessful);
     });
 
     eventBus.$on(this.actionButtonClick, item => {
@@ -266,10 +267,10 @@ export default {
         this.ordertitle = "Order : " + item.id;
         this.orderIds.push(item.id);
         this.$bvModal.show("showSignatureDialog");
-      } else{
-          var isSuccessful = true;
+      } else {
+        var isSuccessful = true;
         this.updateStatusTabsAndTable(orderIds, isSuccessful);
-        }
+      }
     });
 
     eventBus.$on(this.imageClick, thumbNailUrl => {
@@ -279,10 +280,10 @@ export default {
       this.downloadImages(listOfThumbNailUrl);
     });
 
-      eventBus.$on("cancelOrder", orderIds => {
-        console.log("eventbus cancelorder",orderIds)
-        var isSuccessful = false;
-        this.updateStatusTabsAndTable(orderIds, isSuccessful);
+    eventBus.$on("cancelOrder", orderIds => {
+      console.log("eventbus cancelorder", orderIds);
+      var isSuccessful = false;
+      this.updateStatusTabsAndTable(orderIds, isSuccessful);
     });
 
     // Establish hub connection
@@ -293,36 +294,15 @@ export default {
       console.log("OneOrder called");
       console.log("one order id : ", orderId);
 
-      let updatedOrderList = [];
+      var orderIds = [orderId];
 
-      // updatedOrderList.push({
-      //   orderId: updatedOrder.orderId,
-      //   statusId: updatedOrder.statusId,
-      //   statusName: updatedOrder.status.statusName
-      // });
-
-      // this.highlightRows(updatedOrderList);
-      // this.updateCurrentOrders(updatedOrderList);
-      // this.setUpTabs();
+      this.getAndUpdateMultipleOrders(orderIds);
     });
 
     this.connection.on("MultipleOrders", orderIds => {
       console.log("MultipleOrders called");
       console.log("multiple order id : ", orderIds);
-      this.getMultipleOrders(orderIds);
-
-      let updatedOrderList = [];
-      // orders.forEach(updatedOrder => {
-      //   updatedOrderList.push({
-      //     orderId: updatedOrder.orderId,
-      //     statusId: updatedOrder.statusId,
-      //     statusName: updatedOrder.status.statusName
-      //   });
-      // });
-
-      // this.highlightRows(updatedOrderList);
-      // this.updateCurrentOrders(updatedOrderList);
-      // this.setUpTabs();
+      this.getAndUpdateMultipleOrders(orderIds);
     });
 
     // start the connection
@@ -369,7 +349,7 @@ export default {
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
             if (this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status))
-              this.items[x] = {
+              this.items.push({
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
                 date: response[x].createdAt.substring(0, 10),
@@ -378,7 +358,8 @@ export default {
                 quantity: response[x].orderItems,
                 status: response[x].status,
                 actions: [this.getAction(response[x].status)]
-              };
+              });
+            
           }
           //reset updatedOrders
           this.updatedOrders = [];
@@ -396,11 +377,29 @@ export default {
           this.message("danger", error);
         });
     },
-    getMultipleOrders(ids) {
-      console.log("getMultipleOrders called");
-      this.$store.dispatch(GET_MULTIPLE_ORDERS, ids).then(response => {
-        console.log(response);
-      });
+    getAndUpdateMultipleOrders(ids) {
+      this.$store
+        .dispatch(GET_MULTIPLE_ORDERS, ids)
+        .then(response => {
+          console.log("GEt multiple orders : ", response);
+
+          let updatedOrderList = [];
+          response.forEach(updatedOrder => {
+            updatedOrderList.push({
+              orderId: updatedOrder.orderId,
+              statusId: updatedOrder.statusId,
+              statusName: updatedOrder.status
+            });
+          });
+
+          this.highlightRows(updatedOrderList);
+          this.updateCurrentOrders(updatedOrderList);
+          this.setUpTabs();
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
     },
     onTabChange(id) {
       //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
@@ -489,7 +488,6 @@ export default {
     updateStatusTabsAndTable(orderIds, isSuccessful) {
       //isSuccessful will always be true unless the admin presses on the dropdown at the
       //end of the row and click cancel order
-    
 
       const jsonData = {
         orderIds: orderIds,
@@ -518,8 +516,7 @@ export default {
       for (x = 0; x < this.items.length; x++) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
           if (
-            this.items[x].id == oneUpdatedOrder.orderId &&
-            this.userRoleIsAllowedToSeeThisTabOrItem(oneUpdatedOrder.statusName)
+            this.items[x].id == oneUpdatedOrder.orderId 
           ) {
             this.items[x].status = oneUpdatedOrder.statusName;
             this.items[x].actions = [
@@ -541,6 +538,7 @@ export default {
             var url = urls.pop();
             console.log(url);
             var a = document.createElement("a");
+
             a.setAttribute("href", url);
             a.setAttribute("download", "");
             a.setAttribute("target", "_blank");
@@ -557,24 +555,7 @@ export default {
           this.message("danger", error);
         });
     },
-    downloadURI(urls, interval) {
-      var url = urls.pop();
-      var a = document.createElement("a");
-      a.setAttribute("href", url);
-      a.setAttribute("download", "");
-      a.setAttribute("target", "_blank");
-      a.click();
-      if (urls.length == 0) {
-        clearInterval(interval);
-      }
-    },
-    // highlightOneRow(order) {
-    //   for (var x = 0; x < this.items.length; x++) {
-    //     if (order.orderId == this.items[x].id) {
-    //       this.$set(this.items[x], "_rowVariant", "primary");
-    //     }
-    //   }
-    // },
+
     highlightRows(orders) {
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
