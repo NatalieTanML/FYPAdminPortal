@@ -20,11 +20,12 @@
                 </b-input-group-append>
               </b-input-group>
             </b-col>
-            <b-col>
-              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
+            <b-col >
+              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id" >
                 <b-button
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
+                  style="margin-left: 1em"
                   class="float-right"
                   v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
@@ -70,9 +71,11 @@
               ></b-form-checkbox>
             </template>
 
-            <template slot="actions" slot-scope="row">
+            <template slot="actions" slot-scope="row" >
+              <b-row  >
+                <b-col cols="10">
               <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div v-if="oneActionButton != null" class="text-break">
+                <div v-if="oneActionButton != null" >
                   <b-button
                     type="button"
                     v-on:click="onActionButtonClick(row.item, oneActionButton)"
@@ -83,13 +86,15 @@
                   >{{oneActionButton}}</b-button>
                 </div>
               </div>
+                </b-col>
 
+              <b-col cols="2">
               <div v-if="tableName == 'Orders'">
                 <b-dropdown
                   id="dropdown-header"
                   variant="transparent"
                   no-caret
-                  class="mydropdown float-right"
+                  class="mydropdown "
                 >
                   <template slot="button-content">
                     <i class="fas fa-ellipsis-v fa-sm"></i>
@@ -105,6 +110,8 @@
                   >Cancel Order</b-dropdown-item-button>
                 </b-dropdown>
               </div>
+              </b-col>
+              </b-row>
             </template>
 
             <template slot="refNo" slot-scope="row">
@@ -130,6 +137,7 @@
                 ref="imagediv"
                 v-for="(oneItem, index) in row.item.items"
                 v-bind:key="oneItem.optionId"
+                style="cursor:pointer;"
               >
                 <!-- <div style="height:60px;max-height:60px;display:block;max-width: 150px">{{oneItem.orderImageUrl}}</div> -->
                 <!-- <hr :style="{width : mounted ? arrayOfTdWidth[1] : '150%'}"  ref="imageshr" v-if="(index + 1 ) != row.item.items.length"> -->
