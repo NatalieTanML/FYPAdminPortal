@@ -75,8 +75,8 @@
               <b-row  >
                 <b-col cols="10">
               <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div v-if="oneActionButton != null &&
-                (oneActionButton == 'Edit Resource' && tableName == 'Resource Management' && this.$store.getters.userRole == 'Admin')
+                <div v-if="oneActionButton != null ||
+                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')
                  ">
                   <b-button
                     type="button"
@@ -229,7 +229,8 @@ export default {
       showHeaderButton: true,
       showDownloadImageButton: true,
       showDeliveryFailedButton: true,
-      cancelOrderId: null
+      cancelOrderId: null,
+      userRole: null,
       // arrayOfTdWidth : [],
       // mounted: false,
     };
@@ -247,6 +248,7 @@ export default {
   mounted() {
     this.totalRows = this.items.length;
     console.log(this.enableCheckbox);
+    this.userRole = this.$store.getters.userRole
     //to redraw the hr line.
     // if(this.$refs.itemdiv != undefined){
     //   console.log(this.$refs.itemdiv[0].clientWidth)

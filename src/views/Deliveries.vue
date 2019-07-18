@@ -312,6 +312,10 @@ export default {
         for (x = 0; x < response.length; x++) {
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
+          console.log( response[x].deliveryManId)
+          console.log( this.$store.getters.userId)
+          console.log(response[x].status)
+
           if (
             (response[x].status == "Out for Delivery" &&
               response[x].deliveryManId == this.$store.getters.userId) ||
