@@ -244,29 +244,31 @@ export default {
           console.log("one updated order : ", oneUpdatedOrder);
           if (this.items[x].id == oneUpdatedOrder.orderId) {
             this.items.splice(x, 1);
-          } 
+          }
         });
       }
 
-      
       updatedOrders.forEach((oneUpdatedOrder, index) => {
-      if (oneUpdatedOrder.status == "Out for Delivery") {
-           var itemLength = this.items.push({
-              id: oneUpdatedOrder.orderId,
-              refNo: oneUpdatedOrder.referenceNo,
-              date: new Date(
-                Date.parse(oneUpdatedOrder.createdAt)
-              ).toLocaleString(),
-              items: oneUpdatedOrder.orderItems,
-              address: this.getAddressOrHotelName(oneUpdatedOrder),
-              actions: ["Delivered"]
-            });
+        console.log(index + ". ", oneUpdatedOrder);
+        if (
+          oneUpdatedOrder.status == "Out for Delivery" &&
+          oneUpdatedOrder.deliveryManId == this.$store.getters.userId
+        ) {
+          var itemLength = this.items.push({
+            id: oneUpdatedOrder.orderId,
+            refNo: oneUpdatedOrder.referenceNo,
+            date: new Date(
+              Date.parse(oneUpdatedOrder.createdAt)
+            ).toLocaleString(),
+            items: oneUpdatedOrder.orderItems,
+            address: this.getAddressOrHotelName(oneUpdatedOrder),
+            actions: ["Delivered"]
+          });
 
-               this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
-             console.log("one new updated item : ", this.items);
-          }
-                 });
-      
+          this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
+          console.log("one new updated item : ", this.items);
+        }
+      });
 
       if (this.forceRender) this.forceRender = false;
       else this.forceRender = true;
@@ -312,9 +314,10 @@ export default {
         for (x = 0; x < response.length; x++) {
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
-          console.log( response[x].deliveryManId)
-          console.log( this.$store.getters.userId)
-          console.log(response[x].status)
+
+          console.log("response status : " + response[x].status);
+          console.log("Delivery Man ID : " + response[x].deliveryManID);
+          console.log("Current ID : " + this.$store.getters.userId);
 
           if (
             (response[x].status == "Out for Delivery" &&

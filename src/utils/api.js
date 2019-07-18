@@ -24,11 +24,23 @@ export const api_routes = {
     updateOrder: "/api/orders/",
     getAllDeliveryTypes: "api/orders/deliverytypes"
   },
-
   product: {
-    get_all: "api/products/",
+    create: "api/products",
+    update: "api/products",
     get_one: "api/products/",
+    get_all: "api/products/",
     update_stock: "api/products/stock/"
+  },
+  s3: {
+    upload: "api/s3/product",
+    delete: "api/s3/delete"
+  },
+  hotel: {
+    create: "api/hotels/",
+    update: "api/hotels/",
+    get_one: "api/hotels/",
+    get_all: "api/hotels/",
+    delete_one: "api/hotels/"
   }
 };
 

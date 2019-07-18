@@ -166,7 +166,7 @@ export default {
     });
 
     eventBus.$on(this.actionButtonClick, jsonData => {
-      if (jsonData.actionButton == "Edit")
+      if (jsonData.actionButton == "Edit Resource")
         this.$router.replace({ name: "UpdateResource" });
       if (jsonData.actionButton == "Manage Resource Quantity") {
         this.id = jsonData.item.id;

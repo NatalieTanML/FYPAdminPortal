@@ -1,0 +1,5 @@
+export const GET_ALL_HOTELS = "GET_ALL_HOTELS";
+export const GET_ONE_HOTEL = "GET_ONE_HOTEL";
+export const CREATE_HOTEL = "CREATE_HOTEL";
+export const UPDATE_ONE_HOTEL = "UPDATE_ONE_HOTEL";
+export const DELETE_HOTEL = "DELETE_HOTEL";
