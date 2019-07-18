@@ -11,8 +11,8 @@ const debug = process.env.NODE_ENV !== "production";
 export default new Vuex.Store({
   modules: {
     order,
-   user,
-   product,
+    user,
+    product,
   },
   strict: debug
 });

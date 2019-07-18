@@ -6,10 +6,10 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-   
-          <DashboardHeader title="Update User"></DashboardHeader>
-          <!-- Topbar Navbar -->
-       
+
+        <DashboardHeader title="Update User"></DashboardHeader>
+        <!-- Topbar Navbar -->
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -19,32 +19,41 @@
           <div id="content">
             <div class="row mb-4">
               <b-container fluid>
-                <b-row class="bg-white text-left" align-h="center">
+                <b-row class="bg-white text-left" align-h="center" align-v="center">
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="User Name" >
-                         <input type="text" v-model="name" class="form-control form-control-user" placeholder="Enter A Name...">
+                      <b-form-group label-cols-sm="3" label="User Name">
+                        <input
+                          type="text"
+                          v-model="name"
+                          class="form-control form-control-user"
+                          placeholder="Enter A Name..."
+                        >
                       </b-form-group>
 
-                    
-
-                          <b-form-group label-cols-sm="3" label="Email" >
-                         <input type="email" v-model="email" class="form-control form-control-user" placeholder="Enter An Email Address...">
-
+                      <b-form-group label-cols-sm="3" label="Email">
+                        <input
+                          type="email"
+                          v-model="email"
+                          class="form-control form-control-user"
+                          placeholder="Enter An Email Address..."
+                        >
                       </b-form-group>
 
-                       <b-form-group label-cols-sm="3" label="Role" >
-                    
-                        <select class="custom-select form-control" name="role" @change="onSelectChange($event)">
-                        <option v-for="role in roles"
-                        v-bind:key="role.roleName"
-                        :selected="role.roleName == selectedRole"
-                        :value="role.roleId">
-                        {{ role.roleName}}
-                        </option>
-                        </select> 
-
+                      <b-form-group label-cols-sm="3" label="Role">
+                        <select
+                          class="custom-select form-control"
+                          name="role"
+                          @change="onSelectChange($event)"
+                        >
+                          <option
+                            v-for="role in roles"
+                            v-bind:key="role.roleName"
+                            :selected="role.roleName == selectedRole"
+                            :value="role.roleId"
+                          >{{ role.roleName}}</option>
+                        </select>
                       </b-form-group>
 
                       <b-form-group
@@ -60,12 +69,9 @@
                         label="Is Enabled"
                         label-for="input-horizontal"
                       >
-                      <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch>
-
-                      </b-form-checkbox>
+                        <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch></b-form-checkbox>
                       </b-form-group>
 
-                 
                       <b-form-group label-cols-sm="3" label-for="input-horizontal">
                         <b-button class="w-25" v-on:click="saveUser()" variant="primary">Save</b-button>
                         <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
@@ -83,8 +89,6 @@
               <b-modal id="disableUser" title="Disable User">
                 <p class="my-4">You are about to disable this user's account</p>
               </b-modal>
-
-             
             </div>
           </div>
         </div>
@@ -108,57 +112,59 @@
 </template>
 
 <script>
-  import SideBar from "@/components/SideBar";
-  import DashboardHeader from "@/components/DashboardHeader";
-  import { GET_ONE_USER, GET_ALL_ROLES,UPDATE_ONE_USER, RESETUSERPASSWORD} from "@/store/actions/user";
-  
+import SideBar from "@/components/SideBar";
+import DashboardHeader from "@/components/DashboardHeader";
+import {
+  GET_ONE_USER,
+  GET_ALL_ROLES,
+  UPDATE_ONE_USER,
+  RESETUSERPASSWORD
+} from "@/store/actions/user";
 
-  export default {
-
-    data(){
-      return{
-        userId: null,
+export default {
+  data() {
+    return {
+      userId: null,
       name: "",
       roleName: "",
-      roles : null,
+      roles: null,
       selectedRole: null,
       email: null,
       isEnabled: null,
       checked: null,
       updatedRole: null,
-      userRoleId : null,
-      }
-    },
-    components: {
-      SideBar,
-      DashboardHeader
-    },
-    methods:{
-       message(method, messageText) {
+      userRoleId: null
+    };
+  },
+  components: {
+    SideBar,
+    DashboardHeader
+  },
+  methods: {
+    message(method, messageText) {
       let config = {
         text: messageText,
         button: "ok"
       };
       this.$snack[method](config);
     },
-       getUserInformation() {
-       let id = localStorage.getItem("updateUserId");
+    getUserInformation() {
+      let id = localStorage.getItem("updateUserId");
 
       this.$store
         .dispatch(GET_ONE_USER, id)
         .then(response => {
-          console.log(response)
+          console.log(response);
           this.name = response.name;
           this.selectedRole = response.roleName;
           this.email = response.email;
           this.isEnabled = response.isEnabled;
           this.userId = response.id;
-          console.log(response)
+          console.log(response);
           //i have to use updatedRole because for some reason, there is a bug in doing a v-model in select,
           //so i did a @onchange instead, which uses updatedRole
           this.updatedRole = response.roleId;
-          console.log(this.selectedRole)
-     
+          console.log(this.selectedRole);
         })
         .catch(error => {
           console.dir(error);
@@ -166,69 +172,62 @@
           //this.$router.replace({name:'SummaryOfOrders'});
         });
     },
-    getRoles(){
-        this.$store
-      .dispatch(GET_ALL_ROLES)
-      .then(response => {
-        this.roles = response;
-        console.log(this.roles)
-      })
-      .catch(error => {
+    getRoles() {
+      this.$store
+        .dispatch(GET_ALL_ROLES)
+        .then(response => {
+          this.roles = response;
+          console.log(this.roles);
+        })
+        .catch(error => {
           console.dir(error);
           this.message("danger", error.response.data.message);
           //this.$router.replace({name:'SummaryOfOrders'});
         });
     },
-       onSelectChange(event) {
-         this.updatedRole = event.target.value
-         console.log(this.updatedRole)
-        },
-        saveUser(){
-         console.log(this.updatedRole)
-         let idInt = parseInt(this.updatedRole); 
+    onSelectChange(event) {
+      this.updatedRole = event.target.value;
+      console.log(this.updatedRole);
+    },
+    saveUser() {
+      console.log(this.updatedRole);
+      let idInt = parseInt(this.updatedRole);
 
-              const userStr = {
-          "userId" : this.userId,
-          "Email" : this.email,
-          "Name" : this.name,
-          "IsEnabled": this.isEnabled,
-          "RoleId": idInt
-    };
-    console.log(userStr)
-         this.$store
-          .dispatch(UPDATE_ONE_USER, userStr)
-          .then(response => {
-            this.message("success", "User is updated!");
-     
-
-          })
-          .catch(error => {
-            this.message("danger", error);
-          });
-
-        },
-    handleok(){
-
-       this.$store
-      .dispatch(RESETUSERPASSWORD, this.userId)
-      .then(response => {
-       this.message("success", response.message);
-
-      })
-      .catch(error => {
+      const userStr = {
+        userId: this.userId,
+        Email: this.email,
+        Name: this.name,
+        IsEnabled: this.isEnabled,
+        RoleId: idInt
+      };
+      console.log(userStr);
+      this.$store
+        .dispatch(UPDATE_ONE_USER, userStr)
+        .then(response => {
+          this.message("success", "User is updated!");
+        })
+        .catch(error => {
+          this.message("danger", error);
+        });
+    },
+    handleok() {
+      this.$store
+        .dispatch(RESETUSERPASSWORD, this.userId)
+        .then(response => {
+          this.message("success", response.message);
+        })
+        .catch(error => {
           console.dir(error);
           this.message("danger", error.response.data.message);
           //this.$router.replace({name:'SummaryOfOrders'});
         });
     }
-        
-    },
-    mounted(){
-            this.getRoles();
+  },
+  mounted() {
+    this.getRoles();
 
-      this.getUserInformation();
-    }
-  
+    this.getUserInformation();
+  }
 };
 </script>
 
