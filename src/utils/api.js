@@ -7,7 +7,7 @@ export const api_routes = {
     get_all: "api/users/",
     get_one: "api/users/",
     update_one: "api/users/",
-    get_all_roles: "api/users/getRoles",
+    get_all_roles: "api/users/roles",
     get_all_deliverymen: "api/users/deliverymen",
     change_password: "api/users/changepassword"
   },
@@ -22,7 +22,7 @@ export const api_routes = {
     update_recipient: "api/orders/recipient",
     getHotels: "/api/hotels/",
     updateOrder: "/api/orders/",
-    getAllDeliveryTypes: "api/orders/getAllDeliveryTypes"
+    getAllDeliveryTypes: "api/orders/deliverytypes"
   },
 
   product: {
