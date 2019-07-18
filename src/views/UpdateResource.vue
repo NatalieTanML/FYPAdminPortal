@@ -406,7 +406,8 @@ import {
   UPLOAD_PRODUCT_IMAGES,
   DELETE_PRODUCT_IMAGES,
   UPLOAD_AND_DELETE_PRODUCT_IMAGES,
-  GET_ONE_PRODUCT
+  GET_ONE_PRODUCT,
+  UPDATE_ONE_PRODUCT
 } from "@/store/actions/product";
 
 export default {
@@ -422,6 +423,7 @@ export default {
   data() {
     return {
       form: {
+        productId: null,
         name: "",
         price: null,
         imageHeight: null,
@@ -512,7 +514,8 @@ export default {
       isFileDuplicate: false,
 
       submitLoader: false,
-      varientSubmitLoader: false
+      varientSubmitLoader: false,
+      cancelLoader: false
     };
   },
 
@@ -522,6 +525,10 @@ export default {
         type: {
           required,
           isDuplicateType(type, varient) {
+            // Validations to check if there is duplicate values for the field "type"
+            // The condition obj.values !== varient.values is to ensure that the
+            // current field that the user is typing is not being validated.
+            // But rather, other elements in the array
             let foundDuplicate = this.varientSections.find(
               obj => obj.type === type && obj.values !== varient.values
             );
@@ -545,12 +552,21 @@ export default {
 
   mounted() {
     this.$store
-      .dispatch(GET_ONE_PRODUCT, 19)
+      .dispatch(GET_ONE_PRODUCT, 2019)
       .then(response => {
         console.dir(response);
+        this.form.productId = response.productId;
+        this.form.name = response.productName;
+        this.form.price = response.price;
+        this.form.imageHeight = response.imageHeight;
+        this.form.imageWidth = response.imageWidth;
+        this.form.effectiveStartDate = response.effectiveStartDate;
+        this.form.effectiveEndDate = response.effectiveEndDate;
+        this.form.description = response.description;
 
         this.varientDetails = response.options.map((option, index) => {
           return {
+            productId: response.productId,
             SKUNumber: option.skuNumber,
             optionId: option.optionId,
             attributes: option.attributes.map(attribute => {
@@ -566,7 +582,6 @@ export default {
               let fileName = productImage.imageKey;
               let uuid =
                 fileName.substring(0, fileName.lastIndexOf(".")) || fileName;
-              console.log(uuid);
               return {
                 upload: {
                   uuid
@@ -582,8 +597,6 @@ export default {
             varientId: index
           };
         });
-
-        // Validation for value as well
 
         let map = new Map();
         response.options.forEach(option => {
@@ -609,7 +622,6 @@ export default {
                 .toString(36)
                 .substring(7)
             };
-
             console.log(value);
           });
         });
@@ -628,15 +640,9 @@ export default {
         console.log(varientResults);
         console.log(this.varientDetails);
 
-        this.form.name = response.productName;
-        this.form.price = response.price;
-        this.form.imageHeight = response.imageHeight;
-        this.form.imageWidth = response.imageWidth;
-        this.form.effectiveStartDate = response.effectiveStartDate;
-        this.form.effectiveEndDate = response.effectiveEndDate;
-        this.form.description = response.description;
-
         this.discountDetails = response.discountPrice.map(discount => {
+          // Attach the property called productId
+          discount.productId = this.form.productId;
           // Add a new property called discount type
           let discountTypeProp = {
             discountType: discount.isPercentage ? "Percentage" : "Fixed"
@@ -647,6 +653,7 @@ export default {
           discount.effectiveEndDate = moment(discount.effectiveEndDate).format(
             "YYYY-MM-DD"
           );
+          // discount.optionId =
 
           // Assign new propertiy and return
           return Object.assign(discount, discountTypeProp);
@@ -666,16 +673,14 @@ export default {
   methods: {
     handleAddDiscount() {
       let discount = this.form.discount;
-      console.log(discount);
       this.formatDiscountDate(discount);
       if (discount.discountType === "Percentage") {
         discount.isPercentage = true;
       } else {
         discount.isPercentage = false;
       }
-      console.log(discount);
       this.discountDetails.push(discount);
-      this.form.discount = clonedeep({});
+      this.form.discount = {};
     },
 
     // Reset the discount object when user exits the discount dialog
@@ -695,17 +700,15 @@ export default {
       let discount = this.form.discount;
       let index = this.discountIndex;
       this.formatDiscountDate(discount);
+
       if (discount.discountType === "Percentage") {
         discount.isPercentage = true;
       } else {
         discount.isPercentage = false;
       }
+
       // Update the discount object based on the index in the array
       this.$set(this.discountDetails, index, discount);
-
-      console.log(this.currentDiscountRowSelected);
-      console.log(this.form.discount);
-      console.log(this.discountDetails);
 
       // Once updated, remove the values in the field
       this.form.discount = clonedeep({});
@@ -772,7 +775,7 @@ export default {
     // This method is invoked when user clicked on the "OK" button on the varient option modal dialog
     handleSubmit() {
       // Calculate and return the combinations for each varient type and value
-      let varientResults = this.getCombinations();
+      let varientResults = this.getCombinations(this.varientSections);
 
       // Find the combination based on the combine Id between this.varientDetails and varientResult
       // Do note that, this.varientDetails is an array of varient object from the "varient" table
@@ -796,7 +799,6 @@ export default {
       });
 
       this.varientDetails = varientResults;
-      console.log(this.varientDetails);
 
       //https://stackoverflow.com/questions/49943140/validating-form-inside-a-modal-with-vuelidate-and-bootstrap-vue
       this.$nextTick(() => {
@@ -884,9 +886,6 @@ export default {
               image => image.imageKey === file.upload.uuid + ".jpg"
             );
 
-            console.log(file);
-            console.log(file.imageUrl);
-
             if (index > -1) {
               var fileProperty = {
                 size: file.size,
@@ -909,148 +908,60 @@ export default {
       bvModalEvt.preventDefault();
 
       let index = this.selectedVarientIndex;
-      console.log(index);
+      // this.varientSubmitLoader = true;
 
-      console.log(this.form.varient.files);
-      console.log(this.varientDetails);
-      console.log(this.varientDetails[index].files);
-
-      // Throw this into a new method
-      // Check if user have make any changes to the dropzone. For example
-      // create or remove. If they did, make the changes in S3 as well
-      let fileDifference = differencewith(
+      // Check if there is any changes between the old and new list
+      let newImages = differencewith(
         this.form.varient.files,
         this.varientDetails[index].files
       );
 
-      fileDifference = fileDifference.filter(fd => {
+      // Keep the objects in the array that has the dataURL value as it signifies a new file.
+      newImages = newImages.filter(fd => {
         return fd.dataURL !== undefined;
       });
 
-      console.log(fileDifference);
+      console.log(newImages);
 
-      // If files have been deleted / added in the dropzone, the following condition will be called
-      if (fileDifference.length > 0 && this.deletedImageKeys.length > 0) {
-        const formData = new FormData();
-        for (var i = 0; i < fileDifference.length; i++) {
-          formData.append(
-            "imageFiles[" + i + "].ImageFile.File",
-            fileDifference[i]
-          );
-          formData.append(
-            "imageFiles[" + i + "].ImageKey",
-            fileDifference[i].upload.uuid + ".jpg"
-          );
-        }
-
-        var guids = this.deletedImageKeys;
-        let obj = {
-          formData,
-          guids
-        };
-
-        this.$store
-          .dispatch(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
-          .then(response => {
-            response[0].productImages.forEach((productImage, index) => {
-              this.form.varient.productImages.push({
-                imageKey: productImage.imageKey,
-                imageUrl: productImage.imageUrl,
-                imageSize: fileDifference[index].size
-              });
-            });
-
-            console.log(this.form.varient);
-            console.log(this.form.varient.productImages);
-
-            // Remove keys from the productImages array once s3 deleted the thumbnail
-            // Return the array of all the objects that does not contain the deleted guid
-            this.form.varient.productImages = this.form.varient.productImages.filter(
-              image => !guids.includes(image.imageKey)
-            );
-
-            console.log(this.form.varient);
-            this.updateVarientTable(this.form.varient);
-          })
-          .catch(error => {
-            console.dir(error);
-            alert("error");
-            this.varientSubmitLoader = false;
-          });
-      } else {
-        // If have, we need to find out what to add or remove from the s3 bucket
-        // if got filedifference, mean user add an image
-        if (fileDifference.length > 0) {
-          const formData = new FormData();
-          for (var i = 0; i < fileDifference.length; i++) {
-            formData.append(
-              "imageFiles[" + i + "].ImageFile.File",
-              fileDifference[i]
-            );
-            formData.append(
-              "imageFiles[" + i + "].ImageKey",
-              fileDifference[i].upload.uuid + ".jpg"
-            );
-          }
-
-          for (var pair of formData.entries()) {
-            console.log(pair[0] + ", " + pair[1]);
-          }
-
-          this.$store
-            .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
-            .then(response => {
-              console.dir(response);
-
-              response.productImages.forEach((productImage, index) => {
-                console.log("called");
-                this.form.varient.productImages.push({
-                  imageKey: productImage.imageKey,
-                  imageUrl: productImage.imageUrl,
-                  imageSize: fileDifference[index].size
-                });
-                console.log(this.form.varient.productImages);
-              });
-
-              console.log("add done called");
-
-              console.log(this.form.varient);
-              console.log(this.form.varient.productImages);
-
-              this.updateVarientTable(this.form.varient);
-            })
-            .catch(error => {
-              console.dir(error);
-              alert("error");
-              this.varientSubmitLoader = false;
-            });
-        } else if (this.deletedImageKeys.length > 0) {
-          console.log(this.deletedImageKeys);
-
-          this.$store
-            .dispatch(DELETE_PRODUCT_IMAGES, this.deletedImageKeys)
-            .then(response => {
-              console.dir(response);
-              console.log(this.form.varient);
-
-              // Remove keys from the productImages array once s3 deleted the thumbnail
-              // Return the array of all the objects that does not contain the deleted guid
-              this.form.varient.productImages = this.form.varient.productImages.filter(
-                image => !this.deletedImageKeys.includes(image.imageKey)
-              );
-
-              console.log(this.form.varient);
-
-              this.updateVarientTable(this.form.varient);
-            })
-            .catch(error => {
-              console.dir(error);
-              alert("error");
-            });
-        } else {
-          this.updateVarientTable(this.form.varient);
-        }
+      // Remember to remove it at import as well
+      if (newImages.length > 0) {
+        this.uploadImages();
       }
+    },
+
+    uploadImages(newImages) {
+      const formData = new FormData();
+      for (var i = 0; i < newImages.length; i++) {
+        formData.append("imageFiles[" + i + "].ImageFile.File", newImages[i]);
+        formData.append(
+          "imageFiles[" + i + "].ImageKey",
+          newImages[i].upload.uuid + ".jpg"
+        );
+      }
+
+      this.$store
+        .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
+        .then(response => {
+          console.dir(response);
+          response.productImages.forEach((productImage, index) => {
+            this.form.varient.productImages.push({
+              imageKey: productImage.imageKey,
+              imageUrl: productImage.imageUrl,
+              imageSize: newImages[index].size
+            });
+            console.log(this.form.varient.productImages);
+          });
+
+          console.log("add done called");
+          console.log(this.form.varient);
+          console.log(this.form.varient.productImages);
+          this.updateVarientTable(this.form.varient);
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+          this.varientSubmitLoader = false;
+        });
     },
 
     updateVarientTable(varient) {
@@ -1122,11 +1033,10 @@ export default {
 
     addFileToDropzone(file) {
       console.log(file);
-
       if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
-        // this.form.varient.files = Object.assign([], this.form.varient.files);
         // Add the user upload file into the array
         console.log("Added file into files array ");
+        file.isNew = true;
         this.form.varient.files.push(file);
         console.dir(this.form.varient.files);
       }
@@ -1136,26 +1046,16 @@ export default {
 
     deleteFileFromDropzone(file) {
       console.log(file);
+      // Remove the deleted file from the array by checking the uuid
       if (file.manuallyAdded !== true) {
-        // Remove the deleted file from the array
         this.form.varient.files = this.form.varient.files.filter(
           el => el.upload.uuid != file.upload.uuid
         );
       } else {
-        console.log(this.form.varient);
-        console.log(this.form.varient.files);
-
-        // I can't test with manually add file or type, cos all the item in the array
-        // have both the same values
-        // If you want to remove manually added file, you can't compare it against uuid
-        // since it does not contain it
+        // Remove manuallyAdded file from the array by checking it against the name and size
         this.form.varient.files = this.form.varient.files.filter(
           el => el.name !== file.name && el.size !== file.size
         );
-
-        console.log(this.form.varient);
-        console.log(this.form.varient.files);
-        console.log(this.varientDetails[this.selectedVarientIndex]);
 
         // Find out which image was deleted by comparing the uuid from productImages and form.varient.file
         this.form.varient.productImages.forEach(image => {
@@ -1176,14 +1076,10 @@ export default {
       }
     },
 
-    // handleMaxFileExceeded(file) {
-    //   let dropzone = this.$refs.myVueDropzone.dropzone;
-    //   dropzone.removeFile(file);
-    // },
-
     submit() {
       const { varientDetails, discountDetails, form } = this;
 
+      // put in method?
       form.effectiveStartDate = moment(form.effectiveStartDate).format(
         "YYYY-MM-DD"
       );
@@ -1195,11 +1091,10 @@ export default {
       console.log(this.varientDetails);
       console.log(this.discountDetails);
 
-      // remove type, value, varient name
-
       this.submitLoader = true;
 
       var productObj = {
+        productId: form.productId,
         productName: form.name,
         description: form.description,
         Price: form.price,
@@ -1214,7 +1109,7 @@ export default {
       console.log(productObj);
 
       this.$store
-        .dispatch(CREATE_PRODUCT, productObj)
+        .dispatch(UPDATE_ONE_PRODUCT, productObj)
         .then(response => {
           console.dir(response);
           this.submitLoader = false;
@@ -1231,16 +1126,24 @@ export default {
     getOptions() {
       return this.varientDetails.map((varient, index) => {
         return {
+          productId: varient.productId,
           skuNumber: varient.SKUNumber,
           currentQuantity: varient.currentQuantity,
           minimumQuantity: varient.minimumQuantity,
+          optionId: varient.optionId,
+          // Attach the optionId for each object in the array "attributes" and "productImages"
           attributes: varient.attributes.map(atr => {
             return {
+              optionId: varient.optionId,
+              attributeId: atr.attributeId,
               attributeType: atr.type,
               attributeValue: atr.values.individualValue
             };
           }),
-          productImages: varient.productImages
+          productImages: varient.productImages.map(image => {
+            image.optionId = varient.optionId;
+            return image;
+          })
         };
       });
     }

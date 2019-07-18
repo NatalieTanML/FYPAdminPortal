@@ -26,6 +26,7 @@ export const api_routes = {
   },
   product: {
     create: 'api/products',
+    update: 'api/products',
     get_one: 'api/products/',
     get_all: 'api/products/',
     update_stock: 'api/products/stock/'

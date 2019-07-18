@@ -50,7 +50,6 @@ const actions = {
             apiCall({ url: api_routes.product.get_all, method: "get" })
                 .then(resp => {
                     console.dir(resp)
-
                     resolve(resp);
                 })
                 .catch(err => {
@@ -67,10 +66,6 @@ const actions = {
             addImage = formData
         }
 
-        for (var pair of addImage.entries()) {
-            console.log(pair[0] + ", " + pair[1]);
-        }
-
         return new Promise((resolve, reject) => {
             apiCall({ url: api_routes.s3.upload, data: addImage, method: 'post' })
                 .then(resp => {
@@ -78,6 +73,7 @@ const actions = {
                     resolve(resp);
                 })
                 .catch(err => {
+                    reject(err);
                 })
         })
     },
@@ -96,6 +92,7 @@ const actions = {
                     resolve(resp);
                 })
                 .catch(err => {
+                    reject(err);
                 })
         })
     },
@@ -120,9 +117,9 @@ const actions = {
                 console.dir(resp)
                 return resp;
             })
-        // .catch(err => {
-        //     reject(err);
-        // });
+            .catch(err => {
+                return err
+            });
     },
 
     [CREATE_PRODUCT]: ({ commit }, productObj) => {
@@ -133,6 +130,20 @@ const actions = {
                     resolve(resp);
                 })
                 .catch(err => {
+                    reject(err);
+                })
+        })
+    },
+
+    [UPDATE_ONE_PRODUCT]: ({ commit }, productObj) => {
+        return new Promise((resolve, reject) => {
+            apiCall({ url: api_routes.product.update, data: productObj, method: 'put' })
+                .then(resp => {
+                    console.dir(resp)
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
                 })
         })
     },
@@ -143,11 +154,9 @@ const actions = {
             apiCall({ url: api_routes.product.update_stock + data[0] + "/" + data[1], method: "put" })
                 .then(resp => {
                     console.dir(resp)
-
                     resolve(resp);
                 })
                 .catch(err => {
-
                     reject(err);
                 })
         })

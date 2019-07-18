@@ -541,7 +541,6 @@ export default {
             let foundDuplicate = this.varientSections.find(
               obj => obj.type === type && obj.values !== varient.values
             );
-
             if (foundDuplicate) {
               return false;
             } else {
@@ -576,7 +575,7 @@ export default {
 
     // Reset the discount object when user exits the discount dialog
     cancelDiscountDialog() {
-      this.form.discount = {};
+      this.form.discount = clonedeep({});
     },
 
     // This method is invoked when the edit button is clicked on the "discount table"
@@ -752,7 +751,6 @@ export default {
           }
         ];
       } else {
-        console.log(this.varientSections);
         this.varientSections = clonedeep(this.originalVarient);
       }
     },
@@ -788,12 +786,42 @@ export default {
 
               this.$refs.myVueDropzone.manuallyAddFile(
                 fileProperty,
-                this.form.varient.productImages[index].imageUrl
+                file.dataURL
               );
+
+              this.$nextTick(() => {
+                var elements = document.getElementsByClassName("dz-image")[0];
+                var image = elements.childNodes[0];
+                console.log(elements);
+                image.setAttribute("src", file.dataURL);
+              });
             }
           });
         }, 100);
       }
+    },
+
+    dataURItoBlob(dataURI) {
+      "use strict";
+      var byteString, mimestring;
+
+      if (dataURI.split(",")[0].indexOf("base64") !== -1) {
+        byteString = atob(dataURI.split(",")[1]);
+      } else {
+        byteString = decodeURI(dataURI.split(",")[1]);
+      }
+
+      mimestring = dataURI
+        .split(",")[0]
+        .split(":")[1]
+        .split(";")[0];
+
+      var content = new Array();
+      for (var i = 0; i < byteString.length; i++) {
+        content[i] = byteString.charCodeAt(i);
+      }
+
+      return new Blob([new Uint8Array(content)], { type: mimestring });
     },
 
     // This method is invoked once the user click the OK button on the edit varient modal dialog
@@ -803,144 +831,128 @@ export default {
       let index = this.selectedVarientIndex;
       this.varientSubmitLoader = true;
 
-      console.log(this.form.varient.files);
-      console.log(this.varientDetails[index].files);
-
-      // Throw this into a new method
-      // Check if user have make any changes to the dropzone. For example
-      // create or remove. If they did, make the changes in S3 as well
-      const fileDifference = differencewith(
+      // Check if there is any changes between the old and new list
+      const newImages = differencewith(
         this.form.varient.files,
         this.varientDetails[index].files
       );
 
-      console.log(fileDifference);
+      console.log(newImages);
 
-      // If files have been deleted / added in the dropzone, the following condition will be called
-      if (fileDifference.length > 0 && this.deletedImageKeys.length > 0) {
-        const formData = new FormData();
-        for (var i = 0; i < fileDifference.length; i++) {
-          formData.append(
-            "imageFiles[" + i + "].ImageFile.File",
-            fileDifference[i]
-          );
-
-          formData.append(
-            "imageFiles[" + i + "].ImageKey",
-            fileDifference[i].upload.uuid + ".jpg"
-          );
-        }
-
-        var guids = this.deletedImageKeys;
-        let obj = {
-          formData,
-          guids
-        };
-
-        this.$store
-          .dispatch(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
-          .then(response => {
-            response[0].productImages.forEach((productImage, index) => {
-              this.form.varient.productImages.push({
-                imageKey: productImage.imageKey,
-                imageUrl: productImage.imageUrl,
-                imageSize: fileDifference[index].size
-              });
-            });
-
-            console.log(this.form.varient);
-            console.log(this.form.varient.productImages);
-
-            // Remove keys from the productImages array once s3 deleted the thumbnail
-            // Return the array of all the objects that does not contain the deleted guid
-            this.form.varient.productImages = this.form.varient.productImages.filter(
-              image => !guids.includes(image.imageKey)
-            );
-
-            console.log(this.form.varient);
-            this.updateVarientTable(this.form.varient);
-          })
-          .catch(error => {
-            console.dir(error);
-            alert("error");
-            this.varientSubmitLoader = false;
-          });
+      // The following condition will be called if new image(s) were added and deleted from the dropzone
+      if (newImages.length > 0 && this.deletedImageKeys.length > 0) {
+        this.uploadAndDeleteImages(newImages);
       } else {
-        // If have, we need to find out what to add or remove from the s3 bucket
-        // if got filedifference, mean user add an image
-        if (fileDifference.length > 0) {
-          const formData = new FormData();
-          for (var i = 0; i < fileDifference.length; i++) {
-            formData.append(
-              "imageFiles[" + i + "].ImageFile.File",
-              fileDifference[i]
-            );
-            formData.append(
-              "imageFiles[" + i + "].ImageKey",
-              fileDifference[i].upload.uuid + ".jpg"
-            );
-          }
-
-          for (var pair of formData.entries()) {
-            console.log(pair[0] + ", " + pair[1]);
-          }
-
-          this.$store
-            .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
-            .then(response => {
-              console.dir(response);
-
-              response.productImages.forEach((productImage, index) => {
-                console.log("called");
-                this.form.varient.productImages.push({
-                  imageKey: productImage.imageKey,
-                  imageUrl: productImage.imageUrl,
-                  imageSize: fileDifference[index].size
-                });
-                console.log(this.form.varient.productImages);
-              });
-
-              console.log("add done called");
-
-              console.log(this.form.varient);
-              console.log(this.form.varient.productImages);
-
-              this.updateVarientTable(this.form.varient);
-            })
-            .catch(error => {
-              console.dir(error);
-              alert("error");
-              this.varientSubmitLoader = false;
-            });
-        } else if (this.deletedImageKeys.length > 0) {
-          console.log(this.deletedImageKeys);
-
-          this.$store
-            .dispatch(DELETE_PRODUCT_IMAGES, this.deletedImageKeys)
-            .then(response => {
-              console.dir(response);
-              console.log(this.form.varient);
-
-              // Remove keys from the productImages array once s3 deleted the thumbnail
-              // Return the array of all the objects that does not contain the deleted guid
-              this.form.varient.productImages = this.form.varient.productImages.filter(
-                image => !this.deletedImageKeys.includes(image.imageKey)
-              );
-
-              // this.deletedImageKeys = Object.assign([], this.deletedImageKeys);
-              console.log(this.form.varient);
-              console.log("delete done called");
-
-              this.updateVarientTable(this.form.varient);
-            })
-            .catch(error => {
-              console.dir(error);
-              alert("error");
-            });
+        // The following condition will be called if new image(s) were added to the dropzone
+        if (newImages.length > 0) {
+          this.uploadImages(newImages);
+        }
+        // The following condition will be called if image(s) were deleted from the dropzone
+        else if (this.deletedImageKeys.length > 0) {
+          this.deleteImages();
         } else {
           this.updateVarientTable(this.form.varient);
         }
       }
+    },
+
+    uploadAndDeleteImages(newImages) {
+      const formData = new FormData();
+      for (var i = 0; i < newImages.length; i++) {
+        formData.append("imageFiles[" + i + "].ImageFile.File", newImages[i]);
+        formData.append(
+          "imageFiles[" + i + "].ImageKey",
+          newImages[i].upload.uuid + ".jpg"
+        );
+      }
+
+      let guids = this.deletedImageKeys;
+      let obj = {
+        formData,
+        guids
+      };
+
+      this.$store
+        .dispatch(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
+        .then(response => {
+          // Get the imageKey, imageUrl and imageSize and push it to the productImages array
+          response[0].productImages.forEach((productImage, index) => {
+            this.form.varient.productImages.push({
+              imageKey: productImage.imageKey,
+              imageUrl: productImage.imageUrl,
+              imageSize: newImages[index].size
+            });
+          });
+
+          // Filter and return the array of productImages that does not contain the deleted guid
+          this.form.varient.productImages = this.form.varient.productImages.filter(
+            image => !guids.includes(image.imageKey)
+          );
+
+          this.updateVarientTable(this.form.varient);
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+          this.varientSubmitLoader = false;
+        });
+    },
+
+    uploadImages(newImages) {
+      const formData = new FormData();
+      for (var i = 0; i < newImages.length; i++) {
+        formData.append("imageFiles[" + i + "].ImageFile.File", newImages[i]);
+        formData.append(
+          "imageFiles[" + i + "].ImageKey",
+          newImages[i].upload.uuid + ".jpg"
+        );
+      }
+
+      this.$store
+        .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
+        .then(response => {
+          console.dir(response);
+          response.productImages.forEach((productImage, index) => {
+            this.form.varient.productImages.push({
+              imageKey: productImage.imageKey,
+              imageUrl: productImage.imageUrl,
+              imageSize: newImages[index].size
+            });
+            console.log(this.form.varient.productImages);
+          });
+
+          console.log("add done called");
+          console.log(this.form.varient);
+          console.log(this.form.varient.productImages);
+          this.updateVarientTable(this.form.varient);
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+          this.varientSubmitLoader = false;
+        });
+    },
+
+    deleteImages() {
+      this.$store
+        .dispatch(DELETE_PRODUCT_IMAGES, this.deletedImageKeys)
+        .then(response => {
+          console.dir(response);
+          console.log(this.form.varient);
+
+          // Filter and return the array of productImages that does not contain the deleted guid
+          this.form.varient.productImages = this.form.varient.productImages.filter(
+            image => !this.deletedImageKeys.includes(image.imageKey)
+          );
+
+          console.log(this.form.varient);
+          console.log("delete done called");
+          this.updateVarientTable(this.form.varient);
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+        });
     },
 
     updateVarientTable(varient) {
@@ -1013,7 +1025,6 @@ export default {
     addFileToDropzone(file) {
       console.log(file);
       if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
-        // this.form.varient.files = Object.assign([], this.form.varient.files);
         // Add the user upload file into the array
         console.log("Added file into files array ");
         this.form.varient.files.push(file);
@@ -1025,28 +1036,19 @@ export default {
 
     deleteFileFromDropzone(file) {
       console.log(file);
+      // Remove the deleted file from the array by checking the uuid
       if (file.manuallyAdded !== true) {
-        // Remove the deleted file from the array
         this.form.varient.files = this.form.varient.files.filter(
           el => el.upload.uuid != file.upload.uuid
         );
       } else {
-        console.log(this.form.varient);
-        console.log(this.form.varient.files);
-
-        // I can't test with manually add file or type, cos all the item in the array
-        // have both the same values
-        // If you want to remove manually added file, you can't compare it against uuid
-        // since it does not contain it
+        // Remove manuallyAdded file from the array by checking it against the name and size
         this.form.varient.files = this.form.varient.files.filter(
           el => el.name !== file.name && el.size !== file.size
         );
 
-        console.log(this.form.varient);
-        console.log(this.form.varient.files);
-        console.log(this.varientDetails[this.selectedVarientIndex]);
-
-        // Find out which image was deleted by comparing the uuid from productImages and form.varient.file
+        // Find out which image was deleted by comparing the uuid with the
+        // productImages and form.varient.file
         this.form.varient.productImages.forEach(image => {
           let parts = image.imageKey.split(".");
           let uuid = parts[0];
@@ -1073,16 +1075,14 @@ export default {
       this.$snack[method](config);
     },
 
+    // Delete images in S3 once user cancel the product
     cancelProduct() {
       this.cancelLoader = true;
       let deleteKeys = [];
-      console.log(this.varientDetails);
+
       this.varientDetails.forEach(varientDetail => {
-        console.log(varientDetail.productImages);
         if (varientDetail.productImages !== undefined) {
           varientDetail.productImages.forEach(image => {
-            console.log(image);
-
             deleteKeys.push(image.imageKey);
           });
         }
@@ -1115,8 +1115,6 @@ export default {
       console.log(this.form);
       console.log(this.varientDetails);
       console.log(this.discountDetails);
-
-      // remove type, value, varient name
 
       this.submitLoader = true;
 
@@ -1199,11 +1197,6 @@ h4 {
   margin: 3px;
 }
 
-/* .dz-max-files-reached {
-  pointer-events: none;
-  cursor: default;
-} */
-
 .table {
   margin-bottom: 0 !important;
 }
@@ -1212,12 +1205,10 @@ h4 {
   margin-right: 63px;
 }
 
-/* https://github.com/charliekassel/vuejs-datepicker/issues/693 */
 .vdp-datepicker .input-group .form-control[readonly] {
   background: none !important;
 }
 
-/* https://stackoverflow.com/questions/51599545/how-can-i-change-variant-of-bootstrap-vue-button-style-checkboxes-when-clicked */
 .radio-button .active {
   color: #fff !important;
   background-color: #28a745 !important;
