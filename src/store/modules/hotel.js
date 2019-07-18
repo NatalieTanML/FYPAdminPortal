@@ -10,12 +10,12 @@ import { apiCall, api_routes } from "@/utils/api";
 
 const state = {
   hotel: [],
-  status: null
+  hotelStatus: null
 };
 
 const getters = {
   hotel: state => state.hotel,
-  status: state => state.status
+  hotelStatus: state => state.hotelStatus
 };
 
 const actions = {
@@ -23,7 +23,8 @@ const actions = {
     return new Promise((resolve, reject) => {
       apiCall({ url: api_routes.hotel.get_all, method: "get" })
         .then(resp => {
-          console.dir(resp);
+          commit(GET_ALL_HOTELS);
+          console.log(resp);
           resolve(resp);
         })
         .catch(err => {
@@ -58,9 +59,24 @@ const actions = {
   [UPDATE_ONE_HOTEL]: ({ commit }, jsonData) => {
     return new Promise((resolve, reject) => {
       apiCall({
-        url: api_routes.hotel.update + "/" + jsonData.orderId,
+        url: api_routes.hotel.update,
         data: jsonData,
         method: "put"
+      })
+        .then(resp => {
+          console.dir(resp);
+          resolve(resp);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  },
+  [DELETE_HOTEL]: ({ commit }, hotelId) => {
+    return new Promise((resolve, reject) => {
+      apiCall({
+        url: api_routes.hotel.delete_one + "/" + hotelId,
+        method: "delete"
       })
         .then(resp => {
           console.dir(resp);
@@ -74,7 +90,9 @@ const actions = {
 };
 
 const mutations = {
-  [GET_ALL_HOTELS]: state => {}
+  [GET_ALL_HOTELS]: state => {
+    state.hotelStatus = "getting all hotels";
+  }
 };
 
 export default {

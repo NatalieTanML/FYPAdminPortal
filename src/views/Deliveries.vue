@@ -292,6 +292,7 @@ export default {
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
           this.message("success", "Order Status(es) is updated successfully!");
+
           this.updateCurrentOrders(response.orders);
         })
         .catch(error => {

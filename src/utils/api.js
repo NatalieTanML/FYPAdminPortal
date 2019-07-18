@@ -37,10 +37,10 @@ export const api_routes = {
   },
   hotel: {
     create: "api/hotels/",
-    update: "api/hotels/",
+    update: "api/hotels",
     get_one: "api/hotels/",
     get_all: "api/hotels/",
-    delete_one: "api/hotels/"
+    delete_one: "api/hotels"
   }
 };
 
