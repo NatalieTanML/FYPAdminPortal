@@ -205,6 +205,7 @@ export default {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
+        console.log(response)
 
         this.typesOfTabs[0] = "All";
         for (x; x < response.length + 1; x++)
@@ -328,6 +329,8 @@ export default {
       // this.$snack[method](config)
     },
     userRoleIsAllowedToSeeThisTabOrItem(tabName) {
+      console.log(tabName == "Received")
+      console.log(this.userRole == "Store")
       if (this.userRole == "Admin") return true;
       else if (this.userRole == "Store") {
         if (tabName == "Received" || tabName == "Awaiting Printing")
@@ -345,10 +348,12 @@ export default {
         .then(response => {
           var x = 0;
           for (x; x < response.length; x++) {
+            console.log(response)
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
-            if (this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status))
-              this.items[x] = {
+            if (this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status)){
+              
+              this.items.push({
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
                 date: response[x].createdAt.substring(0, 10),
@@ -357,7 +362,8 @@ export default {
                 quantity: response[x].orderItems,
                 status: response[x].status,
                 actions: [this.getAction(response[x].status)]
-              };
+              });
+            }
           }
           //reset updatedOrders
           this.updatedOrders = [];
@@ -514,8 +520,8 @@ export default {
       for (x = 0; x < this.items.length; x++) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
           if (
-            this.items[x].id == oneUpdatedOrder.orderId &&
-            this.userRoleIsAllowedToSeeThisTabOrItem(oneUpdatedOrder.statusName)
+            this.items[x].id == oneUpdatedOrder.orderId 
+            // && this.userRoleIsAllowedToSeeThisTabOrItem(oneUpdatedOrder.statusName)
           ) {
             this.items[x].status = oneUpdatedOrder.statusName;
             this.items[x].actions = [

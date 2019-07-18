@@ -2,7 +2,7 @@
   <b-collapse id="nav-collapse" visible>
     <ul id="accordionSidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
         <div class="sidebar-brand-icon rotate-n-15">
           <i class="fas fa-laugh-wink"></i>
         </div>
@@ -12,8 +12,7 @@
       <!-- Divider -->
       <hr class="sidebar-divider" />
 
-      <li class="nav-item">
-        <router-link to="SummaryOfOrders">
+   <li class="nav-item" v-if="userRole == 'Admin' || userRole == 'Store' ">        <router-link to="SummaryOfOrders">
           <a class="nav-link">
             <!-- icon -->
             <i class="mr-2 fas fa-tachometer-alt"></i>
@@ -22,7 +21,7 @@
         </router-link>
       </li>
 
-      <li class="nav-item">
+    <li class="nav-item"  v-if="userRole == 'Admin' ">
         <router-link to="DeliveryRoutes">
           <a class="nav-link">
             <!-- icon -->
@@ -32,7 +31,7 @@
         </router-link>
       </li>
 
-      <li class="nav-item">
+    <li class="nav-item"  v-if="userRole == 'Admin' || userRole == 'Delivery' ">
         <router-link to="Deliveries">
           <a class="nav-link">
             <!-- icon -->
@@ -42,7 +41,7 @@
         </router-link>
       </li>
 
-      <li class="nav-item">
+    <li class="nav-item"  v-if="userRole == 'Admin' ">
         <router-link to="UserManagement">
           <a class="nav-link">
             <!-- icon -->
@@ -52,7 +51,7 @@
         </router-link>
       </li>
 
-      <li class="nav-item">
+    <li class="nav-item"  v-if="userRole == 'Admin' || userRole == 'Store' ">
         <router-link to="ResourceManagement">
           <a class="nav-link">
             <!-- icon -->
