@@ -94,10 +94,10 @@ export default {
   data() {
     return {
       hotel: {
-        id: "",
-        name: "",
-        address: "",
-        postalCode: ""
+        id: null,
+        name: null,
+        address: null,
+        postalCode: null
       }
     };
   },
@@ -131,6 +131,12 @@ export default {
         });
     },
     saveHotel() {
+      if (this.hotel.name == "") this.hotel.name = null;
+
+      if (this.hotel.address == "") this.hotel.address = null;
+
+      if (this.hotel.postalCode == "") this.hotel.postalCode = null;
+
       const hotelStr = {
         HotelId: this.hotel.id,
         HotelName: this.hotel.name,

@@ -82,9 +82,9 @@ export default {
   data() {
     return {
       hotel: {
-        name: "",
-        address: "",
-        postalCode: ""
+        name: null,
+        address: null,
+        postalCode: null
       }
     };
   },
@@ -112,6 +112,12 @@ export default {
       this.$snack[method](config);
     },
     addHotel() {
+      if (this.hotel.name == "") this.hotel.name = null;
+
+      if (this.hotel.address == "") this.hotel.address = null;
+
+      if (this.hotel.postalCode == "") this.hotel.postalCode = null;
+
       const hotelStr = {
         HotelName: this.hotel.name,
         HotelAddress: this.hotel.address,

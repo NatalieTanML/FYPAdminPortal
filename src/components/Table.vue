@@ -218,7 +218,7 @@ export default {
     return {
       totalRows: 1,
       currentPage: 1,
-      perPage: 20,
+      perPage: 5,
       pageOptions: [5, 10, 15, 20, 25],
       sortBy: null,
       sortDesc: false,
