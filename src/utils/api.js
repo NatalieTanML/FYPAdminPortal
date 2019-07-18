@@ -15,7 +15,7 @@ export const api_routes = {
     get: "api/orders/",
     get_all: "api/orders/",
     get_multiple: "api/orders/multi",
-    get_all_status: "api/orders/getOrderStatus",
+    get_all_status: "api/orders/status",
     update_deliveryman: "api/orders/deliveryman",
     update_order_status: "api/orders/status",
     get_presigned_url: "api/s3/url",

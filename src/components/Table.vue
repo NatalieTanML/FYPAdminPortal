@@ -75,7 +75,9 @@
               <b-row  >
                 <b-col cols="10">
               <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div v-if="oneActionButton != null" >
+                <div v-if="oneActionButton != null &&
+                (oneActionButton == 'Edit Resource' && tableName == 'Resource Management' && this.$store.getters.userRole == 'Admin')
+                 ">
                   <b-button
                     type="button"
                     v-on:click="onActionButtonClick(row.item, oneActionButton)"

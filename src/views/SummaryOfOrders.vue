@@ -329,8 +329,6 @@ export default {
       // this.$snack[method](config)
     },
     userRoleIsAllowedToSeeThisTabOrItem(tabName) {
-      console.log(tabName == "Received")
-      console.log(this.userRole == "Store")
       if (this.userRole == "Admin") return true;
       else if (this.userRole == "Store") {
         if (tabName == "Received" || tabName == "Awaiting Printing")
@@ -348,11 +346,9 @@ export default {
         .then(response => {
           var x = 0;
           for (x; x < response.length; x++) {
-            console.log(response)
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
-            if (this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status)){
-              
+            if (this.userRoleIsAllowedToSeeThisTabOrItem(response[x].status))
               this.items.push({
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
@@ -363,7 +359,7 @@ export default {
                 status: response[x].status,
                 actions: [this.getAction(response[x].status)]
               });
-            }
+            
           }
           //reset updatedOrders
           this.updatedOrders = [];
@@ -521,7 +517,6 @@ export default {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
           if (
             this.items[x].id == oneUpdatedOrder.orderId 
-            // && this.userRoleIsAllowedToSeeThisTabOrItem(oneUpdatedOrder.statusName)
           ) {
             this.items[x].status = oneUpdatedOrder.statusName;
             this.items[x].actions = [
@@ -543,6 +538,7 @@ export default {
             var url = urls.pop();
             console.log(url);
             var a = document.createElement("a");
+
             a.setAttribute("href", url);
             a.setAttribute("download", "");
             a.setAttribute("target", "_blank");
@@ -559,24 +555,7 @@ export default {
           this.message("danger", error);
         });
     },
-    downloadURI(urls, interval) {
-      var url = urls.pop();
-      var a = document.createElement("a");
-      a.setAttribute("href", url);
-      a.setAttribute("download", "");
-      a.setAttribute("target", "_blank");
-      a.click();
-      if (urls.length == 0) {
-        clearInterval(interval);
-      }
-    },
-    // highlightOneRow(order) {
-    //   for (var x = 0; x < this.items.length; x++) {
-    //     if (order.orderId == this.items[x].id) {
-    //       this.$set(this.items[x], "_rowVariant", "primary");
-    //     }
-    //   }
-    // },
+
     highlightRows(orders) {
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
