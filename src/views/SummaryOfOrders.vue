@@ -109,7 +109,6 @@ export default {
   },
   data() {
     return {
-      polling: null,
       connection: null,
       //have multiple buttons
       headerButtonClick: [
@@ -191,10 +190,6 @@ export default {
   },
 
   computed: {},
-
-  created() {
-    this.pollData();
-  },
 
   async mounted() {
     this.userRole = this.$store.getters.userRole;
@@ -316,7 +311,6 @@ export default {
 
   async beforeDestroy() {
     this.connection.stop();
-    clearInterval(this.polling);
   },
 
   methods: {
@@ -562,11 +556,6 @@ export default {
           if (orders[i].orderId == this.items[y].id)
             this.$set(this.items[y], "_rowVariant", "primary");
       }
-    },
-    pollData() {
-      this.polling = setInterval(() => {
-        this.getAllOrders();
-      }, 60000);
     },
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
