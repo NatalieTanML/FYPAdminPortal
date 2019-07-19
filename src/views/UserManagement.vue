@@ -17,6 +17,7 @@
 
         <div cols="4">
           <Table
+          :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -57,8 +58,9 @@ export default {
   data() {
     return {
       headerButtonClick: ["Add User"],
-      headerButton: [{id: 1, title: "Add User"}],
+      headerButton: [{ id: 1, title: "Add User" }],
       actionButtonClick: "Edit One User",
+      forceRender: false,
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
@@ -73,46 +75,45 @@ export default {
   },
 
   methods: {
-     message(method, messageText) {
+    message(method, messageText) {
       let config = {
         text: messageText,
         button: "ok"
       };
       this.$snack[method](config);
       // this.$snack[method](config)
-    },
+    }
   },
   mounted() {
     eventBus.$on(this.headerButtonClick[0], () => {
       this.$router.replace({ name: "AddUser" });
     });
 
-    eventBus.$on(this.actionButtonClick,  (id) => {
+    eventBus.$on(this.actionButtonClick, id => {
       localStorage.setItem("updateUserId", id);
-         this.$router.replace({ name: "UpdateUser" });
+      this.$router.replace({ name: "UpdateUser" });
     });
 
-      this.$store
-          .dispatch(GET_ALL_USERS)
-          .then(response => {
-         console.log(response)
-         this.items = response;
-         let index;
-         for(index = 0; index < this.items.length; index++){
+    this.$store
+      .dispatch(GET_ALL_USERS)
+      .then(response => {
+        console.log(response);
+        this.items = response;
+        let index;
+        for (index = 0; index < this.items.length; index++) {
+          if (this.items[index].isEnabled) this.items[index].isEnabled = "Yes";
+          else this.items[index].isEnabled = "No";
 
-         if(this.items[index].isEnabled)
-         this.items[index].isEnabled = "Yes"
-         else
-         this.items[index].isEnabled = "No"
+          this.items[index].actions = ["Edit"];
+        }
 
-         this.items[index].actions = ["Edit"];
-         }
-          })
-          .catch(error => {
-  
-            console.dir(error);
-            this.message("danger", error);
-          });
+        if (this.forceRender) this.forceRender = false;
+        else this.forceRender = true;
+      })
+      .catch(error => {
+        console.dir(error);
+        this.message("danger", error);
+      });
   }
 };
 </script>

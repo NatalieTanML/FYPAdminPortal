@@ -23,17 +23,22 @@
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                        <b-form-group label-cols-sm="3" label="Hotel Name" label-for="input-horizontal">
+                          <b-form-group label-cols-sm="3" label="Hotel Name" label-for="input-horizontal" >
                          <input type="text" v-model="hotel.name" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter The Hotel Name...">
+                         <div class="error-message" v-if="validate && !$v.hotel.name.required" >Hotel Name Is Required</div>
                       </b-form-group>
+
 
                       <b-form-group label-cols-sm="3" label="Hotel Address" label-for="input-horizontal">
                          <input type="text" v-model="hotel.address" class="form-control form-control-user" aria-describedby="" placeholder="Enter The Hotel Address...">
+                         <div class="error-message" v-if="validate && !$v.hotel.address.required" >Hotel Address Is Required</div>
                       </b-form-group>
 
                         <b-form-group label-cols-sm="3" label="Hotel Postal Code" label-for="input-horizontal">
                          <input type="text" v-model="hotel.postalCode" class="form-control form-control-user" aria-describedby="" placeholder="Enter The Hotel Postal Code...">
+                         <div class="error-message" v-if="validate && !$v.hotel.postalCode.required" >Hotel Postal Code Is Required</div>
                       </b-form-group>
+
 
                       <b-form-group
                         label-cols-sm="3"
@@ -84,6 +89,8 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
+import { required } from "vuelidate/lib/validators";
+
 import {
   GET_ONE_HOTEL,
   UPDATE_ONE_HOTEL,
@@ -93,6 +100,7 @@ import {
 export default {
   data() {
     return {
+      validate: false,
       hotel: {
         id: null,
         name: null,
@@ -100,6 +108,19 @@ export default {
         postalCode: null
       }
     };
+  },
+  validations: {
+    hotel: {
+      name: {
+        required
+      },
+      address: {
+        required
+      },
+      postalCode: {
+        required
+      }
+    }
   },
   components: {
     SideBar,
@@ -123,6 +144,7 @@ export default {
           this.hotel.name = response.hotelName;
           this.hotel.address = response.hotelAddress;
           this.hotel.postalCode = response.hotelPostalCode;
+          this.validate = true;
         })
         .catch(error => {
           console.dir(error);
@@ -131,27 +153,34 @@ export default {
         });
     },
     saveHotel() {
+      this.validate = true;
       if (this.hotel.name == "") this.hotel.name = null;
 
       if (this.hotel.address == "") this.hotel.address = null;
 
       if (this.hotel.postalCode == "") this.hotel.postalCode = null;
 
-      const hotelStr = {
-        HotelId: this.hotel.id,
-        HotelName: this.hotel.name,
-        HotelAddress: this.hotel.address,
-        HotelPostalCode: this.hotel.postalCode
-      };
+      if (
+        this.hotel.name != null &&
+        this.hotel.address != null &&
+        this.hotel.postalCode != null
+      ) {
+        const hotelStr = {
+          HotelId: this.hotel.id,
+          HotelName: this.hotel.name,
+          HotelAddress: this.hotel.address,
+          HotelPostalCode: this.hotel.postalCode
+        };
 
-      this.$store
-        .dispatch(UPDATE_ONE_HOTEL, hotelStr)
-        .then(response => {
-          this.message("success", "Hotel is updated!");
-        })
-        .catch(error => {
-          this.message("danger", error);
-        });
+        this.$store
+          .dispatch(UPDATE_ONE_HOTEL, hotelStr)
+          .then(response => {
+            this.message("success", "Hotel is updated!");
+          })
+          .catch(error => {
+            this.message("danger", error);
+          });
+      }
     },
     handleok() {
       this.$store
@@ -172,5 +201,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.error-message {
+  color: #dc3545;
+  display: inline-block;
+  margin-top: 0.5em;
+  margin-left: 0.5em;
+}
 </style>

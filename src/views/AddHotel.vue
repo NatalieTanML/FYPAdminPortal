@@ -22,16 +22,20 @@
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="Hotel Name" label-for="input-horizontal">
+                      <b-form-group label-cols-sm="3" label="Hotel Name" label-for="input-horizontal" >
                          <input type="text" v-model="hotel.name" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter The Hotel Name...">
+                         <div class="error-message" v-if="validate && !$v.hotel.name.required" >Hotel Name Is Required</div>
                       </b-form-group>
+
 
                       <b-form-group label-cols-sm="3" label="Hotel Address" label-for="input-horizontal">
                          <input type="text" v-model="hotel.address" class="form-control form-control-user" aria-describedby="" placeholder="Enter The Hotel Address...">
+                         <div class="error-message" v-if="validate && !$v.hotel.address.required" >Hotel Address Is Required</div>
                       </b-form-group>
 
                         <b-form-group label-cols-sm="3" label="Hotel Postal Code" label-for="input-horizontal">
                          <input type="text" v-model="hotel.postalCode" class="form-control form-control-user" aria-describedby="" placeholder="Enter The Hotel Postal Code...">
+                         <div class="error-message" v-if="validate && !$v.hotel.postalCode.required" >Hotel Postal Code Is Required</div>
                       </b-form-group>
 
 
@@ -81,6 +85,7 @@ export default {
 
   data() {
     return {
+      validate: false,
       hotel: {
         name: null,
         address: null,
@@ -112,27 +117,34 @@ export default {
       this.$snack[method](config);
     },
     addHotel() {
+      this.validate = true;
       if (this.hotel.name == "") this.hotel.name = null;
 
       if (this.hotel.address == "") this.hotel.address = null;
 
       if (this.hotel.postalCode == "") this.hotel.postalCode = null;
 
-      const hotelStr = {
-        HotelName: this.hotel.name,
-        HotelAddress: this.hotel.address,
-        HotelPostalCode: this.hotel.postalCode
-      };
+      if (
+        this.hotel.name != null &&
+        this.hotel.address != null &&
+        this.hotel.postalCode != null
+      ) {
+        const hotelStr = {
+          HotelName: this.hotel.name,
+          HotelAddress: this.hotel.address,
+          HotelPostalCode: this.hotel.postalCode
+        };
 
-      this.$store
-        .dispatch(CREATE_HOTEL, hotelStr)
-        .then(() => {
-          this.message("success", "You have added a new hotel!");
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error.response.data.message);
-        });
+        this.$store
+          .dispatch(CREATE_HOTEL, hotelStr)
+          .then(() => {
+            this.message("success", "You have added a new hotel!");
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error.response.data.message);
+          });
+      }
     }
   },
 
@@ -141,4 +153,10 @@ export default {
 </script>
 
 <style scoped>
+.error-message {
+  color: #dc3545;
+  display: inline-block;
+  margin-top: 0.5em;
+  margin-left: 0.5em;
+}
 </style>
