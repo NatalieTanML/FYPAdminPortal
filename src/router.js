@@ -15,6 +15,9 @@ import UpdateUser from "./views/UpdateUser";
 import OrderDetails from "./views/OrderDetails";
 import EditOrderDetails from "./views/EditOrderDetails";
 import ErrorPage from "./views/Error";
+import HotelManagement from "./views/HotelManagement";
+import AddHotel from "./views/AddHotel";
+import UpdateHotel from "./views/UpdateHotel";
 
 import { eventBus } from "@/eventBus";
 
@@ -149,6 +152,33 @@ let router = new Router({
       path: "/EditOrderDetails",
       name: "EditOrderDetails",
       component: EditOrderDetails,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
+      path: "/HotelManagement",
+      name: "HotelManagement",
+      component: HotelManagement,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
+      path: "/AddHotel",
+      name: "AddHotel",
+      component: AddHotel,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
+      path: "/UpdateHotel",
+      name: "UpdateHotel",
+      component: UpdateHotel,
       meta: {
         needAuthentication: true,
         needNewPassword: true
@@ -307,6 +337,17 @@ router.beforeEach((to, from, next) => {
     localStorage.getItem("editOrderId") == "null"
   )
     next({ path: "/SummaryOfOrders" });
+
+  if (to.name != "UpdateHotel" && localStorage.getItem("updateHotelId") != null)
+    localStorage.setItem("updateHotelId", null);
+
+  //if people try to access the editorderdetails page by typing in the url, it will just
+  //redirect them to summaryofOrders
+  if (
+    to.name == "UpdateHotel" &&
+    localStorage.getItem("updateHotelId") == "null"
+  )
+    next({ path: "/HotelManagement" });
 
   if (from.name == "SummaryOfOrders") {
     //the reason why i have to eventbus.off these variable is because

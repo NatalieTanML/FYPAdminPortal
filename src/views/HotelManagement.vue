@@ -7,7 +7,7 @@
       <div id="content">
         <!-- Topbar -->
      
-          <DashboardHeader title="User Management"></DashboardHeader>
+          <DashboardHeader title="Hotel Management"></DashboardHeader>
          
         <!-- End of Topbar -->
 
@@ -17,7 +17,7 @@
 
         <div cols="4">
           <Table
-          :key="this.forceRender"
+            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -47,7 +47,13 @@ import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
 import { eventBus } from "@/eventBus";
-import { GET_ALL_USERS } from "@/store/actions/user";
+import {
+  GET_ALL_HOTELS,
+  GET_ONE_HOTEL,
+  CREATE_HOTEL,
+  UPDATE_ONE_HOTEL,
+  DELETE_HOTEL
+} from "@/store/actions/hotel";
 
 export default {
   components: {
@@ -57,18 +63,16 @@ export default {
   },
   data() {
     return {
-      headerButtonClick: ["Add User"],
-      headerButton: [{ id: 1, title: "Add User" }],
-      actionButtonClick: "Edit One User",
-      forceRender: false,
+      headerButtonClick: ["Add Hotel"],
+      headerButton: [{ id: 1, title: "Add Hotel" }],
+      actionButtonClick: "Edit Hotel",
+      forceRender: true,
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
-        { key: "name", label: "Username", sortable: true },
-        { key: "role", label: "Role", sortable: true },
-        { key: "createdAt", label: "Created At" },
-        { key: "createdBy", label: "Created By" },
-        { key: "isEnabled", label: "Is Enabled" },
+        { key: "name", label: "Hotel Name", sortable: true },
+        { key: "address", label: "Hotel Address", sortable: true },
+        { key: "postalCode", label: "Hotel Postal Code" },
         { key: "actions", label: "Actions" }
       ]
     };
@@ -86,25 +90,29 @@ export default {
   },
   mounted() {
     eventBus.$on(this.headerButtonClick[0], () => {
-      this.$router.replace({ name: "AddUser" });
+      this.$router.replace({ name: "AddHotel" });
     });
 
     eventBus.$on(this.actionButtonClick, id => {
-      localStorage.setItem("updateUserId", id);
-      this.$router.replace({ name: "UpdateUser" });
+      localStorage.setItem("updateHotelId", id);
+      this.$router.replace({ name: "UpdateHotel" });
     });
 
     this.$store
-      .dispatch(GET_ALL_USERS)
+      .dispatch(GET_ALL_HOTELS)
       .then(response => {
         console.log(response);
-        this.items = response;
-        let index;
-        for (index = 0; index < this.items.length; index++) {
-          if (this.items[index].isEnabled) this.items[index].isEnabled = "Yes";
-          else this.items[index].isEnabled = "No";
 
-          this.items[index].actions = ["Edit"];
+        for (var x = 0; x < response.length; x++) {
+          //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
+          //item: response[x].orderItems[0].options[0].product.productName,
+          this.items.push({
+            id: response[x].value,
+            name: response[x].text,
+            address: response[x].hotelAddress,
+            postalCode: response[x].hotelPostalCode,
+            actions: ["Edit Hotel"]
+          });
         }
 
         if (this.forceRender) this.forceRender = false;
