@@ -786,42 +786,12 @@ export default {
 
               this.$refs.myVueDropzone.manuallyAddFile(
                 fileProperty,
-                file.dataURL
+                this.form.varient.productImages[index].imageUrl
               );
-
-              this.$nextTick(() => {
-                var elements = document.getElementsByClassName("dz-image")[0];
-                var image = elements.childNodes[0];
-                console.log(elements);
-                image.setAttribute("src", file.dataURL);
-              });
             }
           });
         }, 100);
       }
-    },
-
-    dataURItoBlob(dataURI) {
-      "use strict";
-      var byteString, mimestring;
-
-      if (dataURI.split(",")[0].indexOf("base64") !== -1) {
-        byteString = atob(dataURI.split(",")[1]);
-      } else {
-        byteString = decodeURI(dataURI.split(",")[1]);
-      }
-
-      mimestring = dataURI
-        .split(",")[0]
-        .split(":")[1]
-        .split(";")[0];
-
-      var content = new Array();
-      for (var i = 0; i < byteString.length; i++) {
-        content[i] = byteString.charCodeAt(i);
-      }
-
-      return new Blob([new Uint8Array(content)], { type: mimestring });
     },
 
     // This method is invoked once the user click the OK button on the edit varient modal dialog
@@ -1007,6 +977,7 @@ export default {
         files: [],
         productImages: []
       };
+      this.deletedImageKeys = [];
       this.$refs.myVueDropzone.removeAllFiles();
     },
 
@@ -1053,15 +1024,23 @@ export default {
           let parts = image.imageKey.split(".");
           let uuid = parts[0];
           console.log(uuid);
-          const index = this.form.varient.files.findIndex(
-            file => file.upload.uuid === uuid
+
+          // Check to see if uuid is present in the deletedImageKeys array
+          const deletedIndex = this.deletedImageKeys.findIndex(
+            image => image === uuid + ".jpg"
           );
-          console.log(index);
-          if (index === -1) {
-            this.deletedImageKeys.push(uuid + ".jpg");
+
+          // If it is not present, carry on
+          if (deletedIndex === -1) {
+            const index = this.form.varient.files.findIndex(
+              file => file.upload.uuid === uuid
+            );
+            if (index === -1) {
+              this.deletedImageKeys.push(uuid + ".jpg");
+            }
           }
         });
-
+        console.log(this.deletedImageKeys);
         console.log(this.form.varient.productImages);
         console.log(this.varientDetails[this.selectedVarientIndex]);
       }

@@ -127,7 +127,7 @@
                           @click="deleteDiscountInfo(row.index)"
                           v-b-modal.deleteDiscount
                           size="sm"
-                          class="px-3 ml-3"
+                          class="px-3 ml-lg-2 mt-2 mt-lg-0"
                           variant="danger"
                         >Delete</b-button>
                       </template>
@@ -222,11 +222,7 @@
                                         :key="valueIndex"
                                       >
                                         <div class="col-10">
-                                          <b-form-group
-                                            class="hi"
-                                            label="Value"
-                                            label-for="varientValue"
-                                          >
+                                          <b-form-group label="Value" label-for="varientValue">
                                             <b-form-input
                                               id="varientValue"
                                               v-model="value.individualValue.$model"
@@ -377,10 +373,21 @@
                 </b-container>
               </b-form>
 
-              <!-- <notifications/> -->
               <div class="text-right">
-                <b-button @click="submit" variant="primary" class="mr-3 px-4">Save</b-button>
-                <b-button class="px-4" to="/ResourceManagement">Cancel</b-button>
+                <b-button
+                  @click="submitProduct"
+                  variant="primary"
+                  class="mr-3 px-4"
+                  :disabled="productSubmitLoader"
+                >
+                  <b-spinner small class="mr-2" v-if="productSubmitLoader"></b-spinner>
+                  <span>Save</span>
+                </b-button>
+
+                <b-button class="px-4" @click="cancelProduct" :disabled="productCancelLoader">
+                  <b-spinner small class="mr-2" v-if="productCancelLoader"></b-spinner>
+                  <span>Cancel</span>
+                </b-button>
               </div>
             </b-col>
           </b-row>
@@ -445,7 +452,8 @@ export default {
           minimumQuantity: null,
           combination: "",
           files: [],
-          productImages: []
+          productImages: [],
+          imageCount: ""
         }
       },
 
@@ -485,7 +493,10 @@ export default {
 
       varientDetails: [],
       selectedVarientIndex: null,
+
       deletedImageKeys: [],
+      previousDeletedImageKeys: [],
+      previousNewImageKeys: [],
 
       varientFields: [
         { key: "SKUNumber", label: "SKU" },
@@ -513,9 +524,9 @@ export default {
       },
       isFileDuplicate: false,
 
-      submitLoader: false,
+      productSubmitLoader: false,
       varientSubmitLoader: false,
-      cancelLoader: false
+      productCancelLoader: false
     };
   },
 
@@ -591,6 +602,7 @@ export default {
                 type: "image/jpeg"
               };
             }),
+            imageCount: option.productImages.length,
             currentQuantity: option.currentQuantity,
             minimumQuantity: option.minimumQuantity,
             productImages: option.productImages,
@@ -787,14 +799,53 @@ export default {
         // If the combination is found, update it while retaining
         // the product details such as sku, quantity and etc (if any)
         if (varientDetail !== undefined) {
+          console.log(varientDetail);
           let newCombination = varientResult.combination;
           let newAttributes = varientResult.attributes;
+          // Update specific attributes while retanining the attributeId
           varientResult = varientDetail;
 
           // Update the combination as well as the attributes that contains the type and value
           varientResult.combination = newCombination;
-          varientResult.attributes = newAttributes;
+          varientResult.type = newAttributes.type;
+          varientResult.values = newAttributes.values;
           varientResults[index] = varientResult;
+        }
+      });
+
+      console.log(this.varientDetails);
+      console.log(varientResults);
+
+      // Loop through the old list (this.varientDetails, If can't be found in the new list)
+      // it means that the images were deleted
+      this.varientDetails.forEach(vd => {
+        console.log(vd);
+        // If combination is not found in the new list, it means that it is deleted
+        const index = varientResults.findIndex(
+          vr => vr.combination === vd.combination
+        );
+
+        console.log(index);
+
+        if (index === -1) {
+          if (vd.productImages !== undefined) {
+            vd.productImages.forEach(image => {
+              console.log(image);
+              if (image.isNew !== undefined) {
+                this.previousNewImageKeys.push(image.imageKey);
+              }
+              // Check to see if deleted image is arleady present in the deletedImageKeys array
+              const deletedIndex = this.deletedImageKeys.findIndex(
+                deletedImage => deletedImage === image.imageKey
+              );
+              if (deletedIndex === -1) {
+                this.deletedImageKeys.push(image.imageKey);
+              }
+            });
+          }
+          console.log(vd);
+          console.log(this.previousNewImageKeys);
+          console.log(this.deletedImageKeys);
         }
       });
 
@@ -872,6 +923,7 @@ export default {
     // This method is invoked when the "edit" button is clicked on the "varient table"
     varientInfo(varient, index) {
       this.selectedVarientIndex = index;
+      this.previousDeletedImageKeys = Object.assign([], this.deletedImageKeys);
 
       if (varient.SKUNumber == null) {
         // Display the combination in the "varient" input field
@@ -908,7 +960,7 @@ export default {
       bvModalEvt.preventDefault();
 
       let index = this.selectedVarientIndex;
-      // this.varientSubmitLoader = true;
+      this.varientSubmitLoader = true;
 
       // Check if there is any changes between the old and new list
       let newImages = differencewith(
@@ -921,11 +973,11 @@ export default {
         return fd.dataURL !== undefined;
       });
 
-      console.log(newImages);
-
       // Remember to remove it at import as well
       if (newImages.length > 0) {
-        this.uploadImages();
+        this.uploadImages(newImages);
+      } else {
+        this.updateVarientTable(this.form.varient);
       }
     },
 
@@ -944,7 +996,10 @@ export default {
         .then(response => {
           console.dir(response);
           response.productImages.forEach((productImage, index) => {
+            // Attach a property called isNew, which is used to signify
+            // that this image have not been saved to the database
             this.form.varient.productImages.push({
+              isNew: true,
               imageKey: productImage.imageKey,
               imageUrl: productImage.imageUrl,
               imageSize: newImages[index].size
@@ -965,7 +1020,7 @@ export default {
     },
 
     updateVarientTable(varient) {
-      varient.imageCount = varient.productImages.length;
+      varient.imageCount = varient.files.length;
       let index = this.selectedVarientIndex;
 
       // Loop through the array to find out which varient object the user edited.
@@ -990,11 +1045,6 @@ export default {
         productImages: []
       };
 
-      this.deletedImageKeys = [];
-
-      console.log(this.varientDetails[index]);
-      console.log(this.form.varient);
-      console.log(this.varientDetails);
       console.log(this.deletedImageKeys);
       this.varientSubmitLoader = false;
 
@@ -1016,6 +1066,10 @@ export default {
         files: [],
         productImages: []
       };
+      // Clone the array so that it does not contain reference to original array
+      // this.originalVarient = clonedeep(this.varientSections);
+      this.deletedImageKeys = Object.assign([], this.previousDeletedImageKeys);
+      console.log(this.deletedImageKeys);
       this.$refs.myVueDropzone.removeAllFiles();
     },
 
@@ -1034,9 +1088,7 @@ export default {
     addFileToDropzone(file) {
       console.log(file);
       if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
-        // Add the user upload file into the array
         console.log("Added file into files array ");
-        file.isNew = true;
         this.form.varient.files.push(file);
         console.dir(this.form.varient.files);
       }
@@ -1046,37 +1098,97 @@ export default {
 
     deleteFileFromDropzone(file) {
       console.log(file);
-      // Remove the deleted file from the array by checking the uuid
+      // Remove the deleted file from the array that have not yet been uploaded to S3
       if (file.manuallyAdded !== true) {
         this.form.varient.files = this.form.varient.files.filter(
           el => el.upload.uuid != file.upload.uuid
         );
       } else {
-        // Remove manuallyAdded file from the array by checking it against the name and size
+        console.log(this.form.varient.files);
+
+        // Remove the deleted file from the array
         this.form.varient.files = this.form.varient.files.filter(
           el => el.name !== file.name && el.size !== file.size
         );
 
-        // Find out which image was deleted by comparing the uuid from productImages and form.varient.file
         this.form.varient.productImages.forEach(image => {
           let parts = image.imageKey.split(".");
           let uuid = parts[0];
           console.log(uuid);
-          const index = this.form.varient.files.findIndex(
-            file => file.upload.uuid === uuid
+
+          // Check to see if uuid is present in the deletedImageKeys array
+          const deletedIndex = this.deletedImageKeys.findIndex(
+            image => image === uuid + ".jpg"
           );
-          console.log(index);
-          if (index === -1) {
-            this.deletedImageKeys.push(uuid + ".jpg");
+
+          // If it is not present, carry on
+          if (deletedIndex === -1) {
+            const index = this.form.varient.files.findIndex(
+              file => file.upload.uuid === uuid
+            );
+            if (index === -1) {
+              this.deletedImageKeys.push(uuid + ".jpg");
+            }
           }
         });
 
+        console.log(this.deletedImageKeys);
         console.log(this.form.varient.productImages);
         console.log(this.varientDetails[this.selectedVarientIndex]);
       }
     },
 
-    submit() {
+    cancelProduct() {
+      let deletedImageKeys = [];
+      this.varientDetails.forEach(varientDetail => {
+        console.log(varientDetail);
+        if (varientDetail.productImage !== undefined) {
+          varientDetail.productImages.forEach(productImage => {
+            if (productImage.isNew !== undefined) {
+              deletedImageKeys.push(productImage.imageKey);
+            }
+          });
+        }
+      });
+
+      console.log(this.previousNewImageKeys);
+      console.log(deletedImageKeys);
+
+      if (this.previousNewImageKeys.length > 0 && deletedImageKeys > 0) {
+        const deletedImage = this.previousNewImageKeys.concat(deletedImageKeys);
+        this.productCancelLoader = true;
+        console.log(deletedImage);
+        this.deleteImages(deletedImage);
+      } else {
+        if (deletedImageKeys.length > 0) {
+          this.productCancelLoader = true;
+          this.deleteImages(deletedImageKeys);
+        } else if (this.previousNewImageKeys.length > 0) {
+          this.productCancelLoader = true;
+          this.deleteImages(this.previousNewImageKeys);
+        } else {
+        }
+      }
+      this.previousNewImageKeys = [];
+      deletedImageKeys = [];
+    },
+
+    deleteImages(deletedImageKeys) {
+      // this.productCancelLoader = true;
+      this.$store
+        .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
+        .then(response => {
+          alert("successfully deleted");
+          this.productCancelLoader = false;
+        })
+        .catch(error => {
+          console.dir(error);
+          this.productCancelLoader = false;
+          alert("error");
+        });
+    },
+
+    submitProduct() {
       const { varientDetails, discountDetails, form } = this;
 
       // put in method?
@@ -1085,15 +1197,9 @@ export default {
       );
       form.effectiveEndDate = moment(form.effectiveEndDate).format(
         "YYYY-MM-DD"
-      );
+      ); // Check for null end dat, if not null run?
 
-      console.log(this.form);
-      console.log(this.varientDetails);
-      console.log(this.discountDetails);
-
-      this.submitLoader = true;
-
-      var productObj = {
+      let productObj = {
         productId: form.productId,
         productName: form.name,
         description: form.description,
@@ -1105,22 +1211,38 @@ export default {
         DiscountPrices: discountDetails,
         options: this.getOptions()
       };
-
       console.log(productObj);
 
-      this.$store
-        .dispatch(UPDATE_ONE_PRODUCT, productObj)
-        .then(response => {
-          console.dir(response);
-          this.submitLoader = false;
-          // this.message("success", "You have successfully added a new product!");
-          // this.$router.push("/ResourceManagement");
-        })
-        .catch(error => {
-          console.dir(error);
-          alert("error");
-          this.submitLoader = false;
-        });
+      console.log(this.form);
+      console.log(this.varientDetails);
+      console.log(this.discountDetails);
+
+      this.productSubmitLoader = true;
+      console.log(this.deletedImageKeys);
+
+      if (this.deletedImageKeys.length > 0) {
+        this.$store
+          .dispatch(DELETE_PRODUCT_IMAGES, this.deletedImageKeys)
+          .then(response => {
+            // Filter and return the array of productImages that does not contain the deleted key
+            this.varientDetails = this.varientDetails.map(varientDetail => {
+              varientDetail.productImages = varientDetail.productImages.filter(
+                image => {
+                  return !this.deletedImageKeys.includes(image.imageKey);
+                }
+              );
+              return varientDetail;
+            });
+            this.updateProduct(productObj);
+          })
+          .catch(error => {
+            this.productSubmitLoader = false;
+            console.dir(error);
+            alert("error");
+          });
+      } else {
+        this.updateProduct(productObj);
+      }
     },
 
     getOptions() {
@@ -1146,6 +1268,20 @@ export default {
           })
         };
       });
+    },
+
+    updateProduct(productObj) {
+      this.$store
+        .dispatch(UPDATE_ONE_PRODUCT, productObj)
+        .then(response => {
+          console.dir(response);
+          this.productSubmitLoader = false;
+        })
+        .catch(error => {
+          console.dir(error);
+          alert("error");
+          this.productSubmitLoader = false;
+        });
     }
   }
 };

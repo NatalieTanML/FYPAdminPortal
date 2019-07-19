@@ -66,6 +66,8 @@ const actions = {
             addImage = formData
         }
 
+
+
         return new Promise((resolve, reject) => {
             apiCall({ url: api_routes.s3.upload, data: addImage, method: 'post' })
                 .then(resp => {
@@ -123,6 +125,7 @@ const actions = {
     },
 
     [CREATE_PRODUCT]: ({ commit }, productObj) => {
+        console.log(productObj)
         return new Promise((resolve, reject) => {
             apiCall({ url: api_routes.product.create, data: productObj, method: 'post' })
                 .then(resp => {
