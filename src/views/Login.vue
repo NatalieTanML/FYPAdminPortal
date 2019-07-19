@@ -47,8 +47,8 @@
                           </a>-->
                           <b-button
                             type="submit"
-                            v-on:click="validate"
-                            @keydown.enter.native="validate"
+                            @click.prevent="validate"
+                            @keydown.enter.native.prevent="validate"
                             class="btn btn-primary btn-user btn-block"
                             variant="primary"
                           >Login</b-button>

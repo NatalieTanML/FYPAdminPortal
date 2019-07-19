@@ -300,6 +300,11 @@ export default {
       this.getAndUpdateMultipleOrders(orderIds);
     });
 
+    this.connection.on("LowStock", optionIds => {
+      console.log("LowStock called");
+      console.log("lowstock items:", optionIds);
+    })
+
     // start the connection
     this.connection
       .start()
