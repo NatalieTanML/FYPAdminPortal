@@ -166,7 +166,7 @@ export default {
     });
 
     eventBus.$on(this.actionButtonClick, jsonData => {
-      if (jsonData.actionButton == "Edit")
+      if (jsonData.actionButton == "Edit Resource")
         this.$router.replace({ name: "UpdateResource" });
       if (jsonData.actionButton == "Manage Resource Quantity") {
         this.id = jsonData.item.id;
@@ -219,11 +219,24 @@ export default {
             }
             this.items[x].id = this.products[i].options[k].optionId;
             this.items[x].sku = this.products[i].options[k].skuNumber;
-            this.items[x].name =
-              this.products[i].productName +
-              "(" +
-              this.products[i].options[k].optionValue +
-              ")";
+            this.items[x].name += this.products[i].productName + " (";
+            var atr = 1;
+            for (
+              var a = 0;
+              a < this.products[i].options[k].attributes.length;
+              a++
+            ) {
+              if (atr == this.products[i].options[k].attributes.length)
+                this.items[x].name +=
+                  this.products[i].options[k].attributes[a].attributeValue +
+                  ")";
+              else
+                this.items[x].name +=
+                  this.products[i].options[k].attributes[a].attributeValue +
+                  ",";
+              atr++;
+            }
+
             this.items[x].qtyLeft = this.products[i].options[k].currentQuantity;
             this.items[x].originalPrice = this.$options.filters.currency(
               this.products[i].price

@@ -22,12 +22,16 @@
                   <b-col cols="8" class="my-5">
                     <b-form class="resource-form">
                       <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="Email" label-for="input-horizontal">
-                         <input type="email" v-model="user.email" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter Your Email Address...">
-                      </b-form-group>
-
                       <b-form-group label-cols-sm="3" label="Name" label-for="input-horizontal">
                          <input type="text" v-model="user.username" class="form-control form-control-user" aria-describedby="" placeholder="Enter Your Name...">
+                         <div class="error-message" v-if="validate && !$v.user.username.required" >Name Is Required</div>
+                      </b-form-group>
+
+                      
+                      <b-form-group label-cols-sm="3" label="Email" label-for="input-horizontal">
+                         <input type="email" v-model="user.email" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter Your Email Address...">
+                          <div class="error-message" v-if="validate && !$v.user.email.required" >Email Is Required</div>
+                          <div class="error-message" v-if="validate && !$v.user.email.email" >Please Enter A Valid Email</div>
                       </b-form-group>
 
                       <b-form-group label-cols-sm="3" label="Role" label-for="input-horizontal">
@@ -37,6 +41,7 @@
                             {{role.roleName}}
                           </option>
                         </select>
+                        <div class="error-message" v-if="validate && !$v.selectedRole.required" >Please Pick A Role</div>
                       </b-form-group>
 
 
@@ -76,36 +81,38 @@
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { ADD_USER, GET_ALL_ROLES } from "@/store/actions/user";
-import { required } from "vuelidate/lib/validators";
+import { required, email } from "vuelidate/lib/validators";
 export default {
-
-  components:{
+  components: {
     SideBar,
     DashboardHeader
   },
-  
+
   data() {
     return {
-      roles:[],
+      roles: [],
+      validate: false,
       selectedRole: null,
-      user:{
-   
-      email:"",
-      username: "",
-      },
-      
+      user: {
+        email: "",
+        username: ""
+      }
     };
   },
 
   validations: {
-    username: {
+    selectedRole: {
       required
     },
-    password: {
-      required
-    },
-     email: {
-      required
+    user: {
+      username: {
+        required
+      },
+
+      email: {
+        required,
+        email
+      }
     }
   },
 
@@ -118,43 +125,58 @@ export default {
       this.$snack[method](config);
     },
     addUser() {
-   
-    const userStr = {
-      "name" : this.user.username,
-      "email" : this.user.email,
-      "roleId" : this.selectedRole
-    };
-     
+      this.validate = true;
+      if (this.user.username == "") this.user.username = null;
 
-      this.$store
-        .dispatch(ADD_USER, userStr)
-        .then(() => {
-          this.message("success", "You have added a new user!");
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error.response.data.message);
-          //this.$router.replace({name:'SummaryOfOrders'});
-        });
+      if (this.user.email == "") this.user.email = null;
+
+      if (
+        this.user.username != null &&
+        this.user.email != null &&
+        this.$v.user.email.email &&
+        this.selectedRole != null
+      ) {
+        const userStr = {
+          name: this.user.username,
+          email: this.user.email,
+          roleId: this.selectedRole
+        };
+
+        this.$store
+          .dispatch(ADD_USER, userStr)
+          .then(() => {
+            this.message("success", "You have added a new user!");
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error.response.data.message);
+            //this.$router.replace({name:'SummaryOfOrders'});
+          });
+      }
     }
   },
 
   mounted() {
-      this.$store
+    this.$store
       .dispatch(GET_ALL_ROLES)
       .then(response => {
         this.roles = response;
-        console.log(this.roles)
+        console.log(this.roles);
       })
       .catch(error => {
-          console.dir(error);
-          this.message("danger", error.response.data.message);
-          //this.$router.replace({name:'SummaryOfOrders'});
-        });
-
+        console.dir(error);
+        this.message("danger", error.response.data.message);
+        //this.$router.replace({name:'SummaryOfOrders'});
+      });
   }
 };
 </script>
 
 <style scoped>
+.error-message {
+  color: #dc3545;
+  display: inline-block;
+  margin-top: 0.5em;
+  margin-left: 0.5em;
+}
 </style>
