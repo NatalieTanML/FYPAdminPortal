@@ -58,6 +58,7 @@
       </footer>
       <!-- End of Footer -->
 
+      <!-- modal for when Out for Delivery orders status is updated. -->
       <b-modal
         @ok="getModalDetails"
         ref="showSignatureDialog"
@@ -76,6 +77,21 @@
             ref="signaturePad"
           />
         </b-form-group>
+      </b-modal>
+
+      <!-- modal for when printed orders status is updated. -->
+      <b-modal
+        @ok="updateDeliveryman()"
+        id="assignDeliveryManDialog"
+        title="Assign to Deliveryman"
+        ok-title="Save"
+      >
+        <b-row align-v="center">
+          <b-col cols="4">Deliveryman</b-col>
+          <b-col>
+            <b-form-select v-model="selectedDeliveryMan" :options="deliveryman"></b-form-select>
+          </b-col>
+        </b-row>
       </b-modal>
     </div>
   </div>
@@ -96,8 +112,10 @@ import {
   GET_ALL_STATUS,
   UPDATE_ORDER_STATUS,
   GET_PRESIGNED_URL,
-  UPDATE_RECIPIENT
+  UPDATE_RECIPIENT,
+  UPDATE_DELIVERYMAN
 } from "@/store/actions/order";
+import { GET_ALL_DELIVERYMEN } from "@/store/actions/user";
 import { setInterval, clearInterval, setTimeout } from "timers";
 
 export default {
@@ -146,6 +164,9 @@ export default {
       orderIds: [],
       sortItems: [],
       updatedOrders: [],
+      deliveryman: [],
+      deliveryMessage: "",
+      selectedDeliveryMan: null,
       items: [],
       fields: [
         {
@@ -194,13 +215,16 @@ export default {
   async mounted() {
     this.userRole = this.$store.getters.userRole;
 
+    //to be shown in a modal dialog when order status
+    this.getAllDeliveryMan();
+
     this.$store
       .dispatch(GET_ALL_STATUS)
       .then(response => {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
-        console.log(response)
+        console.log(response);
 
         this.typesOfTabs[0] = "All";
         for (x; x < response.length + 1; x++)
@@ -221,22 +245,37 @@ export default {
     //headerButtonClick[0] is Update Status
     eventBus.$on(this.headerButtonClick[0], orderIds => {
       var needsSignature = false;
+      var needAssignDeliveryMan = false;
+      var showDeliveryModal = false;
 
       this.items.forEach(oneItem => {
+        console.log("headerbutton one item", oneItem);
         //if at least one item is Out For Delivery, i will prompt the modal dialog.
         orderIds.forEach(oneOrderId => {
           if (oneItem.id == oneOrderId) {
-            if (oneItem.actions == "Delivered") {
+            if (oneItem.status == "Out for Delivery") {
               needsSignature = true;
+            } else if (oneItem.status == "Printed") {
+              console.log(oneItem.deliveryManId);
+              if (oneItem.deliveryManId == null) {
+                console.log("isnullboys");
+                showDeliveryModal = true;
+                console.log(showDeliveryModal);
+              }
+              needAssignDeliveryMan = true;
             }
           }
         });
       });
 
-      if (!needsSignature) {
-        var isSuccessful = true;
+      var isSuccessful = true;
+      if (!needsSignature && !needAssignDeliveryMan) {
         this.updateStatusTabsAndTable(orderIds, isSuccessful);
-      } else {
+      } else if (needAssignDeliveryMan) {
+        this.orderIds = orderIds;
+        if (showDeliveryModal) this.$bvModal.show("assignDeliveryManDialog");
+        else this.updateStatusTabsAndTable(orderIds, isSuccessful);
+      } else if (needsSignature) {
         this.orderIds = orderIds;
         this.ordertitle = "Multiple Orders";
         this.$bvModal.show("showSignatureDialog");
@@ -258,12 +297,17 @@ export default {
       const orderIds = [];
       orderIds.push(item.id);
 
-      if (item.actions == "Delivered") {
+      var isSuccessful = true;
+      if (item.status == "Out for Delivery") {
         this.ordertitle = "Order : " + item.id;
         this.orderIds.push(item.id);
         this.$bvModal.show("showSignatureDialog");
+      } else if (item.status == "Printed") {
+        this.orderIds.push(item.id);
+        if (item.deliveryManId == null)
+          this.$bvModal.show("assignDeliveryManDialog");
+        else this.updateStatusTabsAndTable(this.orderIds, isSuccessful);
       } else {
-        var isSuccessful = true;
         this.updateStatusTabsAndTable(orderIds, isSuccessful);
       }
     });
@@ -303,7 +347,7 @@ export default {
     this.connection.on("LowStock", optionIds => {
       console.log("LowStock called");
       console.log("lowstock items:", optionIds);
-    })
+    });
 
     // start the connection
     this.connection
@@ -327,6 +371,49 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
+
+    getAllDeliveryMan() {
+      this.$store
+        .dispatch(GET_ALL_DELIVERYMEN)
+        .then(response => {
+          this.allDeliverymen = response;
+          this.deliveryman.push({
+            value: null,
+            text: "Please select an option"
+          });
+          for (var i = 0; i < this.allDeliverymen.length; i++) {
+            this.deliveryman.push({
+              value: response[i].email,
+              text: response[i].name
+            });
+          }
+        })
+        .catch(error => {});
+    },
+    updateDeliveryman() {
+      for (var i = 0; i < this.allDeliverymen.length; i++) {
+        if (this.allDeliverymen[i].email == this.selectedDeliveryMan) {
+          const deliveryDetails = {
+            deliveryManId: this.allDeliverymen[i].id,
+            orderIds: this.orderIds
+          };
+          this.$store
+            .dispatch(UPDATE_DELIVERYMAN, deliveryDetails)
+            .then(response => {
+              this.deliveryMessage = "Orders are assigned Delivery Man.";
+              var isSuccessful = true;
+              this.updateStatusTabsAndTable(this.orderIds, isSuccessful);
+              this.setUpTabs();
+
+              this.selectedDeliveryMan = null;
+              this.orderIds = [];
+            })
+            .catch(error => {
+              alert(error);
+            });
+        }
+      }
+    },
     userRoleIsAllowedToSeeThisTabOrItem(tabName) {
       if (this.userRole == "Admin") return true;
       else if (this.userRole == "Store") {
@@ -344,6 +431,7 @@ export default {
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
           var x = 0;
+          console.log(response);
           for (x; x < response.length; x++) {
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
@@ -356,9 +444,9 @@ export default {
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,
                 status: response[x].status,
-                actions: [this.getAction(response[x].status)]
+                actions: [this.getAction(response[x].status)],
+                deliveryManId: response[x].deliveryManId
               });
-            
           }
           //reset updatedOrders
           this.updatedOrders = [];
@@ -495,10 +583,15 @@ export default {
       this.$store
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
-          this.message("success", "Order Status(es) is updated successfully!");
+          this.message(
+            "success",
+            "Order Status(es) is updated successfully! " + this.deliveryMessage
+          );
           this.updateCurrentOrders(response.orders);
           //reset the tabs.
           this.setUpTabs();
+          this.deliveryMessage = "";
+          this.orderIds = [];
           //there is a few lines in the router.js where i reset the eventbus listener too
           //do take note of that.
         })
@@ -514,9 +607,7 @@ export default {
       let x;
       for (x = 0; x < this.items.length; x++) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
-          if (
-            this.items[x].id == oneUpdatedOrder.orderId 
-          ) {
+          if (this.items[x].id == oneUpdatedOrder.orderId) {
             this.items[x].status = oneUpdatedOrder.statusName;
             this.items[x].actions = [
               this.getAction(oneUpdatedOrder.statusName)

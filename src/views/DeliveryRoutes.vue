@@ -300,8 +300,12 @@ export default {
     updateDeliveryman() {
       for (var i = 0; i < this.allDeliverymen.length; i++) {
         if (this.allDeliverymen[i].email == this.selected) {
+          const deliveryDetails = {
+            deliveryManId : this.allDeliverymen[i].id,
+            orderIds : [this.id],
+          }
           this.$store
-            .dispatch(UPDATE_DELIVERYMAN, [this.id, this.allDeliverymen[i].id])
+            .dispatch(UPDATE_DELIVERYMAN, deliveryDetails)
             .then(response => {
               this.refreshTable();
             })
