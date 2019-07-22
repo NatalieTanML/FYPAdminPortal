@@ -334,7 +334,7 @@ export default {
       console.log("one order id : ", orderId);
 
       var orderIds = [orderId];
-
+      console.log(orderIds);
       this.getAndUpdateMultipleOrders(orderIds);
     });
 
@@ -472,15 +472,16 @@ export default {
 
           let updatedOrderList = [];
           response.forEach(updatedOrder => {
-            updatedOrderList.push({
-              orderId: updatedOrder.orderId,
-              statusId: updatedOrder.statusId,
-              statusName: updatedOrder.status
-            });
+            // updatedOrderList.push({
+            //   orderId: updatedOrder.orderId,
+            //   statusId: updatedOrder.statusId,
+            //   statusName: updatedOrder.status
+            // });
+            updatedOrder.statusName = updatedOrder.status;
           });
 
-          this.highlightRows(updatedOrderList);
-          this.updateCurrentOrders(updatedOrderList);
+          this.highlightRows(response);
+          this.updateCurrentOrders(response);
           this.setUpTabs();
         })
         .catch(error => {
@@ -602,17 +603,38 @@ export default {
     },
     updateCurrentOrders(orders) {
       //update current items's statuses and actions
-      console.log("updated orders : " + orders);
+      console.log("updated orders : ", orders);
       let updatedOrders = orders;
+      var itemsContainsUpdatedOrder = false;
       let x;
       for (x = 0; x < this.items.length; x++) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
           if (this.items[x].id == oneUpdatedOrder.orderId) {
+            itemsContainsUpdatedOrder = true;
             this.items[x].status = oneUpdatedOrder.statusName;
             this.items[x].actions = [
               this.getAction(oneUpdatedOrder.statusName)
             ];
           }
+        });
+      }
+
+      if (!itemsContainsUpdatedOrder) {
+        updatedOrders.forEach((oneUpdatedOrder, index) => {
+          console.log("updated order(@)", oneUpdatedOrder);
+         var itemLength = this.items.push({
+            id: oneUpdatedOrder.orderId,
+            refNo: oneUpdatedOrder.referenceNo,
+            date: oneUpdatedOrder.createdAt.substring(0, 10),
+            items: oneUpdatedOrder.orderItems,
+            images: oneUpdatedOrder.orderItems,
+            quantity: oneUpdatedOrder.orderItems,
+            status: oneUpdatedOrder.status,
+            actions: [this.getAction(oneUpdatedOrder.status)],
+            deliveryManId: oneUpdatedOrder.deliveryManId
+          });
+          //highlights row.
+        this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
         });
       }
     },
@@ -647,11 +669,15 @@ export default {
     },
 
     highlightRows(orders) {
+ 
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
-          if (orders[i].orderId == this.items[y].id)
+          if (orders[i].orderId == this.items[y].id) {
+            doesNotContainOrder = false;
             this.$set(this.items[y], "_rowVariant", "primary");
+          }
       }
+
     },
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
