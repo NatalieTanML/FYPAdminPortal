@@ -78,7 +78,8 @@
                   <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
                     <div
                       v-if="(oneActionButton != null && tableName != 'Resource Management') ||
-                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')
+                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')||
+                 (tableName == 'Resource Management' && userRole == 'Admin')
                  "
                     >
                       <b-button
