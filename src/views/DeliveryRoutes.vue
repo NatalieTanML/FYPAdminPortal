@@ -80,8 +80,8 @@ export default {
     return {
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
-      headerButton: [{ id: 1, title: "Assign Delivery Man" }],
-      headerButtonClick: ["Assign Delivery Man"],
+      headerButton: [{ id: 1, title: "Assign/Update Delivery Man" }],
+      headerButtonClick: ["Assign/Update Delivery Man"],
       id: "",
       orderIds: [],
       forceRender: false,
@@ -285,7 +285,8 @@ export default {
       } else return "Postalcode does not match any district in Singapore";
     },
 
-    refreshTable() {
+    getAllOrders() {
+      this.items = [];
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
@@ -308,7 +309,7 @@ export default {
               var deliveryman;
 
               if (response[i].deliveryManId != null) {
-                actions = ["Update Deliveryman"];
+                actions = ["Update Delivery Man"];
                 deliveryman = response[i].deliveryMan.name;
               } else {
                 actions = ["Assign Delivery Man"];
@@ -349,7 +350,7 @@ export default {
               this.message("success", "Successfully updated order(s) !");
               this.orderIds = [];
               this.selected = null;
-              this.refreshTable();
+              this.getAllOrders();
             })
             .catch(error => {
               alert(error);
@@ -402,7 +403,7 @@ export default {
       this.orderIds = orderIds;
       this.$bvModal.show("delivery-routes-modal");
     });
-    this.refreshTable();
+    this.getAllOrders();
     this.$store
       .dispatch(GET_ALL_DELIVERYMEN)
       .then(response => {
@@ -431,7 +432,7 @@ export default {
     this.connection.on("MultipleOrders", orders => {
       console.log("MultipleOrders called");
       console.log(orders);
-      this.refreshTable();
+      this.getAllOrders();
       this.highlightRows(orders);
     });
 
