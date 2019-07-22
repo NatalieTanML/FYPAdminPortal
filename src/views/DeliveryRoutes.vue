@@ -90,8 +90,8 @@ export default {
         { key: "checkbox", label: "" },
         { key: "refNo", label: "Ref. No", sortable: true },
         { key: "region", label: "Region", sortable: true },
-        { key: "postcode", label: "Postcode", sortable: true },
-        { key: "deliveryman", label: "Deliveryman", sortable: true },
+        { key: "postalcode", label: "Postal Code", sortable: true },
+        { key: "deliveryman", label: "Delivery Man", sortable: true },
         { key: "actions", label: "Actions" }
       ],
       selected: null,
@@ -111,7 +111,12 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
-    getRegionByPostalCode(postcode) {
+    getRegionByPostalCode(item) {
+      var postcode = item.address.postalCode;
+
+      if (item.deliveryType == "Hotel")
+        return "Hotel, " + item.address.hotel.hotelName;
+
       if (postcode.length == 6) {
         if (
           postcode.substring(0, 2) == "01" ||
@@ -284,30 +289,50 @@ export default {
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
-          this.allOrders = response;
-          for (var i = 0; i < this.allOrders.length; i++) {
-            this.items[i].id = this.allOrders[i].orderId;
-            this.items[i].refNo = this.allOrders[i].referenceNo;
-            if (this.allOrders[i].addressId != null) {
-              this.items[i].postcode = this.allOrders[i].address.postalCode;
-              this.items[i].region = this.getRegionByPostalCode(
-                this.items[i].postcode
-              );
-            }
-            if (this.allOrders[i].deliveryManId != null) {
-              this.items[i].actions = ["Update Deliveryman"];
-              this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
-            } else {
-              this.items[i].actions = ["Assign Delivery Man"];
-              this.items[i].deliveryman = "Not Assigned";
+          console.log(response);
+          for (var i = 0; i < response.length; i++) {
+            if (response[i].deliveryType != "Self Pick-up") {
+              var postalcode;
+              var region;
+
+              if (response[i].addressId != null) {
+                postalcode = response[i].address.postalCode;
+                region = this.getRegionByPostalCode(
+                  // response[i].address.postalCode
+                  response[i]
+                );
+              } else {
+              }
+
+              var actions;
+              var deliveryman;
+
+              if (response[i].deliveryManId != null) {
+                actions = ["Update Deliveryman"];
+                deliveryman = response[i].deliveryMan.name;
+              } else {
+                actions = ["Assign Delivery Man"];
+                deliveryman = "Not Assigned";
+              }
+
+              this.items.push({
+                id: response[i].orderId,
+                refNo: response[i].referenceNo,
+                region: region,
+                postalcode: postalcode,
+                deliveryman: deliveryman,
+                actions: actions
+              });
             }
           }
+
+          console.log(this.items);
 
           if (this.forceRender) this.forceRender = false;
           else this.forceRender = true;
         })
         .catch(error => {
-          alert(error);
+          console.log(error);
         });
     },
 
@@ -347,6 +372,24 @@ export default {
           }
         }
       }
+    },
+    getAddressOrHotelName(response) {
+      console.log("getaddressorhotel", response);
+      var addressOrHotel = null;
+
+      if (response.address.hotel.hotelName != null)
+        addressOrHotel = response.address.hotel.hotelName;
+      else
+        addressOrHotel =
+          response.address.addressLine1 + ", " + response.address.addressLine2;
+
+      if (
+        response.address.addressLine1 == null ||
+        response.address.addressLine1 == ""
+      )
+        addressOrHotel = "Self-Pick Up";
+
+      return addressOrHotel;
     }
   },
 
@@ -359,41 +402,7 @@ export default {
       this.orderIds = orderIds;
       this.$bvModal.show("delivery-routes-modal");
     });
-    this.$store
-      .dispatch(GET_ALL_ORDERS)
-      .then(response => {
-        this.allOrders = response;
-        for (var i = 0; i < this.allOrders.length; i++) {
-          this.items.push({
-            refNo: "",
-            region: "",
-            postcode: "",
-            deliveryman: "",
-            actions: ""
-          });
-          this.items[i].id = this.allOrders[i].orderId;
-          this.items[i].refNo = this.allOrders[i].referenceNo;
-          if (this.allOrders[i].addressId != null) {
-            this.items[i].postcode = this.allOrders[i].address.postalCode;
-            this.items[i].region = this.getRegionByPostalCode(
-              this.items[i].postcode
-            );
-          }
-          if (this.allOrders[i].deliveryManId != null) {
-            this.items[i].actions = ["Update Deliveryman"];
-            this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
-          } else {
-            this.items[i].actions = ["Assign Delivery Man"];
-            this.items[i].deliveryman = "Not Assigned";
-          }
-        }
-
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
-      })
-      .catch(error => {
-        alert(error);
-      });
+    this.refreshTable();
     this.$store
       .dispatch(GET_ALL_DELIVERYMEN)
       .then(response => {

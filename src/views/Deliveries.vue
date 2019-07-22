@@ -206,6 +206,10 @@ export default {
       else
         addressOrHotel =
           response.address.addressLine1 + ", " + response.address.addressLine2;
+
+      if (response.address.addressLine1 == null || response.address.addressLine1 == "")
+        addressOrHotel = "Self-Pick Up";
+
       return addressOrHotel;
     },
     getAndUpdateMultipleOrders(ids) {
