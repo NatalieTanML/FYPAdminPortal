@@ -350,7 +350,7 @@ export default {
               this.message("success", "Successfully updated order(s) !");
               this.orderIds = [];
               this.selected = null;
-              this.getAllOrders();
+              // this.getAllOrders();
             })
             .catch(error => {
               alert(error);
@@ -362,7 +362,7 @@ export default {
     highlightRows(orders) {
       let idsToUpdate = [];
       for (var i = 0; i < orders.length; i++) {
-        idsToUpdate.push(orders[i].orderId);
+        idsToUpdate.push(orders[i]);
       }
       console.log("idsToUpdate", idsToUpdate);
       for (var e = 0; e < idsToUpdate.length; e++) {
