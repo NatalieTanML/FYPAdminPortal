@@ -17,16 +17,19 @@
           <div>
             <!-- headerButton="Assign Selected to Deliveryman" -->
             <Table
-               :key="this.forceRender"
+              :key="this.forceRender"
               v-bind:headerButtonClick="this.headerButtonClick"
               v-bind:actionButtonClick="this.actionButtonClick"
+              :headerButton="this.headerButton"
+              v-bind:enableCheckbox="this.enableCheckbox"
+              tableName="Delivery Routes"
               v-bind:fields="this.fields"
               v-bind:items="this.items"
             ></Table>
             <b-modal
               @ok="updateDeliveryman()"
               id="delivery-routes-modal"
-              title="Assign to Deliveryman"
+              title="Assign Delivery Man"
               ok-title="Save"
             >
               <b-row align-v="center">
@@ -77,12 +80,14 @@ export default {
     return {
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
-      headerButton: [{ id: 1, title: "Assign to Deliveryman" }],
-      headerButtonClick: ["Assign to Deliveryman"],
-      id: "" ,
+      headerButton: [{ id: 1, title: "Assign Delivery Man" }],
+      headerButtonClick: ["Assign Delivery Man"],
+      id: "",
+      orderIds: [],
       forceRender: false,
-      items:  [],
+      items: [],
       fields: [
+        { key: "checkbox", label: "" },
         { key: "refNo", label: "Ref. No", sortable: true },
         { key: "region", label: "Region", sortable: true },
         { key: "postcode", label: "Postcode", sortable: true },
@@ -90,6 +95,7 @@ export default {
         { key: "actions", label: "Actions" }
       ],
       selected: null,
+      enableCheckbox: true,
       deliveryman: [],
       allOrders: [],
       allDeliverymen: []
@@ -97,6 +103,14 @@ export default {
   },
 
   methods: {
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+      // this.$snack[method](config)
+    },
     getRegionByPostalCode(postcode) {
       if (postcode.length == 6) {
         if (
@@ -156,7 +170,7 @@ export default {
           return "Ardmore, Bukit Timah, Holland Road, Tanglin";
         if (
           postcode.substring(0, 2) == "28" ||
-          postcode.substring(0, 2) == "29"    ||  
+          postcode.substring(0, 2) == "29" ||
           postcode.substring(0, 2) == "30"
         )
           return "Watten Estate, Novena, Thomson";
@@ -284,13 +298,13 @@ export default {
               this.items[i].actions = ["Update Deliveryman"];
               this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
             } else {
-              this.items[i].actions = ["Assign Deliveryman"];
+              this.items[i].actions = ["Assign Delivery Man"];
               this.items[i].deliveryman = "Not Assigned";
             }
           }
 
-             if (this.forceRender) this.forceRender = false;
-            else this.forceRender = true;
+          if (this.forceRender) this.forceRender = false;
+          else this.forceRender = true;
         })
         .catch(error => {
           alert(error);
@@ -301,12 +315,15 @@ export default {
       for (var i = 0; i < this.allDeliverymen.length; i++) {
         if (this.allDeliverymen[i].email == this.selected) {
           const deliveryDetails = {
-            deliveryManId : this.allDeliverymen[i].id,
-            orderIds : [this.id],
-          }
+            deliveryManId: this.allDeliverymen[i].id,
+            orderIds: this.orderIds
+          };
           this.$store
             .dispatch(UPDATE_DELIVERYMAN, deliveryDetails)
             .then(response => {
+              this.message("success", "Successfully updated order(s) !");
+              this.orderIds = [];
+              this.selected = null;
               this.refreshTable();
             })
             .catch(error => {
@@ -336,11 +353,12 @@ export default {
   async mounted() {
     eventBus.$on(this.actionButtonClick, id => {
       this.$bvModal.show("delivery-routes-modal");
-      this.id = id;
+      this.orderIds.push(id);
     });
-    // eventBus.$on(this.headerButtonClick[0], () => {
-    //   console.log("Header button clicked");
-    // });
+    eventBus.$on(this.headerButtonClick[0], orderIds => {
+      this.orderIds = orderIds;
+      this.$bvModal.show("delivery-routes-modal");
+    });
     this.$store
       .dispatch(GET_ALL_ORDERS)
       .then(response => {
@@ -365,13 +383,13 @@ export default {
             this.items[i].actions = ["Update Deliveryman"];
             this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
           } else {
-            this.items[i].actions = ["Assign Deliveryman"];
+            this.items[i].actions = ["Assign Delivery Man"];
             this.items[i].deliveryman = "Not Assigned";
           }
         }
-        
-             if (this.forceRender) this.forceRender = false;
-            else this.forceRender = true;
+
+        if (this.forceRender) this.forceRender = false;
+        else this.forceRender = true;
       })
       .catch(error => {
         alert(error);
