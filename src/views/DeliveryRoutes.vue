@@ -291,8 +291,11 @@ export default {
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
           console.log(response);
+          var status;
           for (var i = 0; i < response.length; i++) {
-            if (response[i].deliveryType != "Self Pick-up") {
+            status = response[i].status
+            if (response[i].deliveryType != "Self Pick-up" &&
+            (status == "Received" || status == "Awaiting Printing"|| status == "Printed" || status == "Delivery Failed")) {
               var postalcode;
               var region;
 
