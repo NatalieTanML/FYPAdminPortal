@@ -101,6 +101,11 @@ export default {
         this.items = response;
         let index;
         for (index = 0; index < this.items.length; index++) {
+          
+          this.items[index].createdAt = new Date(
+                Date.parse(this.items[index].createdAt)
+              ).toLocaleString()
+
           if (this.items[index].isEnabled) this.items[index].isEnabled = "Yes";
           else this.items[index].isEnabled = "No";
 

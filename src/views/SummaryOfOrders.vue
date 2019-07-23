@@ -440,7 +440,9 @@ export default {
               this.items.push({
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
-                date: response[x].createdAt.substring(0, 10),
+                date: new Date(
+                Date.parse(response[x].createdAt)
+              ).toLocaleString(),
                 items: response[x].orderItems,
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,
@@ -626,7 +628,9 @@ export default {
           var itemLength = this.items.push({
             id: oneUpdatedOrder.orderId,
             refNo: oneUpdatedOrder.referenceNo,
-            date: oneUpdatedOrder.createdAt.substring(0, 10),
+            date: new Date(
+                Date.parse(oneUpdatedOrder.createdAt)
+              ).toLocaleString(),
             items: oneUpdatedOrder.orderItems,
             images: oneUpdatedOrder.orderItems,
             quantity: oneUpdatedOrder.orderItems,
