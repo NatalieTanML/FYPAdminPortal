@@ -347,6 +347,7 @@ export default {
     this.connection.on("LowStock", optionIds => {
       console.log("LowStock called");
       console.log("lowstock items:", optionIds);
+      this.notifyLowStock(optionIds);
     });
 
     // start the connection
@@ -358,7 +359,7 @@ export default {
       .catch(err => console.log(err));
   },
 
-  async beforeDestroy() {
+  beforeDestroy() {
     this.connection.stop();
   },
 
@@ -667,7 +668,6 @@ export default {
           this.message("danger", error);
         });
     },
-
     highlightRows(orders) {
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
@@ -675,6 +675,14 @@ export default {
             this.$set(this.items[y], "_rowVariant", "primary");
           }
       }
+    },
+    notifyLowStock(optionIds) {
+      var skus = "";
+      for (var i = 0; i < optionIds.length; i++) {
+        skus += " '" + optionIds[i] + "'";
+      }
+      console.log("skus", skus);
+      this.message("danger", "Low stock count for" + skus + "!");
     },
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
@@ -698,7 +706,7 @@ export default {
               "success",
               "Order Status(es) is updated successfully!"
             );
-            console.log(response)
+            console.log(response);
             this.updateCurrentOrders(response.orders);
             //reset the tabs.
             this.setUpTabs();
