@@ -672,7 +672,6 @@ export default {
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
           if (orders[i].orderId == this.items[y].id) {
-            doesNotContainOrder = false;
             this.$set(this.items[y], "_rowVariant", "primary");
           }
       }
