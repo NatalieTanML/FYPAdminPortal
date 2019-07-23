@@ -622,7 +622,7 @@ export default {
       if (!itemsContainsUpdatedOrder) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
           console.log("updated order(@)", oneUpdatedOrder);
-         var itemLength = this.items.push({
+          var itemLength = this.items.push({
             id: oneUpdatedOrder.orderId,
             refNo: oneUpdatedOrder.referenceNo,
             date: oneUpdatedOrder.createdAt.substring(0, 10),
@@ -634,7 +634,7 @@ export default {
             deliveryManId: oneUpdatedOrder.deliveryManId
           });
           //highlights row.
-        this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
+          this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
         });
       }
     },
@@ -669,15 +669,12 @@ export default {
     },
 
     highlightRows(orders) {
- 
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
           if (orders[i].orderId == this.items[y].id) {
-            doesNotContainOrder = false;
             this.$set(this.items[y], "_rowVariant", "primary");
           }
       }
-
     },
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
@@ -701,6 +698,7 @@ export default {
               "success",
               "Order Status(es) is updated successfully!"
             );
+            console.log(response)
             this.updateCurrentOrders(response.orders);
             //reset the tabs.
             this.setUpTabs();

@@ -294,7 +294,7 @@ export default {
           var status;
           for (var i = 0; i < response.length; i++) {
             status = response[i].status
-            if (response[i].deliveryType != "Self Pick-up" &&
+            if ((response[i].deliveryType == "Hotel" || response[i].deliveryType == "Residential") &&
             (status == "Received" || status == "Awaiting Printing"|| status == "Printed" || status == "Delivery Failed")) {
               var postalcode;
               var region;

@@ -221,7 +221,7 @@
                         @change="onSelectChange($event)"
                       >
                         <option
-                        v-if=""
+                        
                           v-for="oneHotel in hotels"
                          v-bind:key="oneHotel.value"
                          v-bind:selected="oneHotel.value == selectedHotel.value"
@@ -418,7 +418,7 @@ export default {
          this.country = response.address.country
          this.state = response.address.state
 
-      if(response.address.hotelId != null){
+      if(response.deliveryType == 'Hotel'){
       this.selectedDeliveryType = "Hotel"
       this.hotel.id = response.address.hotelId
       this.hotel.roomNo = response.address.unitNo
@@ -436,7 +436,7 @@ export default {
     //   this.selectedHotel.value = response.address.hotelId
     this.selectedHotel = selectedHotelObject;
       }
-      else if(response.address.addressLine1 != null){
+      else if(response.deliveryType == 'Residential'){
       this.selectedDeliveryType = "Residential"
       this.residential.addressOne = response.address.addressLine1
       this.residential.addressTwo = response.address.addressLine2
