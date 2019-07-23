@@ -200,7 +200,7 @@ export default {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
-        console.log(response)
+        console.log(response);
 
         this.typesOfTabs[0] = "All";
         for (x; x < response.length + 1; x++)
@@ -303,7 +303,8 @@ export default {
     this.connection.on("LowStock", optionIds => {
       console.log("LowStock called");
       console.log("lowstock items:", optionIds);
-    })
+      this.notifyLowStock(optionIds);
+    });
 
     // start the connection
     this.connection
@@ -314,7 +315,7 @@ export default {
       .catch(err => console.log(err));
   },
 
-  async beforeDestroy() {
+  beforeDestroy() {
     this.connection.stop();
   },
 
@@ -358,7 +359,6 @@ export default {
                 status: response[x].status,
                 actions: [this.getAction(response[x].status)]
               });
-            
           }
           //reset updatedOrders
           this.updatedOrders = [];
@@ -514,9 +514,7 @@ export default {
       let x;
       for (x = 0; x < this.items.length; x++) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
-          if (
-            this.items[x].id == oneUpdatedOrder.orderId 
-          ) {
+          if (this.items[x].id == oneUpdatedOrder.orderId) {
             this.items[x].status = oneUpdatedOrder.statusName;
             this.items[x].actions = [
               this.getAction(oneUpdatedOrder.statusName)
@@ -554,13 +552,20 @@ export default {
           this.message("danger", error);
         });
     },
-
     highlightRows(orders) {
       for (var i = 0; i < orders.length; i++) {
         for (var y = 0; y < this.items.length; y++)
           if (orders[i].orderId == this.items[y].id)
             this.$set(this.items[y], "_rowVariant", "primary");
       }
+    },
+    notifyLowStock(optionIds) {
+      var skus = "";
+      for (var i = 0; i < optionIds.length; i++) {
+        skus += " '" + optionIds[i] + "'";
+      }
+      console.log("skus", skus);
+      this.message("danger", "Low stock count for" + skus + "!");
     },
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
