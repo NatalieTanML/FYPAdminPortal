@@ -20,17 +20,18 @@
                 </b-input-group-append>
               </b-input-group>
             </b-col>
-            <b-col >
-              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id" >
+            <b-col>
+              <div v-for="oneHeaderButton in this.headerButton" v-bind:key="oneHeaderButton.id">
                 <b-button
                   v-on:click="onHeaderButtonClick(oneHeaderButton.title)"
                   variant="primary"
                   style="margin-left: 1em"
                   class="float-right"
-                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' ) ||
+                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' && tableName != 'Delivery Routes' ) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
+                (tableName == 'Delivery Routes' &&(checkedCheckBox.length != 0))||
                 (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
@@ -71,48 +72,51 @@
               ></b-form-checkbox>
             </template>
 
-            <template slot="actions" slot-scope="row" >
-              <b-row  >
+            <template slot="actions" slot-scope="row">
+              <b-row>
                 <b-col cols="10">
-              <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
-                <div v-if="oneActionButton != null ||
-                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')
-                 ">
-                  <b-button
-                    type="button"
-                    v-on:click="onActionButtonClick(row.item, oneActionButton)"
-                    lg="4"
-                    class="w-75 mb-2"
-                    variant="primary"
-                    size="sm"
-                  >{{oneActionButton}}</b-button>
-                </div>
-              </div>
+                  <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
+                    <div
+                      v-if="(oneActionButton != null && tableName != 'Resource Management') ||
+                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')||
+                 (tableName == 'Resource Management' && userRole == 'Admin')
+                 "
+                    >
+                      <b-button
+                        type="button"
+                        v-on:click="onActionButtonClick(row.item, oneActionButton)"
+                        lg="4"
+                        class="w-75 mb-2"
+                        variant="primary"
+                        size="sm"
+                      >{{oneActionButton}}</b-button>
+                    </div>
+                  </div>
                 </b-col>
 
-              <b-col cols="2">
-              <div v-if="tableName == 'Orders'">
-                <b-dropdown
-                  id="dropdown-header"
-                  variant="transparent"
-                  no-caret
-                  class="mydropdown "
-                >
-                  <template slot="button-content">
-                    <i class="fas fa-ellipsis-v fa-sm"></i>
-                  </template>
+                <b-col cols="2">
+                  <div v-if="tableName == 'Orders'">
+                    <b-dropdown
+                      id="dropdown-header"
+                      variant="transparent"
+                      no-caret
+                      class="mydropdown"
+                    >
+                      <template slot="button-content">
+                        <i class="fas fa-ellipsis-v fa-sm"></i>
+                      </template>
 
-                  <b-dropdown-item-button
-                    v-on:click="editOrder(row.item.id)"
-                    aria-describedby="dropdown-header-label"
-                  >Edit Order</b-dropdown-item-button>
-                  <b-dropdown-item-button
-                    v-on:click="showCancelOrderDialog(row.item.id)"
-                    aria-describedby="dropdown-header-label"
-                  >Cancel Order</b-dropdown-item-button>
-                </b-dropdown>
-              </div>
-              </b-col>
+                      <b-dropdown-item-button
+                        v-on:click="editOrder(row.item.id)"
+                        aria-describedby="dropdown-header-label"
+                      >Edit Order</b-dropdown-item-button>
+                      <b-dropdown-item-button
+                        v-on:click="showCancelOrderDialog(row.item.id)"
+                        aria-describedby="dropdown-header-label"
+                      >Cancel Order</b-dropdown-item-button>
+                    </b-dropdown>
+                  </div>
+                </b-col>
               </b-row>
             </template>
 
@@ -264,12 +268,14 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields.filter(f => f.sortable).map(f => {
-        return {
-          text: f.label,
-          value: f.key
-        };
-      });
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => {
+          return {
+            text: f.label,
+            value: f.key
+          };
+        });
     }
   },
   methods: {
@@ -317,6 +323,8 @@ export default {
           this.checkedCheckBox = [];
           this.checkAll = false;
         }
+      } else if (this.tableName == "Delivery Routes") {
+        eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
       } else eventBus.$emit(this.headerButtonClick[0]);
     },
     onActionButtonClick(item, oneActionButton) {
