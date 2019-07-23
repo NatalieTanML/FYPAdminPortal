@@ -18,8 +18,10 @@
                   label-cols-sm="3"
                   label="Product Name"
                   label-for="input-horizontal"
+                  aria-describedby="input-1-live-feedback"
                 >
                   <b-form-input id="productName" v-model="form.name"></b-form-input>
+                  <b-form-invalid-feedback id="input-1-live-feedback">Name is required</b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
@@ -184,99 +186,98 @@
                   @close="cancel"
                 >
                   <form @submit.stop.prevent="submitDiscount">
-                    <form @submit.stop.prevent="submitDiscount">
-                      <div class="container">
-                        <div
-                          v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
-                          :key="varientIndex"
-                        >
-                          <b-row>
-                            <b-col>
-                              <form>
-                                <div class="offset-md-1">
-                                  <div class="row">
-                                    <b-col cols="5">
-                                      <b-form-group label="Type" label-for="varientType">
-                                        <b-form-input
-                                          v-model="varientSection.type.$model"
-                                          id="varientType"
-                                          :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
-                                        ></b-form-input>
-                                        <b-form-invalid-feedback>
-                                          <p v-if="!varientSection.type.required">Type is required</p>
-                                          <p
-                                            v-if="!varientSection.type.isDuplicateType"
-                                          >There is an existing option with the same type</p>
-                                        </b-form-invalid-feedback>
-                                      </b-form-group>
-                                      <p
-                                        class="btn-delete-varient text-danger"
-                                        @click="deleteType(varientIndex)"
-                                      >Delete Type</p>
-                                    </b-col>
+                    <div class="container">
+                      <div
+                        v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
+                        :key="varientIndex"
+                      >
+                        <b-row>
+                          <b-col>
+                            <form>
+                              <div class="offset-md-1">
+                                <div class="row">
+                                  <b-col cols="5">
+                                    <b-form-group label="Type" label-for="varientType">
+                                      <b-form-input
+                                        v-model="varientSection.type.$model"
+                                        id="varientType"
+                                        :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
+                                      ></b-form-input>
+                                      <b-form-invalid-feedback>
+                                        <p v-if="!varientSection.type.required">Type is required</p>
+                                        <p
+                                          v-if="!varientSection.type.isDuplicateType"
+                                        >There is an existing option with the same type</p>
+                                      </b-form-invalid-feedback>
+                                    </b-form-group>
+                                    <p
+                                      class="btn-delete-varient text-danger"
+                                      @click="deleteType(varientIndex)"
+                                    >Delete Type</p>
+                                  </b-col>
 
-                                    <div class="col-6">
-                                      <div
-                                        class="row"
-                                        v-for="(value, valueIndex) in varientSection.values.$each.$iter"
-                                        :key="valueIndex"
-                                      >
-                                        <div class="col-10">
-                                          <b-form-group label="Value" label-for="varientValue">
-                                            <b-form-input
-                                              id="varientValue"
-                                              v-model="value.individualValue.$model"
-                                              :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
-                                            ></b-form-input>
+                                  <div class="col-6">
+                                    <div
+                                      class="row"
+                                      v-for="(value, valueIndex) in varientSection.values.$each.$iter"
+                                      :key="valueIndex"
+                                    >
+                                      <div class="col-10">
+                                        <b-form-group label="Value" label-for="varientValue">
+                                          <b-form-input
+                                            id="varientValue"
+                                            v-model="value.individualValue.$model"
+                                            :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
+                                          ></b-form-input>
 
-                                            <b-form-invalid-feedback>
-                                              <p
-                                                v-if="!value.individualValue.required"
-                                              >Value is required</p>
-                                            </b-form-invalid-feedback>
-                                          </b-form-group>
-                                        </div>
-
-                                        <div class="col-2 col-sm-2">
-                                          <b-button
-                                            v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
-                                            size="sm"
-                                            class="btn-delete-value"
-                                            variant="danger"
-                                            @click="removeValue(varientIndex, valueIndex)"
-                                          >-</b-button>
-                                        </div>
+                                          <b-form-invalid-feedback>
+                                            <p
+                                              v-if="!value.individualValue.required"
+                                            >Value is required</p>
+                                          </b-form-invalid-feedback>
+                                        </b-form-group>
                                       </div>
-                                      <p
-                                        @click="addValue(varientIndex)"
-                                        class="btn-add-value text-primary"
-                                      >+ Add Another Value</p>
+
+                                      <div class="col-2 col-sm-2">
+                                        <b-button
+                                          v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
+                                          size="sm"
+                                          class="btn-delete-value"
+                                          variant="danger"
+                                          @click="removeValue(varientIndex, valueIndex)"
+                                        >-</b-button>
+                                      </div>
                                     </div>
+                                    <p
+                                      @click="addValue(varientIndex)"
+                                      class="btn-add-value text-primary"
+                                    >+ Add Another Value</p>
                                   </div>
                                 </div>
-                              </form>
-                            </b-col>
-                          </b-row>
-                        </div>
-                        <b-row>
-                          <b-col class="offset-md-1">
-                            <b-button
-                              variant="outline-primary mt-3"
-                              @click="addVarient()"
-                            >+ Add Varient Option</b-button>
+                              </div>
+                            </form>
                           </b-col>
                         </b-row>
-                        <!-- <pre>{{$v}}</pre> -->
                       </div>
-                      <!-- <VarientOption
+                      <b-row>
+                        <b-col class="offset-md-1">
+                          <b-button
+                            variant="outline-primary mt-3"
+                            @click="addVarient()"
+                          >+ Add Varient Option</b-button>
+                        </b-col>
+                      </b-row>
+                      <!-- <pre>{{$v}}</pre> -->
+                    </div>
+                    <!-- <VarientOption
                       v-model="varientSections"
                       :v="$v.varientSections.$each"
                       @addVarient="addVarient"
                       @addValue="addValue"
                       @removeValue="removeValue"
                       @deleteType="deleteType"
-                      ></VarientOption>-->
-                    </form>
+                    ></VarientOption>-->
+
                     <!-- <VarientOption
                       v-model="varientSections"
                       @addVarient="addVarient"
@@ -401,14 +402,11 @@
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import vueDropzone from "vue2-dropzone";
-import Multiselect from "vue-multiselect";
 import Datepicker from "vuejs-datepicker";
-import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as asingle module
+import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as a single module
 import differencewith from "lodash.differencewith";
-import isequal from "lodash.isequal";
 import moment from "moment";
-import DiscountForm from "@/components/DiscountForm";
-import { required, minLength } from "vuelidate/lib/validators";
+import { required, minValue, decimal, integer } from "vuelidate/lib/validators";
 import {
   UPLOAD_PRODUCT_IMAGES,
   DELETE_PRODUCT_IMAGES,
@@ -422,9 +420,7 @@ export default {
     SideBar,
     DashboardHeader,
     vueDropzone,
-    Multiselect,
-    Datepicker,
-    DiscountForm
+    Datepicker
   },
 
   data() {
@@ -531,6 +527,23 @@ export default {
   },
 
   validations: {
+    form: {
+      name: {
+        required
+      },
+      imageWidth: {
+        required
+      }
+
+      //  productId: null,
+      //         name: "",
+      //         price: null,
+      //         imageHeight: null,
+      //         imageWidth: null,
+      //         effectiveStartDate: "",
+      //         effectiveEndDate: "",
+      //         description: "",
+    },
     varientSections: {
       $each: {
         type: {
@@ -691,6 +704,7 @@ export default {
       } else {
         discount.isPercentage = false;
       }
+      discount.productId = this.form.productId;
       this.discountDetails.push(discount);
       this.form.discount = {};
     },
@@ -1173,20 +1187,20 @@ export default {
       deletedImageKeys = [];
     },
 
-    deleteImages(deletedImageKeys) {
-      // this.productCancelLoader = true;
-      this.$store
-        .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
-        .then(response => {
-          alert("successfully deleted");
-          this.productCancelLoader = false;
-        })
-        .catch(error => {
-          console.dir(error);
-          this.productCancelLoader = false;
-          alert("error");
-        });
-    },
+    // deleteImages(deletedImageKeys) {
+    //   // this.productCancelLoader = true;
+    //   this.$store
+    //     .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
+    //     .then(response => {
+    //       alert("successfully deleted");
+    //       this.productCancelLoader = false;
+    //     })
+    //     .catch(error => {
+    //       console.dir(error);
+    //       this.productCancelLoader = false;
+    //       alert("error");
+    //     });
+    // },
 
     submitProduct() {
       const { varientDetails, discountDetails, form } = this;
@@ -1208,8 +1222,8 @@ export default {
         ImageHeight: form.imageHeight,
         EffectiveStartDate: form.effectiveStartDate,
         EffectiveEndDate: form.effectiveEndDate,
-        DiscountPrices: discountDetails,
-        options: this.getOptions()
+        DiscountPrices: discountDetails
+        // options: this.getOptions()
       };
       console.log(productObj);
 
@@ -1233,6 +1247,8 @@ export default {
               );
               return varientDetail;
             });
+            console.log(this.varientDetails);
+            productObj.options = this.getOptions();
             this.updateProduct(productObj);
           })
           .catch(error => {
@@ -1241,6 +1257,7 @@ export default {
             alert("error");
           });
       } else {
+        productObj.options = this.getOptions();
         this.updateProduct(productObj);
       }
     },
@@ -1248,7 +1265,7 @@ export default {
     getOptions() {
       return this.varientDetails.map((varient, index) => {
         return {
-          productId: varient.productId,
+          productId: this.form.productId,
           skuNumber: varient.SKUNumber,
           currentQuantity: varient.currentQuantity,
           minimumQuantity: varient.minimumQuantity,
@@ -1274,6 +1291,7 @@ export default {
       this.$store
         .dispatch(UPDATE_ONE_PRODUCT, productObj)
         .then(response => {
+          alert("successfully update object");
           console.dir(response);
           this.productSubmitLoader = false;
         })
