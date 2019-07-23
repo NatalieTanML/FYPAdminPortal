@@ -86,11 +86,14 @@ const actions = {
     });
   },
 
-  [UPDATE_DELIVERYMAN]: ({ commit }, arrayOfIds) => {
+  [UPDATE_DELIVERYMAN]: ({ commit }, deliveryDetails) => {
     return new Promise((resolve, reject) => {
       apiCall({
-        url: api_routes.order.update_deliveryman + "/" + arrayOfIds[1],
-        data: arrayOfIds,
+        url:
+          api_routes.order.update_deliveryman +
+          "/" +
+          deliveryDetails.deliveryManId,
+        data: deliveryDetails.orderIds,
         method: "put"
       })
         .then(resp => {

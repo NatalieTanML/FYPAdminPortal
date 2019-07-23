@@ -17,16 +17,19 @@
           <div>
             <!-- headerButton="Assign Selected to Deliveryman" -->
             <Table
-               :key="this.forceRender"
+              :key="this.forceRender"
               v-bind:headerButtonClick="this.headerButtonClick"
               v-bind:actionButtonClick="this.actionButtonClick"
+              :headerButton="this.headerButton"
+              v-bind:enableCheckbox="this.enableCheckbox"
+              tableName="Delivery Routes"
               v-bind:fields="this.fields"
               v-bind:items="this.items"
             ></Table>
             <b-modal
               @ok="updateDeliveryman()"
               id="delivery-routes-modal"
-              title="Assign to Deliveryman"
+              title="Assign Delivery Man"
               ok-title="Save"
             >
               <b-row align-v="center">
@@ -77,19 +80,22 @@ export default {
     return {
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
-      headerButton: [{ id: 1, title: "Assign to Deliveryman" }],
-      headerButtonClick: ["Assign to Deliveryman"],
-      id: "" ,
+      headerButton: [{ id: 1, title: "Assign/Update Delivery Man" }],
+      headerButtonClick: ["Assign/Update Delivery Man"],
+      id: "",
+      orderIds: [],
       forceRender: false,
-      items:  [],
+      items: [],
       fields: [
+        { key: "checkbox", label: "" },
         { key: "refNo", label: "Ref. No", sortable: true },
         { key: "region", label: "Region", sortable: true },
-        { key: "postcode", label: "Postcode", sortable: true },
-        { key: "deliveryman", label: "Deliveryman", sortable: true },
+        { key: "postalcode", label: "Postal Code", sortable: true },
+        { key: "deliveryman", label: "Delivery Man", sortable: true },
         { key: "actions", label: "Actions" }
       ],
       selected: null,
+      enableCheckbox: true,
       deliveryman: [],
       allOrders: [],
       allDeliverymen: []
@@ -97,7 +103,20 @@ export default {
   },
 
   methods: {
-    getRegionByPostalCode(postcode) {
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+      // this.$snack[method](config)
+    },
+    getRegionByPostalCode(item) {
+      var postcode = item.address.postalCode;
+
+      if (item.deliveryType == "Hotel")
+        return "Hotel, " + item.address.hotel.hotelName;
+
       if (postcode.length == 6) {
         if (
           postcode.substring(0, 2) == "01" ||
@@ -156,7 +175,7 @@ export default {
           return "Ardmore, Bukit Timah, Holland Road, Tanglin";
         if (
           postcode.substring(0, 2) == "28" ||
-          postcode.substring(0, 2) == "29"    ||  
+          postcode.substring(0, 2) == "29" ||
           postcode.substring(0, 2) == "30"
         )
           return "Watten Estate, Novena, Thomson";
@@ -266,44 +285,75 @@ export default {
       } else return "Postalcode does not match any district in Singapore";
     },
 
-    refreshTable() {
+    getAllOrders() {
+      this.items = [];
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
-          this.allOrders = response;
-          for (var i = 0; i < this.allOrders.length; i++) {
-            this.items[i].id = this.allOrders[i].orderId;
-            this.items[i].refNo = this.allOrders[i].referenceNo;
-            if (this.allOrders[i].addressId != null) {
-              this.items[i].postcode = this.allOrders[i].address.postalCode;
-              this.items[i].region = this.getRegionByPostalCode(
-                this.items[i].postcode
-              );
-            }
-            if (this.allOrders[i].deliveryManId != null) {
-              this.items[i].actions = ["Update Deliveryman"];
-              this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
-            } else {
-              this.items[i].actions = ["Assign Deliveryman"];
-              this.items[i].deliveryman = "Not Assigned";
+          console.log(response);
+          var status;
+          for (var i = 0; i < response.length; i++) {
+            status = response[i].status
+            if (response[i].deliveryType != "Self Pick-up" &&
+            (status == "Received" || status == "Awaiting Printing"|| status == "Printed" || status == "Delivery Failed")) {
+              var postalcode;
+              var region;
+
+              if (response[i].addressId != null) {
+                postalcode = response[i].address.postalCode;
+                region = this.getRegionByPostalCode(
+                  // response[i].address.postalCode
+                  response[i]
+                );
+              } else {
+              }
+
+              var actions;
+              var deliveryman;
+
+              if (response[i].deliveryManId != null) {
+                actions = ["Update Delivery Man"];
+                deliveryman = response[i].deliveryMan.name;
+              } else {
+                actions = ["Assign Delivery Man"];
+                deliveryman = "Not Assigned";
+              }
+
+              this.items.push({
+                id: response[i].orderId,
+                refNo: response[i].referenceNo,
+                region: region,
+                postalcode: postalcode,
+                deliveryman: deliveryman,
+                actions: actions
+              });
             }
           }
 
-             if (this.forceRender) this.forceRender = false;
-            else this.forceRender = true;
+          console.log(this.items);
+
+          if (this.forceRender) this.forceRender = false;
+          else this.forceRender = true;
         })
         .catch(error => {
-          alert(error);
+          console.log(error);
         });
     },
 
     updateDeliveryman() {
       for (var i = 0; i < this.allDeliverymen.length; i++) {
         if (this.allDeliverymen[i].email == this.selected) {
+          const deliveryDetails = {
+            deliveryManId: this.allDeliverymen[i].id,
+            orderIds: this.orderIds
+          };
           this.$store
-            .dispatch(UPDATE_DELIVERYMAN, [this.id, this.allDeliverymen[i].id])
+            .dispatch(UPDATE_DELIVERYMAN, deliveryDetails)
             .then(response => {
-              this.refreshTable();
+              this.message("success", "Successfully updated order(s) !");
+              this.orderIds = [];
+              this.selected = null;
+              // this.getAllOrders();
             })
             .catch(error => {
               alert(error);
@@ -315,7 +365,7 @@ export default {
     highlightRows(orders) {
       let idsToUpdate = [];
       for (var i = 0; i < orders.length; i++) {
-        idsToUpdate.push(orders[i].orderId);
+        idsToUpdate.push(orders[i]);
       }
       console.log("idsToUpdate", idsToUpdate);
       for (var e = 0; e < idsToUpdate.length; e++) {
@@ -326,52 +376,37 @@ export default {
           }
         }
       }
+    },
+    getAddressOrHotelName(response) {
+      console.log("getaddressorhotel", response);
+      var addressOrHotel = null;
+
+      if (response.address.hotel.hotelName != null)
+        addressOrHotel = response.address.hotel.hotelName;
+      else
+        addressOrHotel =
+          response.address.addressLine1 + ", " + response.address.addressLine2;
+
+      if (
+        response.address.addressLine1 == null ||
+        response.address.addressLine1 == ""
+      )
+        addressOrHotel = "Self-Pick Up";
+
+      return addressOrHotel;
     }
   },
 
   async mounted() {
     eventBus.$on(this.actionButtonClick, id => {
       this.$bvModal.show("delivery-routes-modal");
-      this.id = id;
+      this.orderIds.push(id);
     });
-    // eventBus.$on(this.headerButtonClick[0], () => {
-    //   console.log("Header button clicked");
-    // });
-    this.$store
-      .dispatch(GET_ALL_ORDERS)
-      .then(response => {
-        this.allOrders = response;
-        for (var i = 0; i < this.allOrders.length; i++) {
-          this.items.push({
-            refNo: "",
-            region: "",
-            postcode: "",
-            deliveryman: "",
-            actions: ""
-          });
-          this.items[i].id = this.allOrders[i].orderId;
-          this.items[i].refNo = this.allOrders[i].referenceNo;
-          if (this.allOrders[i].addressId != null) {
-            this.items[i].postcode = this.allOrders[i].address.postalCode;
-            this.items[i].region = this.getRegionByPostalCode(
-              this.items[i].postcode
-            );
-          }
-          if (this.allOrders[i].deliveryManId != null) {
-            this.items[i].actions = ["Update Deliveryman"];
-            this.items[i].deliveryman = this.allOrders[i].deliveryMan.name;
-          } else {
-            this.items[i].actions = ["Assign Deliveryman"];
-            this.items[i].deliveryman = "Not Assigned";
-          }
-        }
-        
-             if (this.forceRender) this.forceRender = false;
-            else this.forceRender = true;
-      })
-      .catch(error => {
-        alert(error);
-      });
+    eventBus.$on(this.headerButtonClick[0], orderIds => {
+      this.orderIds = orderIds;
+      this.$bvModal.show("delivery-routes-modal");
+    });
+    this.getAllOrders();
     this.$store
       .dispatch(GET_ALL_DELIVERYMEN)
       .then(response => {
@@ -400,7 +435,7 @@ export default {
     this.connection.on("MultipleOrders", orders => {
       console.log("MultipleOrders called");
       console.log(orders);
-      this.refreshTable();
+      this.getAllOrders();
       this.highlightRows(orders);
     });
 
