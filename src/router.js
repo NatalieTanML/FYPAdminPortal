@@ -333,6 +333,17 @@ router.beforeEach((to, from, next) => {
   //if people try to access the editorderdetails page by typing in the url, it will just
   //redirect them to summaryofOrders
   if (
+    to.name == "UpdateResource" &&
+    localStorage.getItem("updateResourceId") == "null"
+  )
+    next({ path: "/ResourceManagement" });
+
+  if (to.name != "UpdateResource" && localStorage.getItem("updateResourceId") != null)
+    localStorage.setItem("updateResourceId", null);
+
+    //if people try to access the editorderdetails page by typing in the url, it will just
+  //redirect them to summaryofOrders
+  if (
     to.name == "EditOrderDetails" &&
     localStorage.getItem("editOrderId") == "null"
   )

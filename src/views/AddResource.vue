@@ -6,7 +6,7 @@
         <DashboardHeader title="Resource Management - Add Resource"></DashboardHeader>
 
         <b-container fluid>
-          <b-row class="bg-white text-left" align-h="center">
+          <b-row class="bg-white text-left shadow" align-h="center">
             <b-col cols="10" class="my-5">
               <h4 class="text-uppercase">General</h4>
               <hr class="mb-5" />
@@ -228,9 +228,7 @@
                   class="px-4"
                   v-b-modal.addVarient
                   @click="openVarientModal"
-                >+ Add Varient Option</b-button>
-
-                <!-- <span>Test</span> -->
+                >+ Add Variant Option</b-button>
 
                 <!-- modal dialog for varient option -->
                 <b-modal
@@ -331,6 +329,7 @@
                     </div>
                   </form>
                 </b-modal>
+
                 <div class="text-center" v-if="this.varientTableError">
                   <p
                     v-if="varientDetails.length === 0"
@@ -341,9 +340,9 @@
                     class="table-varient-error"
                   >Please fill in all the necessary varient details</p>
                 </div>
+
                 <b-container class="px-0" fluid>
                   <div class="table-wrapper">
-                    <!-- :class="{'border border-danger' : this.varientTableError}" -->
                     <div :class="{'border border-danger' : this.varientTableError}">
                       <div class="table-title">
                         <b-row class="mx-auto">
@@ -594,7 +593,8 @@ export default {
       varientTableError: false,
       selectedVarientIndex: null,
       deletedImageKeys: [],
-      // Used to store images of deleted varient
+
+      // Used to store images of deleted varients
       previousDeletedImageKeys: [],
 
       varientFields: [
@@ -637,6 +637,7 @@ export default {
 
       price: {
         required,
+        // validate price up to 2 decimal places
         twoDecimal(price) {
           if (price === "") return true;
           let regex = /^\d+(\.\d{1,2})?$/;
@@ -659,16 +660,14 @@ export default {
 
       effectiveStartDate: {
         required,
+        // Check if start date is equal or greater than end date
         checkDate(startDate) {
-          if (typeof startDate === "string") return true;
-
           let endDate = this.form.effectiveEndDate;
           if (endDate == "" || endDate == null) return true;
-          console.log(startDate);
-          console.log(endDate);
+
           // Initialize the time to midnight for accurate comparison
-          startDate.setHours(0, 0, 0, 0);
-          endDate.setHours(0, 0, 0, 0);
+          startDate = new Date(new Date(startDate).setHours(0, 0, 0, 0));
+          endDate = new Date(new Date(endDate).setHours(0, 0, 0, 0));
 
           if (startDate >= endDate) return false;
           return true;
@@ -682,11 +681,13 @@ export default {
       discount: {
         discountValue: {
           required,
+          // Validate discount value up to 2 decimal places
           twoDecimal(value) {
             if (value === "" || value < 0 || this.isMaxFixedValue) return true;
             let regex = /^\d+(\.\d{1,2})?$/;
             return regex.test(value);
           },
+          // Check if value is greater than 0 and less than or equal to 100 for percentage discount
           maxPercentageValue(value, discountObject) {
             if (value === "") return true;
             if (discountObject.discountType === "Percentage") {
@@ -696,6 +697,7 @@ export default {
             }
             return true;
           },
+          // Check if base price is larger than discount price and less than or equal to 0 for fixed discount
           maxFixedValue(value, discountObject) {
             if (discountObject.discountType === "Fixed") {
               if (value === "" || this.form.price === "") {
@@ -703,8 +705,8 @@ export default {
                 return true;
               }
               value = Number(value);
-              let price = Number(this.form.price);
-              if (value > price || value <= 0) {
+              let basePrice = Number(this.form.price);
+              if (value > basePrice || value <= 0) {
                 this.isMaxFixedValue = true;
                 return false;
               }
@@ -716,6 +718,7 @@ export default {
 
         effectiveStartDate: {
           required,
+          // Check if discount start date is greater than or equal to discount end date
           checkDate(startDate) {
             if (typeof startDate === "string") return true;
             if (
@@ -727,7 +730,7 @@ export default {
 
             let endDate = this.form.discount.effectiveEndDate;
             if (endDate == "" || endDate == null) return true;
-            if (startDate > this.form.discount.effectiveEndDate) return false;
+            if (startDate >= this.form.discount.effectiveEndDate) return false;
             return true;
           },
           overlapFound() {
@@ -739,15 +742,18 @@ export default {
       varient: {
         SKUNumber: {
           required,
+          // Check if sku number exist in previous varients
           isDuplicateSKU(value) {
             if (value === "") return true;
             let isDuplicate = true;
 
             if (this.varientDetails.length > 0) {
-              this.varientDetails.forEach(varientDetail => {
-                if (varientDetail.SKUNumber !== undefined) {
-                  if (varientDetail.SKUNumber === value) {
-                    isDuplicate = false;
+              this.varientDetails.forEach((varientDetail, index) => {
+                if (index !== this.selectedVarientIndex) {
+                  if (varientDetail.SKUNumber !== undefined) {
+                    if (varientDetail.SKUNumber === value) {
+                      isDuplicate = false;
+                    }
                   }
                 }
               });
@@ -783,10 +789,10 @@ export default {
       $each: {
         type: {
           required,
+          // Check if there is duplicate values for the field "type"
           isDuplicateType(type, varient) {
             if (type === "") return true;
 
-            // Check if there is duplicate values for the field "type".
             let foundDuplicate = this.varientSections.find(
               obj => obj.type === type && obj.values !== varient.values
             );
@@ -802,10 +808,10 @@ export default {
           $each: {
             individualValue: {
               required,
+              // Check if there is duplicate values for the field "value"
               isDuplicateValue(varientValue, valueObject) {
                 if (varientValue === "") return true;
 
-                // Check if there is duplicate values for the field "type".
                 let foundDuplicate = this.varientSections.filter(
                   varientSection => {
                     return varientSection.values.some(
@@ -832,7 +838,6 @@ export default {
   methods: {
     handleAddDiscount(bvModalEvt) {
       bvModalEvt.preventDefault();
-
       const { effectiveStartDate, effectiveEndDate } = this.form.discount;
 
       if (this.discountDetails.length > 0) {
@@ -861,7 +866,8 @@ export default {
         // Check for date overlap
         let overlapResult = this.overlap(discountDates);
 
-        // If overlap is found, Set boolean to true and get the current overlapped date
+        // If overlap is found, Set boolean to true, which will trigger the error
+        // and get the current overlapped date
         if (overlapResult.overlap) {
           this.currentOverlappedDate = effectiveStartDate;
           this.isOverlapped = true;
@@ -872,7 +878,7 @@ export default {
         this.isOverlapped = false;
       }
 
-      // Validate discount form
+      // Validate the rest of the discount form
       this.$v.form.discount.$touch();
       if (this.$v.form.discount.$invalid) return;
 
@@ -941,7 +947,7 @@ export default {
           var currentStart = current.effectiveStartDate.getTime();
           var overlap = previousEnd >= currentStart;
 
-          // // store the specific ranges that overlap and set boolean to true
+          // store the specific ranges that overlap and set boolean to true
           if (overlap) {
             result.overlap = true;
             result.ranges.push({
@@ -958,7 +964,7 @@ export default {
       return result;
     },
 
-    // Reset the discount object when user exits the discount dialog and the validation
+    // Reset the discount fields and validations when user exits the discount dialog
     cancelDiscountDialog() {
       this.resetDiscountFields();
       this.$v.form.discount.$reset();
@@ -981,7 +987,6 @@ export default {
       // Get the index (row) and discount object selected
       this.form.discount = Object.assign({}, discount);
       this.discountIndex = index;
-      console.log(index);
     },
 
     // This method is invoked when the OK button is clicked on the "modal dialog" (Save the changes)
@@ -995,6 +1000,7 @@ export default {
         // Retrieve all the previous start and end date and convert it to date object
         let discountDates = this.discountDetails
           .filter(({ effectiveStartDate, effectiveEndDate }, index) => {
+            // Do not retrieve the start and end date for current row (index)
             if (index === this.discountIndex) {
               return false;
             }
@@ -1022,7 +1028,7 @@ export default {
         // Check for date overlap
         let overlapResult = this.overlap(discountDates);
 
-        // If overlap is found, Set boolean to true and get the current overlapped date
+        // If overlap is found, set boolean to true and get the current overlapped date
         if (overlapResult.overlap) {
           this.currentOverlappedDate = effectiveStartDate;
           this.isOverlapped = true;
@@ -1068,14 +1074,15 @@ export default {
     handleDeleteDiscount() {
       // Delete discount object based on the index
       this.discountDetails.splice(this.discountIndex, 1);
-      console.log(this.discountDetails);
     },
 
+    // Format the date object to string
     formatDiscountDate(discount) {
       let { effectiveStartDate, effectiveEndDate } = this.form.discount;
       discount.effectiveStartDate = moment(effectiveStartDate).format(
         "YYYY-MM-DD"
       );
+      // If end date is null or empty, do not format
       if (effectiveEndDate !== "" && effectiveEndDate !== null) {
         discount.effectiveEndDate = moment(effectiveEndDate).format(
           "YYYY-MM-DD"
@@ -1124,13 +1131,9 @@ export default {
 
     handleVarientSubmit(bvModalEvt) {
       bvModalEvt.preventDefault();
-
-      console.log(this.varientSections);
-
       // Validate fields
       this.$v.varientSections.$touch();
       if (this.$v.varientSections.$invalid) return;
-
       this.handleSubmit();
     },
 
@@ -1161,13 +1164,15 @@ export default {
           }
         });
 
-        // previousDeletedImageKeys:
-
+        // Find the combinations that are in varientResults (new) but not in varientDetails (old)
         this.varientDetails.forEach(vd => {
           const index = varientResults.findIndex(
             vr => vr.combination === vd.combination
           );
 
+          // If combination does not exist, it means that the varient was removed. Hence,
+          // grab the image keys and push it to an array so that they can be removed from
+          // S3 when user click on save or cancel
           if (index === -1) {
             if (vd.productImages !== undefined) {
               vd.productImages.forEach(image => {
@@ -1488,14 +1493,6 @@ export default {
       this.deletedImageKeys = [];
     },
 
-    message(method, messageText) {
-      let config = {
-        text: messageText,
-        button: "ok"
-      };
-      this.$snack[method](config);
-    },
-
     duplicateFileCheck(file) {
       this.isFileDuplicate = true;
     },
@@ -1562,7 +1559,7 @@ export default {
       this.$snack[method](config);
     },
 
-    // Delete images in S3 once user cancel the product
+    // Delete images from S3 once user cancel the product
     cancelProduct() {
       let deleteKeys = [];
       this.varientDetails.forEach(varientDetail => {
@@ -1573,8 +1570,8 @@ export default {
         }
       });
 
-      // If there are images from deleted varient(s), we will concat it with the images
-      // from the current varient
+      // If there are images of previously deleted varients, we will concat it
+      // with the images in the current varient and delete them from S3
       if (this.previousDeletedImageKeys.length > 0) {
         deleteKeys = this.previousDeletedImageKeys.concat(deleteKeys);
       }
@@ -1586,13 +1583,15 @@ export default {
         this.$store
           .dispatch(DELETE_PRODUCT_IMAGES, deleteKeys)
           .then(response => {
-            alert("successfully deleted all images");
+            this.message("success", "successfully deleted all images");
             console.dir(response);
             this.cancelLoader = false;
+            this.previousDeletedImageKeys = [];
+            deleteKeys = [];
           })
           .catch(error => {
             console.dir(error);
-            alert("error");
+            this.message("danger", error.response.data.message);
             this.cancelLoader = false;
           });
       }
@@ -1601,6 +1600,8 @@ export default {
     submitProduct() {
       this.$v.validationGroup.$touch();
 
+      // If varientDetails is empty or sku number is undefined, set the
+      // boolean to true which will display an error message
       if (this.varientDetails.length === 0) {
         this.varientTableError = true;
       } else {
@@ -1622,12 +1623,15 @@ export default {
       form.effectiveStartDate = moment(form.effectiveStartDate).format(
         "YYYY-MM-DD"
       );
+
+      // If end date is null or empty, do not format
       if (form.effectiveEndDate !== "" && form.effectiveEndDate !== null) {
         form.effectiveEndDate = moment(form.effectiveEndDate).format(
           "YYYY-MM-DD"
         );
       }
 
+      // construct an object that holds all the product details
       var productObj = {
         productName: form.name,
         description: form.description,
@@ -1642,19 +1646,21 @@ export default {
 
       console.log(productObj);
 
-      this.$store
-        .dispatch(CREATE_PRODUCT, productObj)
-        .then(response => {
-          console.dir(response);
-          this.submitLoader = false;
-          this.message("success", "You have successfully added a new product!");
-          // this.$router.push("/ResourceManagement");
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error.response.data.message);
-          this.submitLoader = false;
-        });
+      this.submitLoader = true;
+      if (this.previousDeletedImageKeys.length > 0) {
+        this.$store
+          .dispatch(DELETE_PRODUCT_IMAGES, this.previousDeletedImageKeys)
+          .then(response => {
+            this.createProduct(productObj);
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error.response.data.message);
+            this.submitLoader = false;
+          });
+      } else {
+        this.createProduct(productObj);
+      }
     },
 
     getOptions() {
@@ -1672,6 +1678,23 @@ export default {
           productImages: varient.productImages
         };
       });
+    },
+
+    createProduct(productObj) {
+      this.$store
+        .dispatch(CREATE_PRODUCT, productObj)
+        .then(response => {
+          console.dir(response);
+          this.submitLoader = false;
+          this.message("success", "You have successfully added a new product!");
+          // this.$router.push("/ResourceManagement");
+          // if never route them back, we need to reset the image keys
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error.response.data.message);
+          this.submitLoader = false;
+        });
     }
   }
 };
@@ -1733,6 +1756,15 @@ h4 {
 
 .btn-outline-secondary {
   border-color: #d1d3e2 !important;
+}
+
+.btn-delete-varient,
+.btn-add-value {
+  cursor: pointer;
+}
+
+.btn-delete-value {
+  margin-top: 33px;
 }
 
 .table-varient-error {
