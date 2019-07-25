@@ -18,6 +18,7 @@ import ErrorPage from "./views/Error";
 import HotelManagement from "./views/HotelManagement";
 import AddHotel from "./views/AddHotel";
 import UpdateHotel from "./views/UpdateHotel";
+import ViewResource from "./views/ViewResource"
 
 import { eventBus } from "@/eventBus";
 
@@ -116,6 +117,15 @@ let router = new Router({
       path: "/UpdateResource",
       name: "UpdateResource",
       component: UpdateResource,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
+      path: "/ViewResource",
+      name: "ViewResource",
+      component: ViewResource,
       meta: {
         needAuthentication: true,
         needNewPassword: true
@@ -270,6 +280,7 @@ router.beforeEach((to, from, next) => {
         if (store.getters.userRole == "Admin") next();
         else if (store.getters.userRole == "Store") {
           if (
+            //these are the paths that the Store person can go to
             to.path == "/SummaryOfOrders" ||
             to.path == "/ResourceManagement" ||
             to.path == "/OrderDetails" ||
@@ -283,6 +294,7 @@ router.beforeEach((to, from, next) => {
             });
         } else if (store.getters.userRole == "Delivery") {
           if (
+            //these are the paths that the Delivery person can go to
             to.path == "/Deliveries" ||
             to.path == "/Login" ||
             to.path == "/ChangePassword"
@@ -334,8 +346,8 @@ router.beforeEach((to, from, next) => {
   )
     localStorage.setItem("editOrderId", null);
 
-  //if people try to access the editorderdetails page by typing in the url, it will just
-  //redirect them to summaryofOrders
+  //if people try to access the UpdateResource page by typing in the url, it will just
+  //redirect them to ResourceManagement
   if (
     to.name == "UpdateResource" &&
     localStorage.getItem("updateResourceId") == "null"
@@ -347,6 +359,20 @@ router.beforeEach((to, from, next) => {
     localStorage.getItem("updateResourceId") != null
   )
     localStorage.setItem("updateResourceId", null);
+
+  //if people try to access the UpdateResource page by typing in the url, it will just
+  //redirect them to ResourceManagement
+  if (
+    to.name == "ViewResource" &&
+    localStorage.getItem("viewResourceId") == "null"
+  )
+    next({ path: "/ResourceManagement" });
+
+  if (
+    to.name != "ViewResource" &&
+    localStorage.getItem("viewResourceId") != null
+  )
+    localStorage.setItem("viewResourceId", null);
 
   //if people try to access the editorderdetails page by typing in the url, it will just
   //redirect them to summaryofOrders

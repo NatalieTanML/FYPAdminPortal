@@ -182,6 +182,10 @@ export default {
         this.$v.$reset();
         this.$bvModal.show("manageQuantity");
       }
+      if (jsonData.actionButton == "View Resource") {
+        localStorage.setItem("viewResourceId", jsonData.item.productId);
+        this.$router.replace({ name: "ViewResource" });
+      }
     });
 
     this.$store
@@ -274,12 +278,12 @@ export default {
 
             this.items[x].actions = [
               "Edit Resource",
-              "Manage Resource Quantity"
+              "Manage Resource Quantity",
+              "View Resource"
             ];
             x++;
           }
         }
-
       })
       .catch(error => {
         alert(error);
@@ -424,12 +428,12 @@ export default {
 
               this.items[x].actions = [
                 "Edit Resource",
-                "Manage Resource Quantity"
+                "Manage Resource Quantity",
+                "View Resource"
               ];
               x++;
             }
           }
-
         })
         .catch(error => {
           alert(error);
