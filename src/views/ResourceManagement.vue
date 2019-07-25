@@ -297,6 +297,7 @@ export default {
             this.form.effectiveQuantity =
               parseInt(this.form.currentQuantity) +
               parseInt(this.form.quantityValue);
+          else this.form.effectiveQuantity = "Please enter numeric value";
         } else this.form.effectiveQuantity = "Please enter numeric value";
       } else {
         if (this.form.quantityValue != null) {
@@ -308,7 +309,7 @@ export default {
               this.form.effectiveQuantity =
                 parseInt(this.form.currentQuantity) -
                 parseInt(this.form.quantityValue);
-          }
+          } else this.form.effectiveQuantity = "Please enter numeric value";
         } else this.form.effectiveQuantity = "Please enter numeric value";
       }
     },
