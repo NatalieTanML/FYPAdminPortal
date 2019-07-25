@@ -226,7 +226,7 @@ export default {
       pageOptions: [5, 10, 15, 20, 25],
       sortBy: null,
       sortDesc: false,
-      // items: [],
+      itemsChange: [],
       sortDirection: "asc",
       filter: null,
       checkedCheckBox: [],
@@ -248,17 +248,10 @@ export default {
     actionButtonClick: String,
     enableCheckbox: Boolean,
     tableName: String,
-    imageClick: String
+    imageClick: String,
   },
   mounted() {
-    // console.log(this.$props.items);
-
-    // if (localStorage.getItem("currentPage") != undefined)
-    // this.currentPage = localStorage.getItem("currentPage");
-
-    this.totalRows = this.items.length;
     console.log("this.totalRows : " + this.totalRows);
-    console.log("this.currentPage : " + this.currentPage);
     console.log(this.enableCheckbox);
     this.userRole = this.$store.getters.userRole;
     //to redraw the hr line.
@@ -275,18 +268,21 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields.filter(f => f.sortable).map(f => {
-        return {
-          text: f.label,
-          value: f.key
-        };
-      });
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => {
+          return {
+            text: f.label,
+            value: f.key
+          };
+        });
     }
   },
   watch: {
     items: {
       handler() {
-        console.log("watch item");
+        this.totalRows = this.items.length;
+        console.log("watch itemsChange");
       },
       deep: true
     }

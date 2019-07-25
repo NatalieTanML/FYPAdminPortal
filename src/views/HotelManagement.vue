@@ -6,9 +6,9 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-     
-          <DashboardHeader title="Hotel Management"></DashboardHeader>
-         
+
+        <DashboardHeader title="Hotel Management"></DashboardHeader>
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -17,7 +17,6 @@
 
         <div cols="4">
           <Table
-            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -66,7 +65,6 @@ export default {
       headerButtonClick: ["Add Hotel"],
       headerButton: [{ id: 1, title: "Add Hotel" }],
       actionButtonClick: "Edit Hotel",
-      forceRender: true,
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
@@ -114,9 +112,6 @@ export default {
             actions: ["Edit Hotel"]
           });
         }
-
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
       })
       .catch(error => {
         console.dir(error);

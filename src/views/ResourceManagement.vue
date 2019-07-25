@@ -11,7 +11,6 @@
         <!-- Topbar Navbar -->
         <div>
           <Table
-            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -128,7 +127,6 @@ export default {
       actionButtonClick: "Resource Action Buttons",
       products: "",
       tableName: "Resource Management",
-      forceRender: true,
       optionId: "",
       items: [],
       quantityOptions: ["Increase", "Reduce"],
@@ -282,8 +280,6 @@ export default {
           }
         }
 
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
       })
       .catch(error => {
         alert(error);
@@ -433,8 +429,7 @@ export default {
               x++;
             }
           }
-          if (this.forceRender) this.forceRender = false;
-          else this.forceRender = true;
+
         })
         .catch(error => {
           alert(error);

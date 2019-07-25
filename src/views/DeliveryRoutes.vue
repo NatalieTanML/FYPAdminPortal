@@ -17,7 +17,6 @@
           <div>
             <!-- headerButton="Assign Selected to Deliveryman" -->
             <Table
-              :key="this.forceRender"
               v-bind:headerButtonClick="this.headerButtonClick"
               v-bind:actionButtonClick="this.actionButtonClick"
               :headerButton="this.headerButton"
@@ -84,7 +83,6 @@ export default {
       headerButtonClick: ["Assign/Update Delivery Man"],
       id: "",
       orderIds: [],
-      forceRender: false,
       items: [],
       fields: [
         { key: "checkbox", label: "" },
@@ -293,9 +291,15 @@ export default {
           console.log(response);
           var status;
           for (var i = 0; i < response.length; i++) {
-            status = response[i].status
-            if ((response[i].deliveryType == "Hotel" || response[i].deliveryType == "Residential") &&
-            (status == "Received" || status == "Awaiting Printing"|| status == "Printed" || status == "Delivery Failed")) {
+            status = response[i].status;
+            if (
+              (response[i].deliveryType == "Hotel" ||
+                response[i].deliveryType == "Residential") &&
+              (status == "Received" ||
+                status == "Awaiting Printing" ||
+                status == "Printed" ||
+                status == "Delivery Failed")
+            ) {
               var postalcode;
               var region;
 
@@ -331,9 +335,6 @@ export default {
           }
 
           console.log(this.items);
-
-          if (this.forceRender) this.forceRender = false;
-          else this.forceRender = true;
         })
         .catch(error => {
           console.log(error);

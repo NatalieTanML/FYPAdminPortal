@@ -6,9 +6,9 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-     
-          <DashboardHeader title="User Management"></DashboardHeader>
-         
+
+        <DashboardHeader title="User Management"></DashboardHeader>
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -17,7 +17,6 @@
 
         <div cols="4">
           <Table
-          :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -60,7 +59,6 @@ export default {
       headerButtonClick: ["Add User"],
       headerButton: [{ id: 1, title: "Add User" }],
       actionButtonClick: "Edit One User",
-      forceRender: false,
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
@@ -101,19 +99,15 @@ export default {
         this.items = response;
         let index;
         for (index = 0; index < this.items.length; index++) {
-          
           this.items[index].createdAt = new Date(
-                Date.parse(this.items[index].createdAt)
-              ).toLocaleString()
+            Date.parse(this.items[index].createdAt)
+          ).toLocaleString();
 
           if (this.items[index].isEnabled) this.items[index].isEnabled = "Yes";
           else this.items[index].isEnabled = "No";
 
           this.items[index].actions = ["Edit"];
         }
-
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
       })
       .catch(error => {
         console.dir(error);
