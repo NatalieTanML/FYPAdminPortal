@@ -177,7 +177,20 @@ const actions = {
           reject(err);
         });
     });
-  }
+  },
+
+  [DELETE_PRODUCT]: ({ commit }, productId) => {
+    return new Promise((resolve, reject) => {
+      apiCall({ url: api_routes.product.create + productId, method: 'delete' })
+        .then(resp => {
+          console.dir(resp)
+          resolve(resp);
+        })
+        .catch(err => {
+          reject(err);
+        })
+    })
+  },
 };
 
 const mutations = {

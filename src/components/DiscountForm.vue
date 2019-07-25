@@ -44,7 +44,6 @@
         :value="datePicker.date"
         :bootstrap-styling="datePicker.style"
         :format="datePicker.format"
-        :disabledDates="datePicker.disabledDates"
         :placeholder="datePicker.placeHolder"
         v-model="v.effectiveStartDate.$model"
         :class="(!v.effectiveStartDate.$dirty) ? null : (v.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
@@ -75,7 +74,7 @@
         :clear-button="true"
         :format="datePicker.format"
         :placeholder="datePicker.placeHolder"
-        :disabledDates="datePicker.disabledDates"
+        :disabledDates="disabledDiscountDates()"
         v-model="v.effectiveEndDate.$model"
         :class="(!v.effectiveEndDate.$dirty) ? null : (v.effectiveEndDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
       ></datepicker>
@@ -108,12 +107,21 @@ export default {
       discountOptions: ["Percentage", "Fixed"],
       datePicker: {
         style: true,
-        format: "yyyy-MM-dd",
-        disabledDates: {
-          to: new Date(Date.now() - 8640000)
-        }
+        format: "yyyy-MM-dd"
       }
     };
+  },
+  methods: {
+    // Disable previous dates for discount end date according to selected discount start date
+    disabledDiscountDates() {
+      let startDate = this.value.effectiveStartDate;
+      if (typeof startDate === "string") {
+        startDate = new Date(startDate);
+      }
+      let disabledDates = {};
+      disabledDates.to = new Date(startDate - 8640000);
+      return disabledDates;
+    }
   }
 };
 </script>

@@ -101,8 +101,6 @@
                     :value="datePicker.date"
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
-                    :disabledDates="datePicker.disabledDates"
-                    :open-date="new Date()"
                     :placeholder="datePicker.placeHolder"
                     v-model="$v.form.effectiveStartDate.$model"
                     :class="(!$v.form.effectiveStartDate.$dirty) ? null : ($v.form.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
@@ -128,8 +126,7 @@
                     :value="datePicker.date"
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
-                    :disabledDates="datePicker.disabledDates"
-                    :open-date="new Date()"
+                    :disabledDates="disabledDates()"
                     :placeholder="datePicker.placeHolder"
                     v-model="form.effectiveEndDate"
                   ></datepicker>
@@ -482,7 +479,7 @@
                   class="mr-3 px-4"
                   :disabled="productSubmitLoader"
                 >
-                  <b-spinner small class="mr-2" v-if="productSubmitLoader"></b-spinner>
+                  <b-spinner small class="mr-2" v-if="productSubmitLoader" value="save"></b-spinner>
                   <span>Save</span>
                 </b-button>
 
@@ -578,10 +575,7 @@ export default {
 
       datePicker: {
         style: true,
-        format: "yyyy-MM-dd",
-        disabledDates: {
-          to: new Date(Date.now() - 8640000)
-        }
+        format: "yyyy-MM-dd"
       },
 
       // This is from varient Option
@@ -1009,6 +1003,17 @@ export default {
   },
 
   methods: {
+    // Disable previous dates for end date according to selected start date
+    disabledDates() {
+      let startDate = this.form.effectiveStartDate;
+      if (typeof startDate === "string") {
+        startDate = new Date(startDate);
+      }
+      let disabledDates = {};
+      disabledDates.to = new Date(startDate - 8640000);
+      return disabledDates;
+    },
+
     handleAddDiscount(bvModalEvt) {
       bvModalEvt.preventDefault();
       const { effectiveStartDate, effectiveEndDate } = this.form.discount;
@@ -1165,6 +1170,9 @@ export default {
 
     // This method is invoked when the OK button is clicked on the "modal dialog" (Save the changes)
     handleEditDiscount(bvModalEvt) {
+      bvModalEvt.preventDefault();
+      this.$v.form.discount.$touch();
+
       const { effectiveStartDate, effectiveEndDate } = this.form.discount;
 
       if (this.discountDetails.length > 0) {
@@ -1748,7 +1756,7 @@ export default {
       }
     },
 
-    submitProduct() {
+    submitProduct(event) {
       this.$v.validationGroup.$touch();
 
       // If varientDetails is empty set boolean to true which will trigger an error message
