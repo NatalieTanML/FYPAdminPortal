@@ -71,6 +71,7 @@ export default {
         { key: "name", label: "Hotel Name", sortable: true },
         { key: "address", label: "Hotel Address", sortable: true },
         { key: "postalCode", label: "Hotel Postal Code" },
+        { key: "isEnabled", label: "Is Enabled" },
         { key: "actions", label: "Actions" }
       ]
     };
@@ -84,6 +85,10 @@ export default {
       };
       this.$snack[method](config);
       // this.$snack[method](config)
+    },
+    getEnabled(isEnabled) {
+      if (isEnabled) return "Yes";
+      else return "No";
     }
   },
   mounted() {
@@ -109,6 +114,7 @@ export default {
             name: response[x].text,
             address: response[x].hotelAddress,
             postalCode: response[x].hotelPostalCode,
+            isEnabled: this.getEnabled(response[x].isActive),
             actions: ["Edit Hotel"]
           });
         }
