@@ -18,7 +18,7 @@ import ErrorPage from "./views/Error";
 import HotelManagement from "./views/HotelManagement";
 import AddHotel from "./views/AddHotel";
 import UpdateHotel from "./views/UpdateHotel";
-import ViewResource from "./views/ViewResource"
+import ViewResource from "./views/ViewResource";
 
 import { eventBus } from "@/eventBus";
 
