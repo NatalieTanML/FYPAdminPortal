@@ -3,23 +3,28 @@
     <SideBar></SideBar>
     <div id="content-wrapper">
       <div id="content">
-        <DashboardHeader title="Resource Management - Update Resource"></DashboardHeader>
+        <DashboardHeader title="Resource Management - Add Resource"></DashboardHeader>
 
         <b-container fluid>
-          <b-row class="bg-white text-left" align-h="center">
+          <b-row class="bg-white text-left shadow" align-h="center">
             <b-col cols="10" class="my-5">
               <h4 class="text-uppercase">General</h4>
               <hr class="mb-5" />
 
               <b-form class="resource-form">
-                <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
                 <b-form-group
                   id="productName"
                   label-cols-sm="3"
                   label="Product Name"
                   label-for="input-horizontal"
                 >
-                  <b-form-input id="productName" v-model="form.name"></b-form-input>
+                  <b-form-input
+                    id="productName"
+                    v-model="$v.form.name.$model"
+                    :state="$v.form.name.$dirty ? !$v.form.name.$error : null"
+                  ></b-form-input>
+
+                  <b-form-invalid-feedback>Name is required</b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
@@ -28,7 +33,19 @@
                   label="Price"
                   label-for="input-horizontal"
                 >
-                  <b-form-input id="price" v-model="form.price"></b-form-input>
+                  <b-form-input
+                    id="price"
+                    v-model="$v.form.price.$model"
+                    :state="$v.form.price.$dirty ? !$v.form.price.$error : null"
+                    maxlength="7"
+                  ></b-form-input>
+                  <b-form-invalid-feedback>
+                    <p v-if="!$v.form.price.required">Price is required</p>
+                    <p
+                      v-if="!$v.form.price.twoDecimal"
+                    >Please enter a valid number and not more than 2 decimal places</p>
+                    <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 999</p>
+                  </b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
@@ -37,7 +54,20 @@
                   label="Width"
                   label-for="input-horizontal"
                 >
-                  <b-form-input id="imageWidth" v-model="form.imageWidth"></b-form-input>
+                  <b-form-input
+                    id="imageWidth"
+                    v-model="$v.form.imageWidth.$model"
+                    :state="$v.form.imageWidth.$dirty ? !$v.form.imageWidth.$error : null"
+                  ></b-form-input>
+
+                  <b-form-invalid-feedback>
+                    <p v-if="!$v.form.imageWidth.required">Width is required</p>
+                    <p
+                      v-if="!$v.form.imageWidth.decimal
+                      ||
+                      !$v.form.imageWidth.minValue"
+                    >Please enter a valid number</p>
+                  </b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
@@ -46,7 +76,18 @@
                   label="Height"
                   label-for="input-horizontal"
                 >
-                  <b-form-input id="imageHeight" v-model="form.imageHeight"></b-form-input>
+                  <b-form-input
+                    id="imageHeight"
+                    v-model="$v.form.imageHeight.$model"
+                    :state="$v.form.imageHeight.$dirty ? !$v.form.imageHeight.$error : null"
+                  ></b-form-input>
+
+                  <b-form-invalid-feedback>
+                    <p v-if="!$v.form.imageHeight.required">Height is required</p>
+                    <p
+                      v-if="!$v.form.imageHeight.decimal || !$v.form.imageHeight.minValue"
+                    >Please enter a valid number</p>
+                  </b-form-invalid-feedback>
                 </b-form-group>
 
                 <b-form-group
@@ -56,14 +97,22 @@
                   label-for="input-horizontal"
                 >
                   <datepicker
-                    id="startDate"
+                    :id="(!$v.form.effectiveStartDate.$dirty) ? 'startDate' : ($v.form.effectiveStartDate.$error) ? 'date-invalid' : 'date-valid' "
                     :value="datePicker.date"
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
+                    :disabledDates="datePicker.disabledDates"
                     :placeholder="datePicker.placeHolder"
-                    v-model="form.effectiveStartDate"
-                    required
+                    v-model="$v.form.effectiveStartDate.$model"
+                    :class="(!$v.form.effectiveStartDate.$dirty) ? null : ($v.form.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
                   ></datepicker>
+
+                  <div v-if="$v.form.effectiveStartDate.$dirty" class="date-invalid-feedback">
+                    <div v-if="!$v.form.effectiveStartDate.required">Start Date is required.</div>
+                    <div
+                      v-if="!$v.form.effectiveStartDate.checkDate"
+                    >Start date must not be the same or greater than end date</div>
+                  </div>
                 </b-form-group>
 
                 <b-form-group
@@ -74,12 +123,13 @@
                 >
                   <datepicker
                     id="endDate"
+                    :clear-button="true"
                     :value="datePicker.date"
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
+                    :disabledDates="datePicker.disabledDates"
                     :placeholder="datePicker.placeHolder"
                     v-model="form.effectiveEndDate"
-                    required
                   ></datepicker>
                 </b-form-group>
 
@@ -89,7 +139,14 @@
                   label="Description"
                   label-for="input-horizontal"
                 >
-                  <b-form-textarea id="description" rows="6" v-model="form.description"></b-form-textarea>
+                  <b-form-textarea
+                    id="description"
+                    rows="6"
+                    v-model="$v.form.description.$model"
+                    :state="$v.form.description.$dirty ? !$v.form.description.$error : null"
+                  ></b-form-textarea>
+
+                  <b-form-invalid-feedback>Description is required</b-form-invalid-feedback>
                 </b-form-group>
 
                 <h4 class="text-uppercase mt-5">Discount</h4>
@@ -127,7 +184,7 @@
                           @click="deleteDiscountInfo(row.index)"
                           v-b-modal.deleteDiscount
                           size="sm"
-                          class="px-3 ml-lg-2 mt-2 mt-lg-0"
+                          class="px-3 ml-3"
                           variant="danger"
                         >Delete</b-button>
                       </template>
@@ -138,23 +195,23 @@
                 <!-- modal dialog for add discount -->
                 <b-modal
                   id="addDiscount"
-                  title="Discount"
+                  title="Add Discount"
+                  ref="discountDialog"
                   @ok="handleAddDiscount"
-                  @close="cancelDiscountDialog"
-                  @cancel="cancelDiscountDialog"
+                  @hidden="cancelDiscountDialog"
                 >
-                  <DiscountForm v-model="this.form"></DiscountForm>
+                  <DiscountForm v-model="form.discount" :v="$v.form.discount"></DiscountForm>
                 </b-modal>
 
                 <!-- modal dialog for edit discount -->
                 <b-modal
                   id="editDiscount"
-                  title="Discount"
+                  title="Edit Discount"
+                  ref="discountDialog"
                   @ok="handleEditDiscount"
-                  @close="cancelDiscountDialog"
-                  @cancel="cancelDiscountDialog"
+                  @hidden="cancelDiscountDialog"
                 >
-                  <DiscountForm v-model="this.form"></DiscountForm>
+                  <DiscountForm v-model="form.discount" :v="$v.form.discount"></DiscountForm>
                 </b-modal>
 
                 <!-- modal dialog for delete discount -->
@@ -171,7 +228,7 @@
                   class="px-4"
                   v-b-modal.addVarient
                   @click="openVarientModal"
-                >+ Add Varient Option</b-button>
+                >+ Add Variant Option</b-button>
 
                 <!-- modal dialog for varient option -->
                 <b-modal
@@ -180,195 +237,230 @@
                   title="Varient Options"
                   ref="varientModal"
                   @ok="handleVarientSubmit"
-                  @cancel="cancel"
-                  @close="cancel"
+                  @cancel="cancelVarientDialog"
+                  @close="cancelVarientDialog"
                 >
-                  <form @submit.stop.prevent="submitDiscount">
-                    <form @submit.stop.prevent="submitDiscount">
-                      <div class="container">
-                        <div
-                          v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
-                          :key="varientIndex"
-                        >
-                          <b-row>
-                            <b-col>
-                              <form>
-                                <div class="offset-md-1">
-                                  <div class="row">
-                                    <b-col cols="5">
-                                      <b-form-group label="Type" label-for="varientType">
-                                        <b-form-input
-                                          v-model="varientSection.type.$model"
-                                          id="varientType"
-                                          :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
-                                        ></b-form-input>
-                                        <b-form-invalid-feedback>
-                                          <p v-if="!varientSection.type.required">Type is required</p>
-                                          <p
-                                            v-if="!varientSection.type.isDuplicateType"
-                                          >There is an existing option with the same type</p>
-                                        </b-form-invalid-feedback>
-                                      </b-form-group>
-                                      <p
-                                        class="btn-delete-varient text-danger"
-                                        @click="deleteType(varientIndex)"
-                                      >Delete Type</p>
-                                    </b-col>
+                  <form>
+                    <div class="container">
+                      <div
+                        v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
+                        :key="varientIndex"
+                      >
+                        <b-row>
+                          <b-col>
+                            <form>
+                              <div class="offset-md-1">
+                                <div class="row">
+                                  <b-col cols="5">
+                                    <b-form-group label="Type" label-for="varientType">
+                                      <b-form-input
+                                        v-model="varientSection.type.$model"
+                                        id="varientType"
+                                        :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
+                                      ></b-form-input>
 
-                                    <div class="col-6">
-                                      <div
-                                        class="row"
-                                        v-for="(value, valueIndex) in varientSection.values.$each.$iter"
-                                        :key="valueIndex"
-                                      >
-                                        <div class="col-10">
-                                          <b-form-group label="Value" label-for="varientValue">
-                                            <b-form-input
-                                              id="varientValue"
-                                              v-model="value.individualValue.$model"
-                                              :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
-                                            ></b-form-input>
+                                      <b-form-invalid-feedback>
+                                        <p v-if="!varientSection.type.required">Type is required</p>
+                                        <p
+                                          v-if="!varientSection.type.isDuplicateType"
+                                        >There is an existing option with the same type</p>
+                                      </b-form-invalid-feedback>
+                                    </b-form-group>
+                                    <p
+                                      class="btn-delete-varient text-danger"
+                                      @click="deleteType(varientIndex)"
+                                    >Delete Type</p>
+                                  </b-col>
 
-                                            <b-form-invalid-feedback>
-                                              <p
-                                                v-if="!value.individualValue.required"
-                                              >Value is required</p>
-                                            </b-form-invalid-feedback>
-                                          </b-form-group>
-                                        </div>
+                                  <div class="col-6 offset-md-1">
+                                    <div
+                                      class="row"
+                                      v-for="(value, valueIndex) in varientSection.values.$each.$iter"
+                                      :key="valueIndex"
+                                    >
+                                      <div class="col-10">
+                                        <b-form-group label="Value" label-for="varientValue">
+                                          <b-form-input
+                                            id="varientValue"
+                                            v-model="value.individualValue.$model"
+                                            :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
+                                          ></b-form-input>
 
-                                        <div class="col-2 col-sm-2">
-                                          <b-button
-                                            v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
-                                            size="sm"
-                                            class="btn-delete-value"
-                                            variant="danger"
-                                            @click="removeValue(varientIndex, valueIndex)"
-                                          >-</b-button>
-                                        </div>
+                                          <b-form-invalid-feedback>
+                                            <p
+                                              v-if="!value.individualValue.required"
+                                            >Value is required</p>
+                                            <p
+                                              v-if="!value.individualValue.isDuplicateValue"
+                                            >There is an existing option with the same value</p>
+                                          </b-form-invalid-feedback>
+                                        </b-form-group>
                                       </div>
-                                      <p
-                                        @click="addValue(varientIndex)"
-                                        class="btn-add-value text-primary"
-                                      >+ Add Another Value</p>
+
+                                      <div class="col-2 col-sm-2">
+                                        <b-button
+                                          v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
+                                          size="sm"
+                                          class="btn-delete-value"
+                                          variant="danger"
+                                          @click="removeValue(varientIndex, valueIndex)"
+                                        >-</b-button>
+                                      </div>
                                     </div>
+                                    <p
+                                      @click="addValue(varientIndex)"
+                                      class="btn-add-value text-primary"
+                                    >+ Add Another Value</p>
                                   </div>
                                 </div>
-                              </form>
-                            </b-col>
-                          </b-row>
-                        </div>
-                        <b-row>
-                          <b-col class="offset-md-1">
-                            <b-button
-                              variant="outline-primary mt-3"
-                              @click="addVarient()"
-                            >+ Add Varient Option</b-button>
+                              </div>
+                            </form>
                           </b-col>
                         </b-row>
-                        <!-- <pre>{{$v}}</pre> -->
                       </div>
-                      <!-- <VarientOption
-                      v-model="varientSections"
-                      :v="$v.varientSections.$each"
-                      @addVarient="addVarient"
-                      @addValue="addValue"
-                      @removeValue="removeValue"
-                      @deleteType="deleteType"
-                      ></VarientOption>-->
-                    </form>
-                    <!-- <VarientOption
-                      v-model="varientSections"
-                      @addVarient="addVarient"
-                      @addValue="addValue"
-                      @removeValue="removeValue"
-                      @deleteType="deleteType"
-                    ></VarientOption>-->
-                  </form>
-                </b-modal>
-
-                <b-container class="px-0" fluid>
-                  <div class="table-wrapper">
-                    <div class="table-title">
-                      <b-row class="mx-auto">
-                        <b-col col-sm="3" class="text-left">
-                          <h5>Variants</h5>
+                      <b-row>
+                        <b-col class="offset-md-1">
+                          <b-button
+                            variant="outline-primary mt-3"
+                            @click="addVarient()"
+                          >+ Add Varient Option</b-button>
                         </b-col>
                       </b-row>
                     </div>
+                  </form>
+                </b-modal>
 
-                    <!-- Varient Table -->
-                    <b-table responsive striped :items="varientDetails" :fields="varientFields">
-                      <template slot="actions" slot-scope="row">
-                        <b-button
-                          @click="varientInfo(row.item, row.index)"
-                          v-b-modal.editVarient
-                          size="sm"
-                          class="px-4"
-                          variant="primary"
-                        >Edit</b-button>
-                      </template>
-                    </b-table>
+                <div class="text-center" v-if="this.varientTableError">
+                  <p
+                    v-if="varientDetails.length === 0"
+                    class="table-varient-error"
+                  >Please add at least one varient option</p>
+                  <p
+                    v-else
+                    class="table-varient-error"
+                  >Please fill in all the necessary varient details</p>
+                </div>
 
-                    <b-modal
-                      id="editVarient"
-                      ref="editVarientModal"
-                      title="Edit Varient"
-                      @ok="editVarientTableDialog"
-                      @cancel="cancelEditVarientTableDialog"
-                      @close="cancelEditVarientTableDialog"
-                    >
-                      <form @submit.stop.prevent="submitDiscount">
-                        <b-form-group label="SKU Number">
-                          <b-form-input id="productSKU" v-model="form.varient.SKUNumber"></b-form-input>
-                        </b-form-group>
+                <b-container class="px-0" fluid>
+                  <div class="table-wrapper">
+                    <div :class="{'border border-danger' : this.varientTableError}">
+                      <div class="table-title">
+                        <b-row class="mx-auto">
+                          <b-col col-sm="3" class="text-left">
+                            <h5>Variants</h5>
+                          </b-col>
+                        </b-row>
+                      </div>
 
-                        <b-form-group label="Varient">
-                          <b-form-input
-                            id="varientCombination"
-                            v-model="form.varient.combination"
-                            disabled
-                          ></b-form-input>
-                        </b-form-group>
+                      <!-- Varient Table -->
+                      <b-table responsive striped :items="varientDetails" :fields="varientFields">
+                        <template slot="actions" slot-scope="row">
+                          <b-button
+                            @click="varientInfo(row.item, row.index)"
+                            v-b-modal.editVarient
+                            size="sm"
+                            class="px-4"
+                            variant="primary"
+                          >Edit</b-button>
+                        </template>
+                      </b-table>
 
-                        <b-form-group label="Current Qty">
-                          <b-form-input id="currentQuantity" v-model="form.varient.currentQuantity"></b-form-input>
-                        </b-form-group>
+                      <b-modal
+                        id="editVarient"
+                        ref="editVarientModal"
+                        title="Edit Varient"
+                        @ok="editVarientTableDialog"
+                        @hidden="cancelEditVarientTableDialog"
+                      >
+                        <form>
+                          <b-form-group label="SKU Number">
+                            <b-form-input
+                              id="productSKU"
+                              v-model="$v.form.varient.SKUNumber.$model"
+                              :state="$v.form.varient.SKUNumber.$dirty ? !$v.form.varient.SKUNumber.$error : null"
+                            ></b-form-input>
 
-                        <b-form-group label="Min. Qty">
-                          <b-form-input id="minimumQuantity" v-model="form.varient.minimumQuantity"></b-form-input>
-                        </b-form-group>
+                            <b-form-invalid-feedback>
+                              <p v-if="!$v.form.varient.SKUNumber.required">SKU Number is required</p>
+                              <p
+                                v-if="!$v.form.varient.SKUNumber.isDuplicateSKU"
+                              >SKU Number already exist</p>
+                            </b-form-invalid-feedback>
+                          </b-form-group>
 
-                        <b-form-group label="Image">
-                          <vue-dropzone
-                            id="dropzone"
-                            ref="myVueDropzone"
-                            :options="dropOptions"
-                            :useCustomSlot="true"
-                            @vdropzone-file-added="addFileToDropzone"
-                            @vdropzone-removed-file="deleteFileFromDropzone"
-                            @vdropzone-duplicate-file="duplicateFileCheck"
-                            :destroyDropzone="false"
-                            :duplicateCheck="true"
-                          >
-                            <div class="dropzone-custom-content">
-                              <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                              <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
-                              <div class="subtitle">or click to add your image</div>
-                            </div>
-                          </vue-dropzone>
-                        </b-form-group>
-                      </form>
+                          <b-form-group label="Varient">
+                            <b-form-input
+                              id="varientCombination"
+                              v-model="form.varient.combination"
+                              disabled
+                            ></b-form-input>
+                          </b-form-group>
 
-                      <template slot="modal-footer" slot-scope="{ ok, cancel }">
-                        <!-- Emulate built in modal footer ok and cancel button actions -->
-                        <b-button variant="secondary" @click="cancel()">Cancel</b-button>
-                        <b-button variant="primary" @click="ok()" :disabled="varientSubmitLoader">
-                          <b-spinner small class="mr-2" v-if="varientSubmitLoader"></b-spinner>
-                          <span>Ok</span>
-                        </b-button>
-                      </template>
-                    </b-modal>
+                          <b-form-group label="Current Qty">
+                            <b-form-input
+                              id="currentQuantity"
+                              v-model="$v.form.varient.currentQuantity.$model"
+                              :state="$v.form.varient.currentQuantity.$dirty ? !$v.form.varient.currentQuantity.$error : null"
+                            ></b-form-input>
+
+                            <b-form-invalid-feedback>
+                              <p
+                                v-if="!$v.form.varient.currentQuantity.required"
+                              >Current quantity is required</p>
+                              <p
+                                v-if="!$v.form.varient.currentQuantity.integer || !$v.form.varient.currentQuantity.minValue"
+                              >Please enter a valid number</p>
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+
+                          <b-form-group label="Min. Qty">
+                            <b-form-input
+                              id="minimumQuantity"
+                              v-model="$v.form.varient.minimumQuantity.$model"
+                              :state="$v.form.varient.minimumQuantity.$dirty ? !$v.form.varient.minimumQuantity.$error : null"
+                            ></b-form-input>
+
+                            <b-form-invalid-feedback>
+                              <p
+                                v-if="!$v.form.varient.minimumQuantity.required"
+                              >Minimum quantity is required</p>
+                              <p
+                                v-if="!$v.form.varient.minimumQuantity.integer || !$v.form.varient.minimumQuantity.minValue"
+                              >Please enter a valid number</p>
+                            </b-form-invalid-feedback>
+                          </b-form-group>
+
+                          <b-form-group label="Image">
+                            <vue-dropzone
+                              id="dropzone"
+                              ref="myVueDropzone"
+                              :options="dropOptions"
+                              :useCustomSlot="true"
+                              @vdropzone-file-added="addFileToDropzone"
+                              @vdropzone-removed-file="deleteFileFromDropzone"
+                              @vdropzone-duplicate-file="duplicateFileCheck"
+                              :destroyDropzone="false"
+                              :duplicateCheck="true"
+                            >
+                              <div class="dropzone-custom-content">
+                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
+                                <div class="subtitle">or click to add your image</div>
+                              </div>
+                            </vue-dropzone>
+                          </b-form-group>
+                        </form>
+
+                        <template slot="modal-footer" slot-scope="{ ok, cancel }">
+                          <!-- Emulate built in modal footer ok and cancel button actions -->
+                          <b-button variant="secondary" @click="cancel()">Cancel</b-button>
+                          <b-button variant="primary" @click="ok()" :disabled="varientSubmitLoader">
+                            <b-spinner small class="mr-2" v-if="varientSubmitLoader"></b-spinner>
+                            <span>Ok</span>
+                          </b-button>
+                        </template>
+                      </b-modal>
+                    </div>
                   </div>
                 </b-container>
               </b-form>
@@ -384,7 +476,7 @@
                   <span>Save</span>
                 </b-button>
 
-                <b-button class="px-4" @click="cancelProduct" :disabled="productCancelLoader">
+                <b-button class="px-4" @click="cancelProduct">
                   <b-spinner small class="mr-2" v-if="productCancelLoader"></b-spinner>
                   <span>Cancel</span>
                 </b-button>
@@ -401,14 +493,18 @@
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import vueDropzone from "vue2-dropzone";
-import Multiselect from "vue-multiselect";
 import Datepicker from "vuejs-datepicker";
-import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as asingle module
+import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as a single module
 import differencewith from "lodash.differencewith";
-import isequal from "lodash.isequal";
 import moment from "moment";
+import {
+  required,
+  minValue,
+  maxValue,
+  decimal,
+  integer
+} from "vuelidate/lib/validators";
 import DiscountForm from "@/components/DiscountForm";
-import { required, minLength } from "vuelidate/lib/validators";
 import {
   UPLOAD_PRODUCT_IMAGES,
   DELETE_PRODUCT_IMAGES,
@@ -422,7 +518,6 @@ export default {
     SideBar,
     DashboardHeader,
     vueDropzone,
-    Multiselect,
     Datepicker,
     DiscountForm
   },
@@ -442,7 +537,7 @@ export default {
           effectiveStartDate: "",
           effectiveEndDate: "",
           discountValue: null,
-          discountType: "",
+          discountType: "Percentage",
           isPercentage: false
         },
         varient: {
@@ -467,10 +562,16 @@ export default {
 
       discountIndex: null,
       discountDetails: [],
+      isMaxFixedValue: false,
+      isOverlapped: false,
+      currentOverlappedDate: "",
 
       datePicker: {
         style: true,
-        format: "yyyy-MM-dd"
+        format: "yyyy-MM-dd",
+        disabledDates: {
+          to: new Date(Date.now() - 8640000)
+        }
       },
 
       // This is from varient Option
@@ -492,6 +593,7 @@ export default {
       originalVarient: [],
 
       varientDetails: [],
+      varientTableError: false,
       selectedVarientIndex: null,
 
       deletedImageKeys: [],
@@ -531,18 +633,174 @@ export default {
   },
 
   validations: {
+    form: {
+      name: {
+        required
+      },
+
+      price: {
+        required,
+        // validate price up to 2 decimal places
+        twoDecimal(price) {
+          if (price === "") return true;
+          let regex = /^\d+(\.\d{1,2})?$/;
+          return regex.test(price);
+        },
+        maxValue: price => (price > 9999.99 && price !== "" ? false : true)
+      },
+
+      imageWidth: {
+        decimal,
+        required,
+        minValue: width => (width >= 0 ? true : false)
+      },
+
+      imageHeight: {
+        decimal,
+        required,
+        minValue: height => (height >= 0 ? true : false)
+      },
+
+      effectiveStartDate: {
+        required,
+        // Check if start date is equal or greater than end date
+        checkDate(startDate) {
+          let endDate = this.form.effectiveEndDate;
+          if (endDate == "" || endDate == null) return true;
+
+          // Initialize the time to midnight for accurate comparison
+          startDate = new Date(new Date(startDate).setHours(0, 0, 0, 0));
+          endDate = new Date(new Date(endDate).setHours(0, 0, 0, 0));
+
+          if (startDate >= endDate) return false;
+          return true;
+        }
+      },
+
+      description: {
+        required
+      },
+
+      discount: {
+        discountValue: {
+          required,
+          // Validate discount value up to 2 decimal places
+          twoDecimal(value) {
+            if (value === "" || value < 0 || this.isMaxFixedValue) return true;
+            let regex = /^\d+(\.\d{1,2})?$/;
+            return regex.test(value);
+          },
+          // Check if value is greater than 0 and less than or equal to 100 for percentage discount
+          maxPercentageValue(value, discountObject) {
+            if (value === "") return true;
+            if (discountObject.discountType === "Percentage") {
+              if (value > 100 || value <= 0) {
+                return false;
+              }
+            }
+            return true;
+          },
+          // Check if base price is larger than discount price and less than or equal to 0 for fixed discount
+          maxFixedValue(value, discountObject) {
+            if (discountObject.discountType === "Fixed") {
+              if (value === "" || this.form.price === "") {
+                this.isMaxFixedValue = false;
+                return true;
+              }
+              value = Number(value);
+              let basePrice = Number(this.form.price);
+              console.log(basePrice);
+              if (value > basePrice || value <= 0) {
+                this.isMaxFixedValue = true;
+                return false;
+              }
+            }
+            this.isMaxFixedValue = false;
+            return true;
+          }
+        },
+
+        effectiveStartDate: {
+          required,
+          // Check if discount start date is greater than or equal to discount end date
+          checkDate(startDate) {
+            if (typeof startDate === "string") return true;
+            if (
+              this.isOverlapped &&
+              this.currentOverlappedDate.getTime() !== startDate.getTime()
+            ) {
+              this.$v.form.discount.effectiveStartDate.$reset();
+            }
+
+            let endDate = this.form.discount.effectiveEndDate;
+            if (endDate == "" || endDate == null) return true;
+            if (startDate >= this.form.discount.effectiveEndDate) return false;
+            return true;
+          },
+          overlapFound() {
+            return !this.isOverlapped;
+          }
+        }
+      },
+
+      varient: {
+        SKUNumber: {
+          required,
+          // Check if sku number exist in previous varients
+          isDuplicateSKU(value) {
+            if (value === "") return true;
+            let isDuplicate = true;
+
+            if (this.varientDetails.length > 0) {
+              this.varientDetails.forEach((varientDetail, index) => {
+                if (index !== this.selectedVarientIndex) {
+                  if (varientDetail.SKUNumber !== undefined) {
+                    if (varientDetail.SKUNumber === value) {
+                      isDuplicate = false;
+                    }
+                  }
+                }
+              });
+            }
+            return isDuplicate;
+          }
+        },
+
+        currentQuantity: {
+          required,
+          integer,
+          minValue: quantity => (quantity >= 0 ? true : false)
+        },
+
+        minimumQuantity: {
+          required,
+          integer,
+          minValue: quantity => (quantity >= 0 ? true : false)
+        }
+      }
+    },
+
+    validationGroup: [
+      "form.name",
+      "form.price",
+      "form.imageWidth",
+      "form.imageHeight",
+      "form.effectiveStartDate",
+      "form.description"
+    ],
+
     varientSections: {
       $each: {
         type: {
           required,
+          // Check if there is duplicate values for the field "type"
           isDuplicateType(type, varient) {
-            // Validations to check if there is duplicate values for the field "type"
-            // The condition obj.values !== varient.values is to ensure that the
-            // current field that the user is typing is not being validated.
-            // But rather, other elements in the array
+            if (type === "") return true;
+
             let foundDuplicate = this.varientSections.find(
               obj => obj.type === type && obj.values !== varient.values
             );
+
             if (foundDuplicate) {
               return false;
             } else {
@@ -553,7 +811,27 @@ export default {
         values: {
           $each: {
             individualValue: {
-              required
+              required,
+              // Check if there is duplicate values for the field "value"
+              isDuplicateValue(varientValue, valueObject) {
+                if (varientValue === "") return true;
+
+                let foundDuplicate = this.varientSections.filter(
+                  varientSection => {
+                    return varientSection.values.some(
+                      value =>
+                        value.individualValue === varientValue &&
+                        value !== valueObject
+                    );
+                  }
+                );
+
+                if (foundDuplicate.length > 0) {
+                  return false;
+                } else {
+                  return true;
+                }
+              }
             }
           }
         }
@@ -562,10 +840,14 @@ export default {
   },
 
   mounted() {
+    var productId = localStorage.getItem("updateResourceId");
+
     this.$store
-      .dispatch(GET_ONE_PRODUCT, 2019)
+      .dispatch(GET_ONE_PRODUCT, productId)
       .then(response => {
         console.dir(response);
+
+        // Retrieve all the general information first
         this.form.productId = response.productId;
         this.form.name = response.productName;
         this.form.price = response.price;
@@ -575,6 +857,7 @@ export default {
         this.form.effectiveEndDate = response.effectiveEndDate;
         this.form.description = response.description;
 
+        // Retrieve the product options and assign it to varient details
         this.varientDetails = response.options.map((option, index) => {
           return {
             productId: response.productId,
@@ -638,36 +921,36 @@ export default {
           });
         });
 
-        // Should pass in this this.varient sections so that they can understand
-        // Get the combination based on this.varientSections
+        // Get the combination based on varient section
         let varientResults = this.getCombinations();
 
-        // Update this.varientDetails to have the same combination and combineId as
-        // varientResults
+        // Update this.varientDetails to have the same combination and combineId as varientResults
         varientResults.forEach((varient, index) => {
           this.varientDetails[index].combination = varient.combination;
           this.varientDetails[index].combinedId = varient.combinedId;
         });
 
-        console.log(varientResults);
-        console.log(this.varientDetails);
-
         this.discountDetails = response.discountPrice.map(discount => {
-          // Attach the property called productId
+          // Attach productId to each discount
           discount.productId = this.form.productId;
-          // Add a new property called discount type
+
+          // Attach discountType
           let discountTypeProp = {
             discountType: discount.isPercentage ? "Percentage" : "Fixed"
           };
+
+          // Format start and end date
           discount.effectiveStartDate = moment(
             discount.effectiveStartDate
           ).format("YYYY-MM-DD");
-          discount.effectiveEndDate = moment(discount.effectiveEndDate).format(
-            "YYYY-MM-DD"
-          );
-          // discount.optionId =
 
-          // Assign new propertiy and return
+          if (discount.effectiveEndDate !== null) {
+            discount.effectiveEndDate = moment(
+              discount.effectiveEndDate
+            ).format("YYYY-MM-DD");
+          }
+
+          // Assign new properties and return
           return Object.assign(discount, discountTypeProp);
         });
 
@@ -677,27 +960,157 @@ export default {
         console.log(this.discountDetails);
       })
       .catch(error => {
+        this.message("danger", error.response.data.message);
         console.dir(error);
-        alert("error");
       });
   },
 
   methods: {
-    handleAddDiscount() {
+    handleAddDiscount(bvModalEvt) {
+      bvModalEvt.preventDefault();
+      const { effectiveStartDate, effectiveEndDate } = this.form.discount;
+
+      if (this.discountDetails.length > 0) {
+        // Retrieve all the previous start and end date and convert it to date object
+        let discountDates = this.discountDetails.map(
+          ({ effectiveStartDate, effectiveEndDate }) => {
+            let dateObj = this.convertToDate(
+              effectiveStartDate,
+              effectiveEndDate
+            );
+            return {
+              effectiveStartDate: dateObj.startDate,
+              effectiveEndDate: dateObj.endDate
+            };
+          }
+        );
+
+        // Retrieve the start and end date from the discount form and convert it to date object
+        let dateObj = this.convertToDate(effectiveStartDate, effectiveEndDate);
+
+        discountDates.push({
+          effectiveStartDate: dateObj.startDate,
+          effectiveEndDate: dateObj.endDate
+        });
+
+        // Check for date overlap
+        let overlapResult = this.overlap(discountDates);
+
+        // If overlap is found, Set boolean to true, which will trigger the error
+        // and get the current overlapped date
+        if (overlapResult.overlap) {
+          this.currentOverlappedDate = effectiveStartDate;
+          this.isOverlapped = true;
+        } else {
+          this.isOverlapped = false;
+        }
+      } else {
+        this.isOverlapped = false;
+      }
+
+      // Validate the rest of the discount form
+      this.$v.form.discount.$touch();
+      if (this.$v.form.discount.$invalid) return;
+
+      // Retrieve the discount object and format the start and end date to string
       let discount = this.form.discount;
       this.formatDiscountDate(discount);
+
       if (discount.discountType === "Percentage") {
         discount.isPercentage = true;
       } else {
         discount.isPercentage = false;
       }
+
+      discount.productId = this.form.productId;
       this.discountDetails.push(discount);
-      this.form.discount = {};
+      this.resetDiscountFields();
+
+      this.$nextTick(() => {
+        this.$v.form.discount.$reset();
+        this.$refs.discountDialog.hide();
+      });
     },
 
-    // Reset the discount object when user exits the discount dialog
+    convertToDate(startDate, endDate) {
+      // If the end date is empty, replace it with a large date so that there will always be overlap
+      startDate = new Date(new Date(startDate).setHours(0, 0, 0, 0));
+      endDate =
+        endDate === "" || endDate === null
+          ? new Date(new Date(8640000000000000).setHours(0, 0, 0, 0))
+          : new Date(new Date(endDate).setHours(0, 0, 0, 0));
+      return {
+        startDate,
+        endDate
+      };
+    },
+
+    overlap(dateRanges) {
+      var sortedRanges = dateRanges.sort((previous, current) => {
+        // get the start date from previous and current
+        var previousTime = previous.effectiveStartDate.getTime();
+        var currentTime = current.effectiveStartDate.getTime();
+
+        // if the previous is earlier than the current
+        if (previousTime < currentTime) {
+          return -1;
+        }
+
+        // if the previous time is the same as the current time
+        if (previousTime === currentTime) {
+          return 0;
+        }
+
+        // if the previous time is later than the current time
+        return 1;
+      });
+
+      var result = sortedRanges.reduce(
+        (result, current, idx, arr) => {
+          // get the previous range
+          if (idx === 0) {
+            return result;
+          }
+          var previous = arr[idx - 1];
+
+          // check for any overlap
+          var previousEnd = previous.effectiveEndDate.getTime();
+          var currentStart = current.effectiveStartDate.getTime();
+          var overlap = previousEnd >= currentStart;
+
+          // store the specific ranges that overlap and set boolean to true
+          if (overlap) {
+            result.overlap = true;
+            result.ranges.push({
+              previous: previous,
+              current: current
+            });
+          }
+          return result;
+        },
+        { overlap: false, ranges: [] }
+      );
+
+      // return the final results
+      return result;
+    },
+
+    // Reset the discount fields and validations when user exits the discount dialog
     cancelDiscountDialog() {
-      this.form.discount = clonedeep({});
+      this.resetDiscountFields();
+      this.$v.form.discount.$reset();
+    },
+
+    resetDiscountFields() {
+      this.form.discount = {
+        effectiveStartDate: "",
+        effectiveEndDate: "",
+        discountValue: "",
+        discountType: "Percentage",
+        isPercentage: false
+      };
+      this.isOverlapped = false;
+      this.currentOverlappedDate = "";
     },
 
     // This method is invoked when the edit button is clicked on the "discount table"
@@ -708,22 +1121,72 @@ export default {
     },
 
     // This method is invoked when the OK button is clicked on the "modal dialog" (Save the changes)
-    handleEditDiscount() {
+    handleEditDiscount(bvModalEvt) {
+      const { effectiveStartDate, effectiveEndDate } = this.form.discount;
+
+      if (this.discountDetails.length > 0) {
+        // Retrieve all the previous start and end date and convert it to date object
+        let discountDates = this.discountDetails
+          .filter(({ effectiveStartDate, effectiveEndDate }, index) => {
+            // Do not retrieve the start and end date for current row (index)
+            if (index === this.discountIndex) {
+              return false;
+            }
+            return true;
+          })
+          .map(({ effectiveStartDate, effectiveEndDate }) => {
+            let dateObj = this.convertToDate(
+              effectiveStartDate,
+              effectiveEndDate
+            );
+            return {
+              effectiveStartDate: dateObj.startDate,
+              effectiveEndDate: dateObj.endDate
+            };
+          });
+
+        // Retrieve the start and end date from the discount form and convert it to date object
+        let dateObj = this.convertToDate(effectiveStartDate, effectiveEndDate);
+
+        discountDates.push({
+          effectiveStartDate: dateObj.startDate,
+          effectiveEndDate: dateObj.endDate
+        });
+
+        // Check for date overlap
+        let overlapResult = this.overlap(discountDates);
+
+        // If overlap is found, set boolean to true and get the current overlapped date
+        if (overlapResult.overlap) {
+          this.currentOverlappedDate = effectiveStartDate;
+          this.isOverlapped = true;
+        } else {
+          this.currentOverlappedDate = "";
+          this.isOverlapped = false;
+        }
+      } else {
+        this.currentOverlappedDate = "";
+        this.isOverlapped = false;
+      }
+
+      // Validate discount form
+      if (this.$v.form.discount.$invalid) return;
+
+      // Retrieve the discount object and format the start and end date to string
       let discount = this.form.discount;
       let index = this.discountIndex;
       this.formatDiscountDate(discount);
-
-      if (discount.discountType === "Percentage") {
-        discount.isPercentage = true;
-      } else {
-        discount.isPercentage = false;
-      }
 
       // Update the discount object based on the index in the array
       this.$set(this.discountDetails, index, discount);
 
       // Once updated, remove the values in the field
-      this.form.discount = clonedeep({});
+      this.resetDiscountFields();
+
+      this.$nextTick(() => {
+        this.$v.form.discount.$reset();
+        this.$refs.discountDialog.hide();
+      });
     },
 
     deleteDiscountInfo(index) {
@@ -735,16 +1198,27 @@ export default {
       this.discountDetails.splice(this.discountIndex, 1);
     },
 
+    // Format the date object to string
     formatDiscountDate(discount) {
-      discount.effectiveStartDate = moment(
-        this.form.discount.effectiveStartDate
-      ).format("YYYY-MM-DD");
-      discount.effectiveEndDate = moment(
-        this.form.discount.effectiveEndDate
-      ).format("YYYY-MM-DD");
+      let { effectiveStartDate, effectiveEndDate } = this.form.discount;
+      discount.effectiveStartDate = moment(effectiveStartDate).format(
+        "YYYY-MM-DD"
+      );
+      // If end date is null or empty, do not format
+      if (effectiveEndDate !== "" && effectiveEndDate !== null) {
+        discount.effectiveEndDate = moment(effectiveEndDate).format(
+          "YYYY-MM-DD"
+        );
+      }
     },
 
     addVarient() {
+      this.$nextTick(() => {
+        this.varientSections.length === 1
+          ? this.$v.varientSections.$reset()
+          : null;
+      });
+
       // Assign a unique Id for each value field. This will be used to keep
       // track of what is added, deleted or updated later on
       this.varientSections.push({
@@ -758,7 +1232,6 @@ export default {
           }
         ]
       });
-      console.log(this.varientSections);
     },
 
     addValue(varientIndex) {
@@ -768,7 +1241,6 @@ export default {
           .substring(7),
         individualValue: ""
       });
-      console.log(this.varientSections);
     },
 
     removeValue(varientIndex, valueIndex) {
@@ -781,78 +1253,88 @@ export default {
 
     handleVarientSubmit(bvModalEvt) {
       bvModalEvt.preventDefault();
+      // Validate fields
+      this.$v.varientSections.$touch();
+      if (this.$v.varientSections.$invalid) return;
       this.handleSubmit();
     },
 
     // This method is invoked when user clicked on the "OK" button on the varient option modal dialog
     handleSubmit() {
-      // Calculate and return the combinations for each varient type and value
-      let varientResults = this.getCombinations(this.varientSections);
+      if (this.varientSections.length !== 0) {
+        // Calculate and return the combinations for each varient type and value
+        let varientResults = this.getCombinations(this.varientSections);
 
-      // Find the combination based on the combine Id between this.varientDetails and varientResult
-      // Do note that, this.varientDetails is an array of varient object from the "varient" table
-      varientResults.forEach((varientResult, index) => {
-        let varientDetail = this.varientDetails.find(
-          vd => vd.combinedId === varientResult.combinedId
-        );
+        // Find the combination based on the combine Id between this.varientDetails and varientResult
+        // Do note that, this.varientDetails is an array of varient object from the "varient" table
+        varientResults.forEach((varientResult, index) => {
+          let varientDetail = this.varientDetails.find(
+            vd => vd.combinedId === varientResult.combinedId
+          );
 
-        // If the combination is found, update it while retaining
-        // the product details such as sku, quantity and etc (if any)
-        if (varientDetail !== undefined) {
-          console.log(varientDetail);
-          let newCombination = varientResult.combination;
-          let newAttributes = varientResult.attributes;
-          // Update specific attributes while retanining the attributeId
-          varientResult = varientDetail;
+          // If the combination is found, update it while retaining
+          // the product details such as sku, quantity and etc (if any)
+          if (varientDetail !== undefined) {
+            console.log(varientDetail);
+            let newCombination = varientResult.combination;
+            let newAttributes = varientResult.attributes;
+            // Update specific attributes while retanining the attributeId
+            varientResult = varientDetail;
 
-          // Update the combination as well as the attributes that contains the type and value
-          varientResult.combination = newCombination;
-          varientResult.type = newAttributes.type;
-          varientResult.values = newAttributes.values;
-          varientResults[index] = varientResult;
-        }
-      });
-
-      console.log(this.varientDetails);
-      console.log(varientResults);
-
-      // Loop through the old list (this.varientDetails, If can't be found in the new list)
-      // it means that the images were deleted
-      this.varientDetails.forEach(vd => {
-        console.log(vd);
-        // If combination is not found in the new list, it means that it is deleted
-        const index = varientResults.findIndex(
-          vr => vr.combination === vd.combination
-        );
-
-        console.log(index);
-
-        if (index === -1) {
-          if (vd.productImages !== undefined) {
-            vd.productImages.forEach(image => {
-              console.log(image);
-              if (image.isNew !== undefined) {
-                this.previousNewImageKeys.push(image.imageKey);
-              }
-              // Check to see if deleted image is arleady present in the deletedImageKeys array
-              const deletedIndex = this.deletedImageKeys.findIndex(
-                deletedImage => deletedImage === image.imageKey
-              );
-              if (deletedIndex === -1) {
-                this.deletedImageKeys.push(image.imageKey);
-              }
-            });
+            // Update the combination as well as the attributes that contains the type and value
+            varientResult.combination = newCombination;
+            varientResult.type = newAttributes.type;
+            varientResult.values = newAttributes.values;
+            varientResults[index] = varientResult;
           }
+        });
+
+        console.log(this.varientDetails);
+        console.log(varientResults);
+
+        // Loop through the old list (this.varientDetails, If can't be found in the new list)
+        // it means that the images were deleted
+        this.varientDetails.forEach(vd => {
           console.log(vd);
-          console.log(this.previousNewImageKeys);
-          console.log(this.deletedImageKeys);
-        }
-      });
+          // If combination is not found in the new list, it means that it is deleted
+          const index = varientResults.findIndex(
+            vr => vr.combination === vd.combination
+          );
 
-      this.varientDetails = varientResults;
+          console.log(index);
 
-      //https://stackoverflow.com/questions/49943140/validating-form-inside-a-modal-with-vuelidate-and-bootstrap-vue
+          if (index === -1) {
+            if (vd.productImages !== undefined) {
+              vd.productImages.forEach(image => {
+                console.log(image);
+                if (image.isNew !== undefined) {
+                  this.previousNewImageKeys.push(image.imageKey);
+                }
+                // Check to see if deleted image is arleady present in the deletedImageKeys array
+                const deletedIndex = this.deletedImageKeys.findIndex(
+                  deletedImage => deletedImage === image.imageKey
+                );
+                if (deletedIndex === -1) {
+                  this.deletedImageKeys.push(image.imageKey);
+                }
+              });
+            }
+            console.log(vd);
+            console.log(this.previousNewImageKeys);
+            console.log(this.deletedImageKeys);
+          }
+        });
+
+        this.varientDetails = varientResults;
+        this.varientTableError = false;
+      } else {
+        this.varientTableError = true;
+        this.varientDetails = [];
+      }
+
+      // Reset validation and hide modal dialog
       this.$nextTick(() => {
+        this.$v.varientSections.$reset();
         this.$refs.varientModal.hide();
       });
     },
@@ -899,20 +1381,32 @@ export default {
       return varientResults;
     },
 
-    cancel() {
-      console.log(this.varientDetails);
+    cancelVarientDialog() {
       // If user previously never save any varient options,
       // reset the values when the modal dialog is cancelled
       if (this.varientDetails.length === 0) {
         this.varientSections = [
           {
             type: "",
-            values: [""]
+            values: [
+              {
+                id: Math.random()
+                  .toString(36)
+                  .substring(7),
+                individualValue: ""
+              }
+            ]
           }
         ];
       } else {
         this.varientSections = clonedeep(this.originalVarient);
       }
+
+      // reset validation and hide modal dialog
+      this.$nextTick(() => {
+        this.$v.varientSections.$reset();
+        this.$refs.varientModal.hide();
+      });
     },
 
     openVarientModal() {
@@ -958,6 +1452,10 @@ export default {
     // This method is invoked once the user click the OK button on the edit varient modal dialog
     editVarientTableDialog(bvModalEvt) {
       bvModalEvt.preventDefault();
+
+      // Check if the fields are invalid
+      this.$v.form.varient.$touch();
+      if (this.$v.form.varient.$invalid) return;
 
       let index = this.selectedVarientIndex;
       this.varientSubmitLoader = true;
@@ -1014,7 +1512,7 @@ export default {
         })
         .catch(error => {
           console.dir(error);
-          alert("error");
+          this.message("danger", error.response.data.message);
           this.varientSubmitLoader = false;
         });
     },
@@ -1047,8 +1545,10 @@ export default {
 
       console.log(this.deletedImageKeys);
       this.varientSubmitLoader = false;
+      this.varientTableError = false;
 
       this.$nextTick(() => {
+        this.$v.form.varient.$reset();
         this.$refs.editVarientModal.hide();
       });
     },
@@ -1066,19 +1566,12 @@ export default {
         files: [],
         productImages: []
       };
+      this.$v.form.varient.$reset();
       // Clone the array so that it does not contain reference to original array
       // this.originalVarient = clonedeep(this.varientSections);
       this.deletedImageKeys = Object.assign([], this.previousDeletedImageKeys);
       console.log(this.deletedImageKeys);
-      this.$refs.myVueDropzone.removeAllFiles();
-    },
-
-    message(method, messageText) {
-      let config = {
-        text: messageText,
-        button: "ok"
-      };
-      this.$snack[method](config);
+      // this.$refs.myVueDropzone.removeAllFiles();
     },
 
     duplicateFileCheck(file) {
@@ -1138,11 +1631,20 @@ export default {
       }
     },
 
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
+    },
+
+    // Delete images from S3 once user cancel the product
     cancelProduct() {
       let deletedImageKeys = [];
       this.varientDetails.forEach(varientDetail => {
         console.log(varientDetail);
-        if (varientDetail.productImage !== undefined) {
+        if (varientDetail.productImages !== undefined) {
           varientDetail.productImages.forEach(productImage => {
             if (productImage.isNew !== undefined) {
               deletedImageKeys.push(productImage.imageKey);
@@ -1154,51 +1656,64 @@ export default {
       console.log(this.previousNewImageKeys);
       console.log(deletedImageKeys);
 
-      if (this.previousNewImageKeys.length > 0 && deletedImageKeys > 0) {
-        const deletedImage = this.previousNewImageKeys.concat(deletedImageKeys);
-        this.productCancelLoader = true;
-        console.log(deletedImage);
-        this.deleteImages(deletedImage);
-      } else {
-        if (deletedImageKeys.length > 0) {
-          this.productCancelLoader = true;
-          this.deleteImages(deletedImageKeys);
-        } else if (this.previousNewImageKeys.length > 0) {
-          this.productCancelLoader = true;
-          this.deleteImages(this.previousNewImageKeys);
-        } else {
-        }
+      // If there are images of previously deleted varients, we will concat it
+      // with the images in the current varient and delete them from S3
+      if (this.previousNewImageKeys.length > 0) {
+        deletedImageKeys = this.previousNewImageKeys.concat(deletedImageKeys);
       }
-      this.previousNewImageKeys = [];
-      deletedImageKeys = [];
-    },
 
-    deleteImages(deletedImageKeys) {
-      // this.productCancelLoader = true;
-      this.$store
-        .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
-        .then(response => {
-          alert("successfully deleted");
-          this.productCancelLoader = false;
-        })
-        .catch(error => {
-          console.dir(error);
-          this.productCancelLoader = false;
-          alert("error");
-        });
+      if (deletedImageKeys.length > 0) {
+        this.$store
+          .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
+          .then(response => {
+            this.message("success", "successfully deleted all images");
+            console.dir(response);
+            this.previousNewImageKeys = [];
+            deletedImageKeys = [];
+            this.cancelLoader = false;
+          })
+          .catch(error => {
+            console.dir(error);
+            this.message("danger", error.response.data.message);
+            this.cancelLoader = false;
+          });
+      }
     },
 
     submitProduct() {
+      this.$v.validationGroup.$touch();
+
+      // If varientDetails is empty or sku number is undefined, set the
+      // boolean to true which will display an error message
+      if (this.varientDetails.length === 0) {
+        this.varientTableError = true;
+      } else {
+        for (let i = 0; i < this.varientDetails.length; i++) {
+          if (this.varientDetails[i].SKUNumber === undefined) {
+            this.varientTableError = true;
+            break;
+          }
+        }
+      }
+
+      if (this.$v.validationGroup.$invalid || this.varientTableError) {
+        return;
+      }
+
       const { varientDetails, discountDetails, form } = this;
 
-      // put in method?
       form.effectiveStartDate = moment(form.effectiveStartDate).format(
         "YYYY-MM-DD"
       );
-      form.effectiveEndDate = moment(form.effectiveEndDate).format(
-        "YYYY-MM-DD"
-      ); // Check for null end dat, if not null run?
 
+      // If end date is null or empty, do not format
+      if (form.effectiveEndDate !== "" && form.effectiveEndDate !== null) {
+        form.effectiveEndDate = moment(form.effectiveEndDate).format(
+          "YYYY-MM-DD"
+        );
+      }
+
+      // construct an object that holds all the product details
       let productObj = {
         productId: form.productId,
         productName: form.name,
@@ -1208,11 +1723,10 @@ export default {
         ImageHeight: form.imageHeight,
         EffectiveStartDate: form.effectiveStartDate,
         EffectiveEndDate: form.effectiveEndDate,
-        DiscountPrices: discountDetails,
-        options: this.getOptions()
+        DiscountPrices: discountDetails
       };
-      console.log(productObj);
 
+      console.log(productObj);
       console.log(this.form);
       console.log(this.varientDetails);
       console.log(this.discountDetails);
@@ -1233,14 +1747,17 @@ export default {
               );
               return varientDetail;
             });
+            console.log(this.varientDetails);
+            productObj.options = this.getOptions();
             this.updateProduct(productObj);
           })
           .catch(error => {
             this.productSubmitLoader = false;
             console.dir(error);
-            alert("error");
+            this.message("danger", error.response.data.message);
           });
       } else {
+        productObj.options = this.getOptions();
         this.updateProduct(productObj);
       }
     },
@@ -1248,7 +1765,7 @@ export default {
     getOptions() {
       return this.varientDetails.map((varient, index) => {
         return {
-          productId: varient.productId,
+          productId: this.form.productId,
           skuNumber: varient.SKUNumber,
           currentQuantity: varient.currentQuantity,
           minimumQuantity: varient.minimumQuantity,
@@ -1274,12 +1791,13 @@ export default {
       this.$store
         .dispatch(UPDATE_ONE_PRODUCT, productObj)
         .then(response => {
+          this.message("success", "Successfully updated product!");
           console.dir(response);
           this.productSubmitLoader = false;
         })
         .catch(error => {
           console.dir(error);
-          alert("error");
+          this.message("danger", error.response.data.message);
           this.productSubmitLoader = false;
         });
     }
@@ -1288,52 +1806,4 @@ export default {
 </script>
 
 <style>
-h4 {
-  color: #6a6c78;
-}
-
-.table-wrapper {
-  border: 1px solid #d1d3e2;
-  margin: 30px 0;
-  border-radius: 3px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.table-title {
-  padding: 15px 0px;
-}
-
-.dz-progress {
-  /* Removes progress bar since we are not uploading it immediately */
-  display: none !important;
-}
-
-/* .dz-max-files-reached {
-  pointer-events: none;
-  cursor: default;
-} */
-
-.table {
-  margin-bottom: 0 !important;
-}
-
-#add-discount {
-  margin-right: 63px;
-}
-
-/* https://github.com/charliekassel/vuejs-datepicker/issues/693 */
-.vdp-datepicker .input-group .form-control[readonly] {
-  background: none !important;
-}
-
-/* https://stackoverflow.com/questions/51599545/how-can-i-change-variant-of-bootstrap-vue-button-style-checkboxes-when-clicked */
-.radio-button .active {
-  color: #fff !important;
-  background-color: #28a745 !important;
-  border-color: #28a745 !important;
-}
-
-.btn-outline-secondary {
-  border-color: #d1d3e2 !important;
-}
 </style>

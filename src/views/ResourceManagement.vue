@@ -11,6 +11,7 @@
         <!-- Topbar Navbar -->
         <div>
           <Table
+            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -127,7 +128,8 @@ export default {
       actionButtonClick: "Resource Action Buttons",
       products: "",
       tableName: "Resource Management",
-      id: "",
+      forceRender: true,
+      optionId: "",
       items: [],
       quantityOptions: ["Increase", "Reduce"],
       fields: [
@@ -166,12 +168,14 @@ export default {
     });
 
     eventBus.$on(this.actionButtonClick, jsonData => {
-      if (jsonData.actionButton == "Edit Resource")
+      if (jsonData.actionButton == "Edit Resource") {
+        localStorage.setItem("updateResourceId", jsonData.item.productId);
         this.$router.replace({ name: "UpdateResource" });
+      }
       if (jsonData.actionButton == "Manage Resource Quantity") {
-        this.id = jsonData.item.id;
+        this.optionId = jsonData.item.optionId;
         for (var i = 0; i < this.items.length; i++) {
-          if (this.items[i].id == jsonData.item.id) {
+          if (this.items[i].optionId == jsonData.item.optionId) {
             this.form.currentQuantity = this.items[i].qtyLeft;
           }
         }
@@ -217,7 +221,8 @@ export default {
                 this.items[x].availability = "Not Active, Out Of Stock";
               else this.items[x].availability = "Not Active";
             }
-            this.items[x].id = this.products[i].options[k].optionId;
+            this.items[x].optionId = this.products[i].options[k].optionId;
+            this.items[x].productId = this.products[i].productId;
             this.items[x].sku = this.products[i].options[k].skuNumber;
             this.items[x].name += this.products[i].productName + " (";
             var atr = 1;
@@ -276,6 +281,9 @@ export default {
             x++;
           }
         }
+
+        if (this.forceRender) this.forceRender = false;
+        else this.forceRender = true;
       })
       .catch(error => {
         alert(error);
@@ -319,7 +327,7 @@ export default {
       } else {
         if (this.form.quantityOption == "Increase") {
           this.$store
-            .dispatch(UPDATE_STOCK, [this.id, this.form.quantityValue])
+            .dispatch(UPDATE_STOCK, [this.optionId, this.form.quantityValue])
             .then(response => {
               this.refreshTable();
             })
@@ -328,7 +336,7 @@ export default {
             });
         } else {
           this.$store
-            .dispatch(UPDATE_STOCK, [this.id, -this.form.quantityValue])
+            .dispatch(UPDATE_STOCK, [this.optionId, -this.form.quantityValue])
             .then(response => {
               this.refreshTable();
             })
@@ -369,7 +377,7 @@ export default {
                   this.items[x].availability = "Not Active, Out Of Stock";
                 else this.items[x].availability = "Not Active";
               }
-              this.items[x].id = this.products[i].options[k].optionId;
+              this.items[x].optionId = this.products[i].options[k].optionId;
               this.items[x].sku = this.products[i].options[k].skuNumber;
               this.items[x].name =
                 this.products[i].productName +
@@ -425,6 +433,8 @@ export default {
               x++;
             }
           }
+          if (this.forceRender) this.forceRender = false;
+          else this.forceRender = true;
         })
         .catch(error => {
           alert(error);
