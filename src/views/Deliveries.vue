@@ -15,7 +15,6 @@
         <!-- Begin Page Content -->
         <div cols="4">
           <Table
-            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             v-bind:enableCheckbox="this.enableCheckbox"
@@ -107,7 +106,6 @@ export default {
         }
       ],
       actionButtonClick: "Delivery Signature",
-      forceRender: false,
       recipientName: null,
       items: [],
       fields: [
@@ -207,7 +205,10 @@ export default {
         addressOrHotel =
           response.address.addressLine1 + ", " + response.address.addressLine2;
 
-      if (response.address.addressLine1 == null || response.address.addressLine1 == "")
+      if (
+        response.address.addressLine1 == null ||
+        response.address.addressLine1 == ""
+      )
         addressOrHotel = "Self-Pick Up";
 
       return addressOrHotel;
@@ -274,8 +275,6 @@ export default {
         }
       });
 
-      if (this.forceRender) this.forceRender = false;
-      else this.forceRender = true;
     }
   },
   async mounted() {
@@ -320,10 +319,6 @@ export default {
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
 
-          console.log("response status : " + response[x].status);
-          console.log("Delivery Man ID : " + response[x].deliveryManID);
-          console.log("Current ID : " + this.$store.getters.userId);
-
           if (
             (response[x].status == "Out for Delivery" &&
               response[x].deliveryManId == this.$store.getters.userId) ||
@@ -344,8 +339,7 @@ export default {
             });
           }
         }
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
+   
       })
       .catch(error => {
         console.dir(error);

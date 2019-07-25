@@ -11,7 +11,6 @@
         <!-- Topbar Navbar -->
         <div>
           <Table
-            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -128,7 +127,6 @@ export default {
       actionButtonClick: "Resource Action Buttons",
       products: "",
       tableName: "Resource Management",
-      forceRender: true,
       optionId: "",
       items: [],
       quantityOptions: ["Increase", "Reduce"],
@@ -183,6 +181,10 @@ export default {
         this.form.effectiveQuantity = null;
         this.$v.$reset();
         this.$bvModal.show("manageQuantity");
+      }
+      if (jsonData.actionButton == "View Resource") {
+        localStorage.setItem("viewResourceId", jsonData.item.productId);
+        this.$router.replace({ name: "ViewResource" });
       }
     });
 
@@ -276,14 +278,12 @@ export default {
 
             this.items[x].actions = [
               "Edit Resource",
-              "Manage Resource Quantity"
+              "Manage Resource Quantity",
+              "View Resource"
             ];
             x++;
           }
         }
-
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
       })
       .catch(error => {
         alert(error);
@@ -429,13 +429,12 @@ export default {
 
               this.items[x].actions = [
                 "Edit Resource",
-                "Manage Resource Quantity"
+                "Manage Resource Quantity",
+                "View Resource"
               ];
               x++;
             }
           }
-          if (this.forceRender) this.forceRender = false;
-          else this.forceRender = true;
         })
         .catch(error => {
           alert(error);

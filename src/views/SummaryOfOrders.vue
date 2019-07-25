@@ -35,7 +35,6 @@
 
         <div cols="4">
           <Table
-            :key="this.forceRender"
             v-bind:fields="this.fields"
             v-bind:items="this.sortItems"
             v-bind:headerButtonClick="this.headerButtonClick"
@@ -150,7 +149,6 @@ export default {
       ],
       actionButtonClick: "Update One Order Status",
       imageClick: "On Order Image Click",
-      forceRender: true,
       noOfTabs: 0,
       enableCheckbox: true,
       selectedTab: 0,
@@ -440,7 +438,9 @@ export default {
               this.items.push({
                 id: response[x].orderId,
                 refNo: response[x].referenceNo,
-                date: response[x].createdAt.substring(0, 10),
+                date: new Date(
+                  Date.parse(response[x].createdAt)
+                ).toLocaleString(),
                 items: response[x].orderItems,
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,
@@ -522,11 +522,6 @@ export default {
       //to disable checkbox is All tabs are selected
       if (sortBy == "All") this.enableCheckbox = false;
       else this.enableCheckbox = true;
-      //forceRender resets all the variable in the table.
-      //like the array list of orderids that will be used to update the status
-      //of the products.
-      if (this.forceRender) this.forceRender = false;
-      else this.forceRender = true;
     },
 
     setUpTabs() {
@@ -626,7 +621,9 @@ export default {
           var itemLength = this.items.push({
             id: oneUpdatedOrder.orderId,
             refNo: oneUpdatedOrder.referenceNo,
-            date: oneUpdatedOrder.createdAt.substring(0, 10),
+            date: new Date(
+              Date.parse(oneUpdatedOrder.createdAt)
+            ).toLocaleString(),
             items: oneUpdatedOrder.orderItems,
             images: oneUpdatedOrder.orderItems,
             quantity: oneUpdatedOrder.orderItems,

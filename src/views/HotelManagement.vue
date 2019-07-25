@@ -6,9 +6,9 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-     
-          <DashboardHeader title="Hotel Management"></DashboardHeader>
-         
+
+        <DashboardHeader title="Hotel Management"></DashboardHeader>
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -17,7 +17,6 @@
 
         <div cols="4">
           <Table
-            :key="this.forceRender"
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
@@ -66,13 +65,13 @@ export default {
       headerButtonClick: ["Add Hotel"],
       headerButton: [{ id: 1, title: "Add Hotel" }],
       actionButtonClick: "Edit Hotel",
-      forceRender: true,
       items: [],
       fields: [
         { key: "id", label: "", sortable: true },
         { key: "name", label: "Hotel Name", sortable: true },
         { key: "address", label: "Hotel Address", sortable: true },
         { key: "postalCode", label: "Hotel Postal Code" },
+        { key: "isEnabled", label: "Is Enabled" },
         { key: "actions", label: "Actions" }
       ]
     };
@@ -86,6 +85,10 @@ export default {
       };
       this.$snack[method](config);
       // this.$snack[method](config)
+    },
+    getEnabled(isEnabled) {
+      if (isEnabled) return "Yes";
+      else return "No";
     }
   },
   mounted() {
@@ -111,12 +114,10 @@ export default {
             name: response[x].text,
             address: response[x].hotelAddress,
             postalCode: response[x].hotelPostalCode,
+            isEnabled: this.getEnabled(response[x].isActive),
             actions: ["Edit Hotel"]
           });
         }
-
-        if (this.forceRender) this.forceRender = false;
-        else this.forceRender = true;
       })
       .catch(error => {
         console.dir(error);

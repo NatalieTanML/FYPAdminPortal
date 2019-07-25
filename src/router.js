@@ -18,6 +18,7 @@ import ErrorPage from "./views/Error";
 import HotelManagement from "./views/HotelManagement";
 import AddHotel from "./views/AddHotel";
 import UpdateHotel from "./views/UpdateHotel";
+import ViewResource from "./views/ViewResource";
 
 import { eventBus } from "@/eventBus";
 
@@ -122,6 +123,15 @@ let router = new Router({
       }
     },
     {
+      path: "/ViewResource",
+      name: "ViewResource",
+      component: ViewResource,
+      meta: {
+        needAuthentication: true,
+        needNewPassword: true
+      }
+    },
+    {
       path: "/DeliveryRoutes",
       name: "DeliveryRoutes",
       component: DeliveryRoutes,
@@ -204,6 +214,8 @@ let router = new Router({
 
 router.beforeEach((to, from, next) => {
   console.log("token: " + store.getters.isAuthenticated);
+  console.log("token from ls: " + localStorage.getItem("token"));
+  console.log("hasloggedinbefore : " + localStorage.getItem("hasLoggedIn"));
 
   // let resolved = router.resolve(to.path)
   //  if(resolved.route.name != '404')
@@ -216,6 +228,7 @@ router.beforeEach((to, from, next) => {
   console.log("From : " + from.name);
 
   localStorage.setItem("previousPathName", from.name);
+  console.log("previousPathName : " + localStorage.getItem("previousPathName"));
 
   //if people try to go to the login page after they logged in,
   //they will be redirected to summaryoforders
@@ -256,6 +269,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.needNewPassword)) {
       //if user needs to change password.
       if (!store.getters.changePassword && to.path != "/ChangePassword") {
+        console.log("have not changed password");
         next({
           path: "/ChangePassword"
           //params: { nextUrl: to.fullPath }
@@ -266,6 +280,7 @@ router.beforeEach((to, from, next) => {
         if (store.getters.userRole == "Admin") next();
         else if (store.getters.userRole == "Store") {
           if (
+            //these are the paths that the Store person can go to
             to.path == "/SummaryOfOrders" ||
             to.path == "/ResourceManagement" ||
             to.path == "/OrderDetails" ||
@@ -279,6 +294,7 @@ router.beforeEach((to, from, next) => {
             });
         } else if (store.getters.userRole == "Delivery") {
           if (
+            //these are the paths that the Delivery person can go to
             to.path == "/Deliveries" ||
             to.path == "/Login" ||
             to.path == "/ChangePassword"
@@ -330,18 +346,35 @@ router.beforeEach((to, from, next) => {
   )
     localStorage.setItem("editOrderId", null);
 
-  //if people try to access the editorderdetails page by typing in the url, it will just
-  //redirect them to summaryofOrders
+  //if people try to access the UpdateResource page by typing in the url, it will just
+  //redirect them to ResourceManagement
   if (
     to.name == "UpdateResource" &&
     localStorage.getItem("updateResourceId") == "null"
   )
     next({ path: "/ResourceManagement" });
 
-  if (to.name != "UpdateResource" && localStorage.getItem("updateResourceId") != null)
+  if (
+    to.name != "UpdateResource" &&
+    localStorage.getItem("updateResourceId") != null
+  )
     localStorage.setItem("updateResourceId", null);
 
-    //if people try to access the editorderdetails page by typing in the url, it will just
+  //if people try to access the UpdateResource page by typing in the url, it will just
+  //redirect them to ResourceManagement
+  if (
+    to.name == "ViewResource" &&
+    localStorage.getItem("viewResourceId") == "null"
+  )
+    next({ path: "/ResourceManagement" });
+
+  if (
+    to.name != "ViewResource" &&
+    localStorage.getItem("viewResourceId") != null
+  )
+    localStorage.setItem("viewResourceId", null);
+
+  //if people try to access the editorderdetails page by typing in the url, it will just
   //redirect them to summaryofOrders
   if (
     to.name == "EditOrderDetails" &&

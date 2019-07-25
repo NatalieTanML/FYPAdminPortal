@@ -42,10 +42,10 @@
 
                       <b-form-group
                         label-cols-sm="3"
-                        label="Delete Hotel"
+                        label="Is Enabled"
                         label-for="input-horizontal"
                       >
-                        <b-button v-b-modal.deleteHotel class="w-25" variant="danger">Delete</b-button>
+                        <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch></b-form-checkbox>
                       </b-form-group>
 
 
@@ -101,6 +101,7 @@ export default {
   data() {
     return {
       validate: false,
+      isEnabled: false,
       hotel: {
         id: null,
         name: null,
@@ -144,6 +145,7 @@ export default {
           this.hotel.name = response.hotelName;
           this.hotel.address = response.hotelAddress;
           this.hotel.postalCode = response.hotelPostalCode;
+          this.isEnabled = response.isActive;
           this.validate = true;
         })
         .catch(error => {
@@ -169,7 +171,8 @@ export default {
           HotelId: this.hotel.id,
           HotelName: this.hotel.name,
           HotelAddress: this.hotel.address,
-          HotelPostalCode: this.hotel.postalCode
+          HotelPostalCode: this.hotel.postalCode,
+          IsActive : this.isEnabled
         };
 
         this.$store
