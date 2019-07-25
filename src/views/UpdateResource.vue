@@ -3,7 +3,7 @@
     <SideBar></SideBar>
     <div id="content-wrapper">
       <div id="content">
-        <DashboardHeader title="Resource Management - Add Resource"></DashboardHeader>
+        <DashboardHeader title="Resource Management - Update Resource"></DashboardHeader>
 
         <b-container fluid>
           <b-row class="bg-white text-left shadow" align-h="center">
@@ -102,6 +102,7 @@
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
                     :disabledDates="datePicker.disabledDates"
+                    :open-date="new Date()"
                     :placeholder="datePicker.placeHolder"
                     v-model="$v.form.effectiveStartDate.$model"
                     :class="(!$v.form.effectiveStartDate.$dirty) ? null : ($v.form.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
@@ -128,6 +129,7 @@
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
                     :disabledDates="datePicker.disabledDates"
+                    :open-date="new Date()"
                     :placeholder="datePicker.placeHolder"
                     v-model="form.effectiveEndDate"
                   ></datepicker>
@@ -234,7 +236,7 @@
                 <b-modal
                   id="addVarient"
                   size="lg"
-                  title="Varient Options"
+                  title="Variant Options"
                   ref="varientModal"
                   @ok="handleVarientSubmit"
                   @cancel="cancelVarientDialog"
@@ -323,7 +325,7 @@
                           <b-button
                             variant="outline-primary mt-3"
                             @click="addVarient()"
-                          >+ Add Varient Option</b-button>
+                          >+ Add Variant Option</b-button>
                         </b-col>
                       </b-row>
                     </div>
@@ -334,11 +336,11 @@
                   <p
                     v-if="varientDetails.length === 0"
                     class="table-varient-error"
-                  >Please add at least one varient option</p>
+                  >Please add at least one variant option</p>
                   <p
                     v-else
                     class="table-varient-error"
-                  >Please fill in all the necessary varient details</p>
+                  >Please fill in all the necessary variant details</p>
                 </div>
 
                 <b-container class="px-0" fluid>
@@ -368,9 +370,12 @@
                       <b-modal
                         id="editVarient"
                         ref="editVarientModal"
-                        title="Edit Varient"
+                        title="Edit Variant"
                         @ok="editVarientTableDialog"
-                        @hidden="cancelEditVarientTableDialog"
+                        @cancel="cancelEditVarientTableDialog"
+                        @close="cancelEditVarientTableDialog"
+                        no-close-on-esc
+                        no-close-on-backdrop
                       >
                         <form>
                           <b-form-group label="SKU Number">
@@ -388,7 +393,7 @@
                             </b-form-invalid-feedback>
                           </b-form-group>
 
-                          <b-form-group label="Varient">
+                          <b-form-group label="Variant">
                             <b-form-input
                               id="varientCombination"
                               v-model="form.varient.combination"
@@ -431,23 +436,28 @@
                           </b-form-group>
 
                           <b-form-group label="Image">
-                            <vue-dropzone
-                              id="dropzone"
-                              ref="myVueDropzone"
-                              :options="dropOptions"
-                              :useCustomSlot="true"
-                              @vdropzone-file-added="addFileToDropzone"
-                              @vdropzone-removed-file="deleteFileFromDropzone"
-                              @vdropzone-duplicate-file="duplicateFileCheck"
-                              :destroyDropzone="false"
-                              :duplicateCheck="true"
-                            >
-                              <div class="dropzone-custom-content">
-                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                                <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
-                                <div class="subtitle">or click to add your image</div>
-                              </div>
-                            </vue-dropzone>
+                            <div :class="{'border border-danger' : this.isImageRequired}">
+                              <vue-dropzone
+                                id="dropzone"
+                                ref="myVueDropzone"
+                                :options="dropOptions"
+                                :useCustomSlot="true"
+                                @vdropzone-file-added="addFileToDropzone"
+                                @vdropzone-removed-file="deleteFileFromDropzone"
+                                @vdropzone-duplicate-file="duplicateFileCheck"
+                                :destroyDropzone="false"
+                                :duplicateCheck="true"
+                              >
+                                <div class="dropzone-custom-content">
+                                  <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                  <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
+                                  <div class="subtitle">or click to add your image</div>
+                                </div>
+                              </vue-dropzone>
+                            </div>
+                            <div v-if="this.isImageRequired" class="image-invalid-feedback">
+                              <p>Image is required for first varient</p>
+                            </div>
                           </b-form-group>
                         </form>
 
@@ -594,6 +604,7 @@ export default {
 
       varientDetails: [],
       varientTableError: false,
+      isImageRequired: false,
       selectedVarientIndex: null,
 
       deletedImageKeys: [],
@@ -739,6 +750,37 @@ export default {
           },
           overlapFound() {
             return !this.isOverlapped;
+          },
+          // Discount start date must not be lesser than base start date
+          checkStartDate(startDate) {
+            let discountStartDate = new Date(
+              new Date(startDate).setHours(0, 0, 0, 0)
+            );
+            let baseStartDate = new Date(
+              new Date(this.form.effectiveStartDate).setHours(0, 0, 0, 0)
+            );
+            if (discountStartDate < baseStartDate) {
+              return false;
+            }
+            return true;
+          }
+        },
+
+        effectiveEndDate: {
+          // Discount end date must not be greater than base end date
+          checkEndDate(endDate) {
+            let discountEndDate = new Date(
+              new Date(endDate).setHours(0, 0, 0, 0)
+            );
+            if (this.form.effectiveEndDate !== null) {
+              let baseEndDate = new Date(
+                new Date(this.form.effectiveEndDate).setHours(0, 0, 0, 0)
+              );
+              if (discountEndDate > baseEndDate) {
+                return false;
+              }
+            }
+            return true;
           }
         }
       },
@@ -840,6 +882,7 @@ export default {
   },
 
   mounted() {
+    console.log(new Date(Date.now() - 8640000));
     var productId = localStorage.getItem("updateResourceId");
 
     this.$store
@@ -1453,11 +1496,18 @@ export default {
     editVarientTableDialog(bvModalEvt) {
       bvModalEvt.preventDefault();
 
+      let index = this.selectedVarientIndex;
+      if (index === 0) {
+        console.log(this.form.varient.files);
+        if (this.form.varient.files.length === 0) {
+          this.isImageRequired = true;
+        }
+      }
+
       // Check if the fields are invalid
       this.$v.form.varient.$touch();
-      if (this.$v.form.varient.$invalid) return;
+      if (this.$v.form.varient.$invalid || this.isImageRequired) return;
 
-      let index = this.selectedVarientIndex;
       this.varientSubmitLoader = true;
 
       // Check if there is any changes between the old and new list
@@ -1553,6 +1603,9 @@ export default {
       });
     },
 
+    // close cancel when they click on the button, hidden when
+    // then you assign back
+
     // This method will be invoked when the cancel or x button is clicked on the varient modal dialog
     cancelEditVarientTableDialog() {
       this.form.varient = {
@@ -1566,13 +1619,27 @@ export default {
         files: [],
         productImages: []
       };
+      this.isImageRequired = false;
       this.$v.form.varient.$reset();
-      // Clone the array so that it does not contain reference to original array
-      // this.originalVarient = clonedeep(this.varientSections);
       this.deletedImageKeys = Object.assign([], this.previousDeletedImageKeys);
       console.log(this.deletedImageKeys);
-      // this.$refs.myVueDropzone.removeAllFiles();
     },
+
+    // cancelDialogOnTouchOutside() {
+    //   this.form.varient = {
+    //     SKUNumber: null,
+    //     varientName: "",
+    //     currentQuantity: null,
+    //     minimumQuantity: null,
+    //     combination: "",
+    //     type: "",
+    //     value: "",
+    //     files: [],
+    //     productImages: []
+    //   };
+    //   this.isImageRequired = false;
+    //   this.$v.form.varient.$reset();
+    // },
 
     duplicateFileCheck(file) {
       this.isFileDuplicate = true;
@@ -1586,6 +1653,7 @@ export default {
         console.dir(this.form.varient.files);
       }
       console.log(this.form.varient);
+      this.isImageRequired = false;
       this.isFileDuplicate = false;
     },
 
@@ -1683,12 +1751,12 @@ export default {
     submitProduct() {
       this.$v.validationGroup.$touch();
 
-      // If varientDetails is empty or sku number is undefined, set the
-      // boolean to true which will display an error message
+      // If varientDetails is empty set boolean to true which will trigger an error message
       if (this.varientDetails.length === 0) {
         this.varientTableError = true;
       } else {
         for (let i = 0; i < this.varientDetails.length; i++) {
+          // If sku number is undefined, trigger error
           if (this.varientDetails[i].SKUNumber === undefined) {
             this.varientTableError = true;
             break;
@@ -1791,7 +1859,7 @@ export default {
       this.$store
         .dispatch(UPDATE_ONE_PRODUCT, productObj)
         .then(response => {
-          this.message("success", "Successfully updated product!");
+          this.message("success", "This product has been updated successfully");
           console.dir(response);
           this.productSubmitLoader = false;
         })

@@ -51,11 +51,14 @@
       ></datepicker>
 
       <div v-if="v.effectiveStartDate.$dirty" class="date-invalid-feedback">
-        <div v-if="!v.effectiveStartDate.required">Start Date is required.</div>
+        <div v-if="!v.effectiveStartDate.required">Start Date is required</div>
         <div v-if="!v.effectiveStartDate.checkDate">Start date must not be greater than end date</div>
         <div
           v-if="!v.effectiveStartDate.overlapFound"
-        >Current discount date overlapped with existing record(s).</div>
+        >Current discount date overlapped with existing record(s)</div>
+        <div v-if="!v.effectiveStartDate.checkStartDate">
+          <p>Start date must not be lesser than base start date</p>
+        </div>
       </div>
     </b-form-group>
 
@@ -66,15 +69,20 @@
       label-for="input-horizontal"
     >
       <datepicker
-        id="discountEndDate"
+        :id="(!v.effectiveEndDate.$dirty) ? 'endDate' : (v.effectiveEndDate.$error) ? 'date-invalid' : 'date-valid' "
         :value="datePicker.date"
         :bootstrap-styling="datePicker.style"
         :clear-button="true"
         :format="datePicker.format"
         :placeholder="datePicker.placeHolder"
         :disabledDates="datePicker.disabledDates"
-        v-model="value.effectiveEndDate"
+        v-model="v.effectiveEndDate.$model"
+        :class="(!v.effectiveEndDate.$dirty) ? null : (v.effectiveEndDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
       ></datepicker>
+
+      <div v-if="v.effectiveEndDate.$dirty" class="date-invalid-feedback">
+        <div v-if="!v.effectiveEndDate.checkEndDate">End date must not be greater than base end date</div>
+      </div>
     </b-form-group>
   </form>
 </template>
