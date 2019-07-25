@@ -230,11 +230,11 @@
                   @click="openVarientModal"
                 >+ Add Variant Option</b-button>
 
-                <!-- modal dialog for varient option -->
+                <!-- modal dialog for variant option -->
                 <b-modal
                   id="addVarient"
                   size="lg"
-                  title="Varient Options"
+                  title="Variant Options"
                   ref="varientModal"
                   @ok="handleVarientSubmit"
                   @cancel="cancelVarientDialog"
@@ -334,11 +334,11 @@
                   <p
                     v-if="varientDetails.length === 0"
                     class="table-varient-error"
-                  >Please add at least one varient option</p>
+                  >Please add at least one variant option</p>
                   <p
                     v-else
                     class="table-varient-error"
-                  >Please fill in all the necessary varient details</p>
+                  >Please fill in all the necessary variant details</p>
                 </div>
 
                 <b-container class="px-0" fluid>
@@ -368,7 +368,7 @@
                       <b-modal
                         id="editVarient"
                         ref="editVarientModal"
-                        title="Edit Varient"
+                        title="Edit Variant"
                         @ok="editVarientTableDialog"
                         @hidden="cancelEditVarientTableDialog"
                       >
@@ -388,7 +388,7 @@
                             </b-form-invalid-feedback>
                           </b-form-group>
 
-                          <b-form-group label="Varient">
+                          <b-form-group label="Variant">
                             <b-form-input
                               id="varientCombination"
                               v-model="form.varient.combination"
@@ -431,23 +431,28 @@
                           </b-form-group>
 
                           <b-form-group label="Image">
-                            <vue-dropzone
-                              id="dropzone"
-                              ref="myVueDropzone"
-                              :options="dropOptions"
-                              :useCustomSlot="true"
-                              @vdropzone-file-added="addFileToDropzone"
-                              @vdropzone-removed-file="deleteFileFromDropzone"
-                              @vdropzone-duplicate-file="duplicateFileCheck"
-                              :destroyDropzone="false"
-                              :duplicateCheck="true"
-                            >
-                              <div class="dropzone-custom-content">
-                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                                <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
-                                <div class="subtitle">or click to add your image</div>
-                              </div>
-                            </vue-dropzone>
+                            <div :class="{'border border-danger' : this.isImageRequired}">
+                              <vue-dropzone
+                                id="dropzone"
+                                ref="myVueDropzone"
+                                :options="dropOptions"
+                                :useCustomSlot="true"
+                                @vdropzone-file-added="addFileToDropzone"
+                                @vdropzone-removed-file="deleteFileFromDropzone"
+                                @vdropzone-duplicate-file="duplicateFileCheck"
+                                :destroyDropzone="false"
+                                :duplicateCheck="true"
+                              >
+                                <div class="dropzone-custom-content">
+                                  <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                  <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
+                                  <div class="subtitle">or click to add your image</div>
+                                </div>
+                              </vue-dropzone>
+                            </div>
+                            <div v-if="this.isImageRequired" class="image-invalid-feedback">
+                              <p>Image is required for first varient</p>
+                            </div>
                           </b-form-group>
                         </form>
 
@@ -591,6 +596,7 @@ export default {
 
       varientDetails: [],
       varientTableError: false,
+      isImageRequired: false,
       selectedVarientIndex: null,
       deletedImageKeys: [],
 
@@ -733,8 +739,41 @@ export default {
             if (startDate >= this.form.discount.effectiveEndDate) return false;
             return true;
           },
+
           overlapFound() {
             return !this.isOverlapped;
+          },
+
+          // Discount start date must not be lesser than base start date
+          checkStartDate(startDate) {
+            let discountStartDate = new Date(
+              new Date(startDate).setHours(0, 0, 0, 0)
+            );
+            let baseStartDate = new Date(
+              new Date(this.form.effectiveStartDate).setHours(0, 0, 0, 0)
+            );
+            if (discountStartDate < baseStartDate) {
+              return false;
+            }
+            return true;
+          }
+        },
+
+        effectiveEndDate: {
+          // Discount end date must not be greater than base end date
+          checkEndDate(endDate) {
+            let discountEndDate = new Date(
+              new Date(endDate).setHours(0, 0, 0, 0)
+            );
+            if (this.form.effectiveEndDate !== null) {
+              let baseEndDate = new Date(
+                new Date(this.form.effectiveEndDate).setHours(0, 0, 0, 0)
+              );
+              if (discountEndDate > baseEndDate) {
+                return false;
+              }
+            }
+            return true;
           }
         }
       },
@@ -833,6 +872,10 @@ export default {
         }
       }
     }
+  },
+
+  mounted() {
+    console.log(new Date(Date.now() - 8640000));
   },
 
   methods: {
@@ -1311,11 +1354,18 @@ export default {
     editVarientTableDialog(bvModalEvt) {
       bvModalEvt.preventDefault();
 
+      let index = this.selectedVarientIndex;
+      if (index === 0) {
+        console.log(this.form.varient.files);
+        if (this.form.varient.files.length === 0) {
+          this.isImageRequired = true;
+        }
+      }
+
       // Check if the fields are invalid
       this.$v.form.varient.$touch();
-      if (this.$v.form.varient.$invalid) return;
+      if (this.$v.form.varient.$invalid || this.isImageRequired) return;
 
-      let index = this.selectedVarientIndex;
       this.varientSubmitLoader = true;
 
       // Check if there is any changes between the old and new list
@@ -1491,6 +1541,7 @@ export default {
       };
       this.$v.form.varient.$reset();
       this.deletedImageKeys = [];
+      this.isImageRequired = false;
     },
 
     duplicateFileCheck(file) {
@@ -1507,6 +1558,7 @@ export default {
       }
       console.log(this.form.varient);
       this.isFileDuplicate = false;
+      this.isImageRequired = false;
     },
 
     deleteFileFromDropzone(file) {
@@ -1613,7 +1665,11 @@ export default {
         }
       }
 
-      if (this.$v.validationGroup.$invalid || this.varientTableError) {
+      if (
+        this.$v.validationGroup.$invalid ||
+        this.varientTableError ||
+        this.isImageRequired
+      ) {
         return;
       }
 
@@ -1686,7 +1742,7 @@ export default {
         .then(response => {
           console.dir(response);
           this.submitLoader = false;
-          this.message("success", "You have successfully added a new product!");
+          this.message("success", "This product has been created successfully");
           // this.$router.push("/ResourceManagement");
           // if never route them back, we need to reset the image keys
         })
@@ -1705,7 +1761,8 @@ h4 {
   color: #6a6c78;
 }
 
-.date-invalid-feedback {
+.date-invalid-feedback,
+.image-invalid-feedback {
   width: 100%;
   margin-top: 0.25rem;
   font-size: 80%;
