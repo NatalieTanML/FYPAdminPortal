@@ -204,6 +204,8 @@ let router = new Router({
 
 router.beforeEach((to, from, next) => {
   console.log("token: " + store.getters.isAuthenticated);
+  console.log("token from ls: " + localStorage.getItem("token"));
+  console.log("hasloggedinbefore : " + localStorage.getItem("hasLoggedIn"));
 
   // let resolved = router.resolve(to.path)
   //  if(resolved.route.name != '404')
@@ -216,6 +218,7 @@ router.beforeEach((to, from, next) => {
   console.log("From : " + from.name);
 
   localStorage.setItem("previousPathName", from.name);
+  console.log("previousPathName : " + localStorage.getItem("previousPathName"));
 
   //if people try to go to the login page after they logged in,
   //they will be redirected to summaryoforders
@@ -256,6 +259,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.needNewPassword)) {
       //if user needs to change password.
       if (!store.getters.changePassword && to.path != "/ChangePassword") {
+        console.log("have not changed password");
         next({
           path: "/ChangePassword"
           //params: { nextUrl: to.fullPath }
@@ -338,10 +342,13 @@ router.beforeEach((to, from, next) => {
   )
     next({ path: "/ResourceManagement" });
 
-  if (to.name != "UpdateResource" && localStorage.getItem("updateResourceId") != null)
+  if (
+    to.name != "UpdateResource" &&
+    localStorage.getItem("updateResourceId") != null
+  )
     localStorage.setItem("updateResourceId", null);
 
-    //if people try to access the editorderdetails page by typing in the url, it will just
+  //if people try to access the editorderdetails page by typing in the url, it will just
   //redirect them to summaryofOrders
   if (
     to.name == "EditOrderDetails" &&
