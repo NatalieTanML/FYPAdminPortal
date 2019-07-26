@@ -17,6 +17,8 @@ import "vue2-dropzone/dist/vue2Dropzone.min.css";
 var signalR = require("@aspnet/signalr");
 
 require("vue-snack/dist/vue-snack.min.css");
+import VueAgile from "vue-agile";
+
 
 Vue.use(BootstrapVue);
 Vue.use(Vuelidate);
@@ -30,6 +32,7 @@ Vue.use(VueCurrencyFilter, {
   symbolPosition: 'front',
   symbolSpacing: true
 });
+Vue.use(VueAgile);
 
 Vue.prototype.$signalR = signalR;
 

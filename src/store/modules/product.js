@@ -10,6 +10,7 @@ import {
   GET_ALL_PRODUCTS_SUCCESS,
   GET_ALL_PRODUCTS_ERROR,
   GET_ONE_PRODUCT,
+  GET_ONE_PRODUCT_ECOMMERCE,
   GET_ONE_PRODUCT_SUCCESS,
   GET_ONE_PRODUCT_ERROR,
   UPDATE_ONE_PRODUCT,
@@ -103,13 +104,9 @@ const actions = {
     let UPLOAD_PRODUCT_IMAGES = dispatch("UPLOAD_PRODUCT_IMAGES");
     let DELETE_PRODUCT_IMAGES = dispatch("DELETE_PRODUCT_IMAGES");
 
-    // https://forum.vuejs.org/t/best-practice-for-handling-multiple-api-calls-inside-vuex-action/49443/2
     return Promise.all([UPLOAD_PRODUCT_IMAGES, DELETE_PRODUCT_IMAGES])
       .then(resp => {
         commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS)
-        // Both done
-        // The order is preserved regardless of what resolved first
-        // upload, delete
         console.dir(resp)
         return resp;
       })
@@ -179,18 +176,18 @@ const actions = {
     });
   },
 
-  [DELETE_PRODUCT]: ({ commit }, productId) => {
+  [GET_ONE_PRODUCT_ECOMMERCE]: ({ commit }, productId) => {
     return new Promise((resolve, reject) => {
-      apiCall({ url: api_routes.product.create + productId, method: 'delete' })
+      apiCall({ url: api_routes.product.get_one_ecommerce + productId, method: "get" })
         .then(resp => {
-          console.dir(resp)
+          console.dir(resp);
           resolve(resp);
         })
         .catch(err => {
           reject(err);
-        })
-    })
-  },
+        });
+    });
+  }
 };
 
 const mutations = {
