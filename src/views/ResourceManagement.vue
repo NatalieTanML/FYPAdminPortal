@@ -347,10 +347,13 @@ export default {
 
       this.products.forEach(product => {
         product.options.forEach(option => {
+          console.log(option);
+          option.status = [];
           times += 1;
 
           if (option.currentQuantity === 0) {
             this.arrayOfNumberOfRows[1] += 1;
+            option.status.push("Out Of Stock");
           }
 
           let startDate = product.effectiveStartDate;
@@ -367,8 +370,13 @@ export default {
             (startDate <= todayDate && endDate === null)
           ) {
             this.arrayOfNumberOfRows[2] += 1;
+            option.status.push("Visible");
           } else {
+            console.log(startDate);
+            console.log(endDate);
+            console.log(todayDate);
             this.arrayOfNumberOfRows[3] += 1;
+            option.status.push("Not Visible");
           }
         });
       });
@@ -415,57 +423,16 @@ export default {
 
       let sortBy = this.typesOfTabs[id];
       //  typesOfTabs: ["All Products", "Out Of Stock", "Visible", "Not Visible"],
+      let sortedIndex = 0;
       this.products.forEach(product => {
-        product.options.forEach((option, index) => {
-          let startDate = product.effectiveStartDate;
-          let endDate = product.effectiveEndDate;
-
-          startDate = new Date(new Date(startDate).setHours(0, 0, 0, 0));
-          endDate !== null
-            ? (endDate = new Date(new Date(endDate).setHours(0, 0, 0, 0)))
-            : (endDate = null);
-          let todayDate = new Date(new Date().setHours(0, 0, 0, 0));
-
-          switch (sortBy) {
-            case "Out Of Stock":
-              if (option.currentQuantity === 0) {
-                this.sortItems.push(this.items[index]);
-              }
-              break;
-            case "Visible":
-              if (
-                (startDate <= todayDate && endDate > todayDate) ||
-                (startDate <= todayDate && endDate === null)
-              ) {
-                this.sortItems.push(this.items[index]);
-              }
-
-            case "Not Visible":
-              if (
-                !(
-                  (startDate <= todayDate && endDate > todayDate) ||
-                  (startDate <= todayDate && endDate === null)
-                )
-              ) {
-                console.log("called");
-                this.sortItems.push(this.items[index]);
-              }
+        product.options.forEach(option => {
+          if (option.status.includes(sortBy)) {
+            console.log(this.items[sortedIndex]);
+            this.sortItems.push(this.items[sortedIndex]);
           }
+          ++sortedIndex;
         });
       });
-
-      // //manipulate table data after changing tab color
-      // let sortBy = this.typesOfTabs[id];
-      // console.log(sortBy);
-      // for (index = 0; index < this.items.length; index++) {
-      //   if (sortBy === this.items[index].status)
-      //     this.sortItems.push(this.items[index]);
-      //   if (sortBy == "All") this.sortItems.push(this.items[index]);
-      // }
-      // // if (sortBy === "All") this.sortItems = this.items;
-      // //to disable checkbox is All tabs are selected
-      // if (sortBy == "All") this.enableCheckbox = false;
-      // else this.enableCheckbox = true;
     },
 
     updateEffectiveQuantity() {
