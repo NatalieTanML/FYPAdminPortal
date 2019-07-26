@@ -101,7 +101,6 @@
                     :value="datePicker.date"
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
-                    :disabledDates="datePicker.disabledDates"
                     :placeholder="datePicker.placeHolder"
                     v-model="$v.form.effectiveStartDate.$model"
                     :class="(!$v.form.effectiveStartDate.$dirty) ? null : ($v.form.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
@@ -127,7 +126,7 @@
                     :value="datePicker.date"
                     :bootstrap-styling="datePicker.style"
                     :format="datePicker.format"
-                    :disabledDates="datePicker.disabledDates"
+                    :disabledDates="disabledDates()"
                     :placeholder="datePicker.placeHolder"
                     v-model="form.effectiveEndDate"
                   ></datepicker>
@@ -570,10 +569,7 @@ export default {
 
       datePicker: {
         style: true,
-        format: "yyyy-MM-dd",
-        disabledDates: {
-          to: new Date(Date.now() - 8640000)
-        }
+        format: "yyyy-MM-dd"
       },
 
       // This is from varient Option
@@ -879,6 +875,13 @@ export default {
   },
 
   methods: {
+    // Disable previous dates for end date according to selected start date
+    disabledDates() {
+      let disabledDates = {};
+      disabledDates.to = new Date(this.form.effectiveStartDate - 8640000);
+      return disabledDates;
+    },
+
     handleAddDiscount(bvModalEvt) {
       bvModalEvt.preventDefault();
       const { effectiveStartDate, effectiveEndDate } = this.form.discount;

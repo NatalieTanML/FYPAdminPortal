@@ -9,13 +9,32 @@
 
         <DashboardHeader title="Resource Management"></DashboardHeader>
         <!-- Topbar Navbar -->
+
+        <div class="container-fluid">
+          <!-- Main Content -->
+          <div id="content">
+            <div class="row mb-4">
+              <ul class="nav" ref="tabs">
+                <DashboardTabs
+                  v-for="tab in this.Tabs"
+                  v-bind:key="tab.id"
+                  v-bind:title="tab.title"
+                  v-bind:isDark="tab.isDark"
+                  v-bind:noOfRows="tab.noOfRows"
+                  @click.native="onTabChange(tab.id)"
+                ></DashboardTabs>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <div>
           <Table
             v-bind:actionButtonClick="this.actionButtonClick"
             v-bind:headerButtonClick="this.headerButtonClick"
             :headerButton="headerButton"
             v-bind:fields="this.fields"
-            v-bind:items="this.items"
+            v-bind:items="this.sortItems"
             v-bind:tableName="this.tableName"
           ></Table>
           <b-modal
@@ -108,10 +127,13 @@ import { eventBus } from "@/eventBus";
 import { GET_ALL_PRODUCTS, UPDATE_STOCK } from "@/store/actions/product";
 import { METHODS } from "http";
 import { required, numeric } from "vuelidate/lib/validators";
+import DashboardTabs from "@/components/DashboardTabs";
+
 export default {
   components: {
     SideBar,
     DashboardHeader,
+    DashboardTabs,
     Table
   },
   data() {
@@ -138,7 +160,13 @@ export default {
         { key: "activeDiscount", label: "Active Discount", sortable: true },
         { key: "availability", label: "Availability", sortable: true },
         { key: "actions", label: "Actions" }
-      ]
+      ],
+      typesOfTabs: ["All Products", "Out Of Stock", "Visible", "Not Visible"],
+      selectedTab: 0, // Currently selected tab
+      arrayOfNumberOfRows: [], // Display the number of rows for each tab
+      noOfTabs: 0,
+      tabs: [],
+      sortItems: []
     };
   },
   validations: {
@@ -184,7 +212,11 @@ export default {
       }
       if (jsonData.actionButton == "View Resource") {
         localStorage.setItem("viewResourceId", jsonData.item.productId);
-        this.$router.replace({ name: "ViewResource" });
+        // this.$router.replace({ name: "ViewResource" });
+        let routeData = this.$router.resolve({
+          name: "ViewResource"
+        });
+        window.open(routeData.href, "_blank");
       }
     });
 
@@ -192,6 +224,7 @@ export default {
       .dispatch(GET_ALL_PRODUCTS)
       .then(response => {
         this.products = response;
+        console.log(this.products);
         var x = 0;
         for (var i = 0; i < this.products.length; i++) {
           for (var k = 0; k < this.products[i].options.length; k++) {
@@ -276,6 +309,8 @@ export default {
               }
             }
 
+            console.log(this.items);
+
             this.items[x].actions = [
               "Edit Resource",
               "Manage Resource Quantity",
@@ -284,12 +319,124 @@ export default {
             x++;
           }
         }
+        this.setUpTabs();
       })
       .catch(error => {
         alert(error);
       });
   },
   methods: {
+    setUpTabs() {
+      let number = 0;
+      console.log(this.products);
+      this.products.forEach(product => {
+        product.options.forEach(option => {
+          number += 1;
+        });
+      });
+      console.log(number);
+      let x;
+      let index;
+      let numberOfRows = 0;
+      this.arrayOfNumberOfRows = [, 0, 0, 0];
+
+      // Since we are not going to continue the number of rows for the first tab,
+      // we are going to push a null value
+      this.arrayOfNumberOfRows.push(null);
+      let times = 0;
+
+      this.products.forEach(product => {
+        product.options.forEach(option => {
+          console.log(option);
+          option.status = [];
+          times += 1;
+
+          if (option.currentQuantity === 0) {
+            this.arrayOfNumberOfRows[1] += 1;
+            option.status.push("Out Of Stock");
+          }
+
+          let startDate = product.effectiveStartDate;
+          let endDate = product.effectiveEndDate;
+
+          startDate = new Date(new Date(startDate).setHours(0, 0, 0, 0));
+          endDate !== null
+            ? (endDate = new Date(new Date(endDate).setHours(0, 0, 0, 0)))
+            : (endDate = null);
+          let todayDate = new Date(new Date().setHours(0, 0, 0, 0));
+
+          if (
+            (startDate <= todayDate && endDate > todayDate) ||
+            (startDate <= todayDate && endDate === null)
+          ) {
+            this.arrayOfNumberOfRows[2] += 1;
+            option.status.push("Visible");
+          } else {
+            console.log(startDate);
+            console.log(endDate);
+            console.log(todayDate);
+            this.arrayOfNumberOfRows[3] += 1;
+            option.status.push("Not Visible");
+          }
+
+          option.status.push("All Products");
+        });
+      });
+
+      console.log(times);
+      console.log(this.arrayOfNumberOfRows);
+
+      let typesOfTabs = this.typesOfTabs;
+      this.Tabs = [];
+
+      for (x = 0; x < typesOfTabs.length; x++)
+        // Initialize the tabs to get title, id and isDark.
+        this.Tabs[x] = {
+          title: typesOfTabs[x],
+          id: x,
+          isDark: false,
+          noOfRows: this.arrayOfNumberOfRows[x]
+        };
+
+      // selects current tabs. By default, it will be 0
+      this.onTabChange(this.selectedTab);
+    },
+
+    onTabChange(id) {
+      //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
+      //reason why i don't use const ^ is because when the data is displayed,
+      //it will become read-only.
+      console.log("on tab change is called");
+      this.sortItems = [];
+      //change background color for the tab
+
+      //will have an error if you remove this if statement.
+      //because the html section will run first, then it will cause an error
+      //because the tabs have not been created.
+      if (this.$refs.tabs != undefined)
+        this.noOfTabs = this.$refs.tabs.childElementCount;
+      if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
+      this.selectedTab = id;
+      var index;
+      for (index = 0; index < this.Tabs.length; index++) {
+        if (id != this.Tabs[index].id)
+          if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
+      }
+
+      let sortBy = this.typesOfTabs[id];
+      //  typesOfTabs: ["All Products", "Out Of Stock", "Visible", "Not Visible"],
+      let sortedIndex = 0;
+      this.products.forEach(product => {
+        product.options.forEach(option => {
+          if (option.status.includes(sortBy)) {
+            console.log(this.items[sortedIndex]);
+            this.sortItems.push(this.items[sortedIndex]);
+          }
+          ++sortedIndex;
+        });
+      });
+    },
+
     updateEffectiveQuantity() {
       if (this.form.quantityOption == "Increase") {
         if (this.form.quantityValue != null) {
@@ -356,6 +503,7 @@ export default {
       this.$store
         .dispatch(GET_ALL_PRODUCTS)
         .then(response => {
+          console.log(response);
           this.products = response;
           var x = 0;
           for (var i = 0; i < this.products.length; i++) {
@@ -380,11 +528,24 @@ export default {
               }
               this.items[x].optionId = this.products[i].options[k].optionId;
               this.items[x].sku = this.products[i].options[k].skuNumber;
-              this.items[x].name =
-                this.products[i].productName +
-                "(" +
-                this.products[i].options[k].optionValue +
-                ")";
+              this.items[x].name = "";
+              this.items[x].name += this.products[i].productName + " (";
+              var atr = 1;
+              for (
+                var a = 0;
+                a < this.products[i].options[k].attributes.length;
+                a++
+              ) {
+                if (atr == this.products[i].options[k].attributes.length)
+                  this.items[x].name +=
+                    this.products[i].options[k].attributes[a].attributeValue +
+                    ")";
+                else
+                  this.items[x].name +=
+                    this.products[i].options[k].attributes[a].attributeValue +
+                    ",";
+                atr++;
+              }
               this.items[x].qtyLeft = this.products[i].options[
                 k
               ].currentQuantity;
@@ -435,6 +596,7 @@ export default {
               x++;
             }
           }
+          this.setUpTabs();
         })
         .catch(error => {
           alert(error);

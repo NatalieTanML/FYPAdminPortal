@@ -37,12 +37,8 @@
 
                 <b-row>
                   <b-col cols="3">{{order.orderId}}</b-col>
-                  <b-col
-                    cols="3"
-                  >{{new Date(Date.parse(order.createdAt)).toLocaleString()}}</b-col>
-                  <b-col cols="3">
-                    {{order.orderTotal | currency}}
-                  </b-col>
+                  <b-col cols="3">{{new Date(Date.parse(order.createdAt)).toLocaleString()}}</b-col>
+                  <b-col cols="3">{{order.orderTotal | currency}}</b-col>
                   <b-col cols="3">{{order.status}}</b-col>
                 </b-row>
 
@@ -55,9 +51,7 @@
 
                 <b-row>
                   <b-col cols="3">{{order.referenceNo}}</b-col>
-                  <b-col
-                    cols="3"
-                  >{{new Date(Date.parse(order.updatedAt)).toLocaleString()}}</b-col>
+                  <b-col cols="3">{{new Date(Date.parse(order.updatedAt)).toLocaleString()}}</b-col>
                   <b-col v-if="order.updatedBy == null" cols="3">N/A</b-col>
                   <b-col v-else cols="3">{{order.updatedBy}}</b-col>
                   <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
@@ -91,31 +85,35 @@
                   <b-col cols="2">Qty</b-col>
                   <b-col cols="2">Discount</b-col>
                 </b-row>
-                <hr class="mb-3">
+                <hr class="mb-3" />
 
-                <b-row style="height: 150px;" v-for="(orderItem) in order.orderItems" v-bind:key="orderItem.orderId">
+                <b-row
+                  style="height: 150px;"
+                  v-for="(orderItem) in order.orderItems"
+                  v-bind:key="orderItem.orderId"
+                >
                   <b-col
                     cols="3"
-                  >{{orderItem.options.product.productName}}({{orderItem.options.optionValue}}) {{orderItem.options.skuNumber}}</b-col>
+                  >{{orderItem.options.product.productName}}{{attribute}} {{orderItem.options.skuNumber}}</b-col>
                   <b-col cols="3">
-                     <img
-                     @click="onImageClick(orderItem.orderImageKey)"
-                     style="height: 100px; max-height: 150px; cursor:pointer;"
-                    v-bind:src="orderItem.orderImageUrl"
-                  />
+                    <img
+                      @click="onImageClick(orderItem.orderImageKey)"
+                      style="height: 100px; max-height: 150px; cursor:pointer;"
+                      v-bind:src="orderItem.orderImageUrl"
+                    />
                   </b-col>
-                  <b-col cols="2">
-                    {{orderItem.options.product.price | currency}}
-                  </b-col>
+                  <b-col cols="2">{{orderItem.options.product.price | currency}}</b-col>
                   <b-col cols="2">{{orderItem.quantity}}</b-col>
                   <b-col cols="2">N/A</b-col>
                 </b-row>
-                <hr class="mb-3">
+                <hr class="mb-3" />
 
                 <b-row>
                   <b-col cols="10"></b-col>
-                  <b-col  cols="2"><span>Total :</span><span> {{order.orderTotal | currency}}</span></b-col>
-               
+                  <b-col cols="2">
+                    <span>Total :</span>
+                    <span>{{order.orderTotal | currency}}</span>
+                  </b-col>
                 </b-row>
               </div>
             </div>
@@ -190,65 +188,56 @@ export default {
     return {
       pad: null,
       order: null,
-      time: ""
+      time: "",
+      attribute: ""
     };
   },
 
   methods: {
-    
-    onImageClick(thumbNailUrl){
-      console.log(thumbNailUrl)
-        var listOfThumbNailUrl = [];
-        listOfThumbNailUrl.push(thumbNailUrl);
-        this.$store
+    onImageClick(thumbNailUrl) {
+      console.log(thumbNailUrl);
+      var listOfThumbNailUrl = [];
+      listOfThumbNailUrl.push(thumbNailUrl);
+      this.$store
         .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
         .then(response => {
-        console.log(response)
-        let index;
+          console.log(response);
+          let index;
 
-        var interval = setInterval(download, 300, response.imgUrls);
+          var interval = setInterval(download, 300, response.imgUrls);
 
-        function download(urls) {
-         var url = urls.pop();
-        console.log(url)
-         var a = document.createElement("a");
-         a.setAttribute('href', url);
-         a.setAttribute('download', '');
-         a.setAttribute('target', '_blank');
-         a.click();
+          function download(urls) {
+            var url = urls.pop();
+            console.log(url);
+            var a = document.createElement("a");
+            a.setAttribute("href", url);
+            a.setAttribute("download", "");
+            a.setAttribute("target", "_blank");
+            a.click();
 
-        if (urls.length == 0) {
-          clearInterval(interval);
-        }
-}
+            if (urls.length == 0) {
+              clearInterval(interval);
+            }
+          }
 
-        // this.presignedUrl = response.imgUrls[0];
-        // this.$bvModal.show("viewPresignedImage");
+          // this.presignedUrl = response.imgUrls[0];
+          // this.$bvModal.show("viewPresignedImage");
         })
         .catch(error => {
           console.dir(error);
           this.message("danger", error);
         });
-
     },
-       getAction(status) {
-        if (status == "Received")
-          return "Accept Order"
-        else if (status == "Awaiting Printing")
-          return "Print"
-        else if (status == "Printed")
-          return "Deliver"
-        else if (status == "Out for Delivery")
-          return "Delivered"
-        else if (status == "Completed")
-          return null
-        else if (status == "Delivery Failed")
-          return "Re-Deliver"
-        else if (status == "Cancelled")
-          return null
-        else
-          return null
-      },
+    getAction(status) {
+      if (status == "Received") return "Accept Order";
+      else if (status == "Awaiting Printing") return "Print";
+      else if (status == "Printed") return "Deliver";
+      else if (status == "Out for Delivery") return "Delivered";
+      else if (status == "Completed") return null;
+      else if (status == "Delivery Failed") return "Re-Deliver";
+      else if (status == "Cancelled") return null;
+      else return null;
+    }
   },
   mounted() {
     const orderId = localStorage.getItem("viewOrderId");
@@ -257,6 +246,26 @@ export default {
       .dispatch(ORDER_GET_REQUEST, orderId)
       .then(response => {
         this.order = response;
+        this.attribute = " (";
+        for (var a = 0; a < this.order.orderItems.length; a++) {
+          var atr = 1;
+          for (
+            var b = 0;
+            b < this.order.orderItems[a].options.attributes.length;
+            b++
+          ) {
+            if (atr == this.order.orderItems[a].options.attributes.length)
+              this.attribute +=
+                this.order.orderItems[a].options.attributes[b].attributeValue +
+                ")";
+            else
+              this.attribute +=
+                this.order.orderItems[a].options.attributes[b].attributeValue +
+                ",";
+            atr++;
+          }
+        }
+        console.log("att " + this.attribute);
       })
       .catch(error => {
         alert("error", error.response.data.message);
