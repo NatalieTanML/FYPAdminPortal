@@ -87,6 +87,7 @@ export default {
       fields: [
         { key: "checkbox", label: "" },
         { key: "refNo", label: "Ref. No", sortable: true },
+         { key: "createdAt", label: "Date", sortable: true },
         { key: "region", label: "Region", sortable: true },
         { key: "postalcode", label: "Postal Code", sortable: true },
         { key: "deliveryman", label: "Delivery Man", sortable: true },
@@ -326,6 +327,9 @@ export default {
               this.items.push({
                 id: response[i].orderId,
                 refNo: response[i].referenceNo,
+                createdAt: new Date(
+                  Date.parse(response[i].createdAt)
+                ).toLocaleString(),
                 region: region,
                 postalcode: postalcode,
                 deliveryman: deliveryman,

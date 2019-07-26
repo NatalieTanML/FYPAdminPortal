@@ -202,7 +202,8 @@ export default {
         },
         {
           key: "actions",
-          label: "Actions"
+          label: "Actions",
+          sortable: true
         }
       ]
     };

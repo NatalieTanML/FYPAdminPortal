@@ -18,24 +18,51 @@
                     <div class="form-group">
                       <input
                         type="password"
+                        v-model="oldPassword"
+                        class="form-control form-control-user"
+                        placeholder="Enter Your Old Password..."
+                      />
+                      <div
+                        class="error-message"
+                        v-if="validate && !$v.oldPassword.required"
+                      >This Field Is Required</div>
+                    </div>
+
+                    <div class="form-group">
+                      <input
+                        type="password"
                         v-model="newPassword"
                         class="form-control form-control-user"
-                        aria-describedby="emailHelp"
                         placeholder="Enter New Password..."
                       />
+                      <div
+                        class="error-message"
+                        v-if="validate && !$v.newPassword.required"
+                      >This Field Is Required</div>
                     </div>
                     <div class="form-group">
                       <input
                         type="password"
                         v-model="newConfirmPassword"
                         class="form-control form-control-user"
-                        placeholder="Confirm Password..."
+                        placeholder="Confirm New Password..."
                       />
+                      <div
+                        class="error-message"
+                        v-if="validate && !$v.newConfirmPassword.required"
+                      >This Field is Required.</div>
+                      <div
+                        class="error-message"
+                        v-else-if="validate && !$v.newConfirmPassword.samePassword"
+                      >New Passwords must be identical</div>
                     </div>
 
-                    <a v-on:click="changePassword" class="btn btn-primary btn-user btn-block">
-                      <span>Change Password</span>
-                    </a>
+                    <b-button
+                      class="btn-user btn-block"
+                  
+                      v-on:click="changePassword"
+                      variant="primary"
+                    >Change Password</b-button>
                   </form>
                 </div>
               </div>
@@ -54,14 +81,31 @@ import {
   USER_LOGOUT
 } from "@/store/actions/user";
 import store from "@/store";
+import { sameAs, required } from "vuelidate/lib/validators";
 
 export default {
   data() {
     return {
+      oldPassword: "",
       newPassword: "",
       newConfirmPassword: "",
-      newPasswordNotSame: false
+      newPasswordNotSame: false,
+      validate: false
     };
+  },
+  validations: {
+    oldPassword: {
+      required
+    },
+
+    newPassword: {
+      required
+    },
+
+    newConfirmPassword: {
+      required,
+      samePassword: sameAs("newPassword")
+    }
   },
   methods: {
     message(method, messageText) {
@@ -72,24 +116,41 @@ export default {
       this.$snack[method](config);
     },
     changePassword() {
-      const { newPassword, newConfirmPassword } = this;
+      this.validate = true;
+      console.log(this.$v.newConfirmPassword.samePassword);
+      if (this.oldPassword == "") this.oldPassword = null;
 
-      if (newPassword != newConfirmPassword) this.newPasswordNotSame = true;
-      else {
-        this.newPasswordNotSame = false;
-        const userStr = {
-          password: newPassword
-        };
-        this.$store
-          .dispatch(CHANGEOWNPASSWORD, userStr)
-          .then(response => {
-            this.message("success", "Your password has been updated!");
-            this.$router.replace({ name: "Login" });
-            this.$store.dispatch(USER_LOGOUT);
-          })
-          .catch(error => {
-            this.message("danger", error.response.data.message);
-          });
+      if (this.newPassword == "") this.newPassword = null;
+
+      if (this.newConfirmPassword == "") this.newConfirmPassword = null;
+
+      if (
+        this.oldPassword != null &&
+        this.newPassword != null &&
+        this.$v.newConfirmPassword.samePassword
+      ) {
+        const { oldPassword, newPassword, newConfirmPassword } = this;
+
+        if (newPassword != newConfirmPassword) {
+        } else {
+          this.newPasswordNotSame = false;
+          const userStr = {
+            inUser: {
+              password: oldPassword
+            },
+            newPassword: newPassword
+          };
+          this.$store
+            .dispatch(CHANGEOWNPASSWORD, userStr)
+            .then(response => {
+              this.message("success", "Your password has been updated!");
+              this.$router.replace({ name: "Login" });
+              this.$store.dispatch(USER_LOGOUT);
+            })
+            .catch(error => {
+              this.message("danger", error.response.data.message);
+            });
+        }
       }
     },
 
@@ -117,6 +178,13 @@ span {
   margin-top: 2em;
   cursor: pointer;
   color: white;
+}
+.error-message {
+  color: #dc3545;
+  float: left;
+  margin-left: 1em;
+  margin-top: 0.2em;
+  margin-bottom: 0.5em;
 }
 </style>
 

@@ -43,6 +43,7 @@ const state = {
   userId: localStorage.getItem("userId"),
   userRole: localStorage.getItem("userRole"),
   userName: localStorage.getItem("userName"),
+  email: localStorage.getItem("userEmail"),
   getOneId: null,
   roles: null
 };
@@ -66,6 +67,7 @@ const getters = {
   userRole: state => state.userRole,
   userName: state => state.userName,
   getOneId: state => state.getOneId,
+  email: state => state.email,
   roles: state => state.roles
 };
 
@@ -256,6 +258,7 @@ const mutations = {
     localStorage.setItem("userRole", resp.user.userRole);
     localStorage.setItem("userName", resp.user.name);
     localStorage.setItem("hasLoggedIn", true);
+    localStorage.setItem("userEmail", resp.user.email);
   },
   [SIGN_IN_ERROR]: state => {
     state.status = "sign in";
@@ -273,6 +276,7 @@ const mutations = {
     localStorage.removeItem("userName");
     localStorage.removeItem("changePassword");
     localStorage.removeItem("hasLoggedIn");
+    localStorage.removeItem("userEmail");
   },
 
   [ADD_USER]: state => {
