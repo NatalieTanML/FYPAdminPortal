@@ -559,11 +559,24 @@ export default {
               }
               this.items[x].optionId = this.products[i].options[k].optionId;
               this.items[x].sku = this.products[i].options[k].skuNumber;
-              this.items[x].name =
-                this.products[i].productName +
-                "(" +
-                this.products[i].options[k].optionValue +
-                ")";
+              this.items[x].name = "";
+              this.items[x].name += this.products[i].productName + " (";
+              var atr = 1;
+              for (
+                var a = 0;
+                a < this.products[i].options[k].attributes.length;
+                a++
+              ) {
+                if (atr == this.products[i].options[k].attributes.length)
+                  this.items[x].name +=
+                    this.products[i].options[k].attributes[a].attributeValue +
+                    ")";
+                else
+                  this.items[x].name +=
+                    this.products[i].options[k].attributes[a].attributeValue +
+                    ",";
+                atr++;
+              }
               this.items[x].qtyLeft = this.products[i].options[
                 k
               ].currentQuantity;
