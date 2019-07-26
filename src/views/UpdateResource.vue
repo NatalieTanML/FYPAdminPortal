@@ -876,7 +876,6 @@ export default {
   },
 
   mounted() {
-    console.log(new Date(Date.now() - 8640000));
     var productId = localStorage.getItem("updateResourceId");
 
     this.$store
