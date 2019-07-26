@@ -338,7 +338,7 @@ export default {
       let x;
       let index;
       let numberOfRows = 0;
-      this.arrayOfNumberOfRows = [0, 0, 0, 0];
+      this.arrayOfNumberOfRows = [, 0, 0, 0];
 
       // Since we are not going to continue the number of rows for the first tab,
       // we are going to push a null value
@@ -378,6 +378,8 @@ export default {
             this.arrayOfNumberOfRows[3] += 1;
             option.status.push("Not Visible");
           }
+
+          option.status.push("All Products");
         });
       });
 
