@@ -23,8 +23,8 @@
           </div>
         </div>
         <div v-if="order != null">
-          <b-container fluid class="bg-white text-left" align-h="center">
-            <div class="card shadow">
+          <b-container fluid class="text-left" align-h="center">
+            <div class="card shadow mb-4">
               <div class="card-header py-3">
                 <h4 class="mb-3">Order Information</h4>
 
@@ -119,7 +119,7 @@
             </div>
           </b-container>
 
-          <b-container fluid class="card2 bg-white text-left mb-5" align-h="center">
+          <b-container fluid class="card2 text-left" align-h="center">
             <div class="card shadow mb-4">
               <div class="card-header py-3">
                 <h4 class="mb-3">Customer Information</h4>
@@ -162,13 +162,7 @@
         </div>
         <p>{{time}}</p>
 
-        <footer class="sticky-footer bg-white">
-          <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-              <span>Copyright &copy; Your Website 2019</span>
-            </div>
-          </div>
-        </footer>
+        <Footer></Footer>
       </div>
     </div>
   </div>
@@ -177,12 +171,14 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
+import Footer from "@/components/Footer";
 import { ORDER_GET_REQUEST, GET_PRESIGNED_URL } from "@/store/actions/order";
 
 export default {
   components: {
     SideBar,
-    DashboardHeader
+    DashboardHeader,
+    Footer
   },
   data() {
     return {

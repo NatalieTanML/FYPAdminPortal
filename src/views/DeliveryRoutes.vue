@@ -46,13 +46,7 @@
         <!-- End of Main Content -->
       </div>
       <!-- Footer -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
-          </div>
-        </div>
-      </footer>
+      <Footer></Footer>
       <!-- End of Footer -->
     </div>
   </div>
@@ -65,6 +59,7 @@ import OrderHub from "@/services/orderHub.js";
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
+import Footer from "@/components/Footer";
 import { eventBus } from "@/eventBus";
 import { GET_ALL_ORDERS, UPDATE_DELIVERYMAN } from "@/store/actions/order";
 import { GET_ALL_DELIVERYMEN } from "@/store/actions/user";
@@ -73,7 +68,8 @@ export default {
   components: {
     SideBar,
     DashboardHeader,
-    Table
+    Table,
+    Footer
   },
   data() {
     return {
@@ -87,7 +83,7 @@ export default {
       fields: [
         { key: "checkbox", label: "" },
         { key: "refNo", label: "Ref. No", sortable: true },
-         { key: "createdAt", label: "Date", sortable: true },
+        { key: "createdAt", label: "Date", sortable: true },
         { key: "region", label: "Region", sortable: true },
         { key: "postalcode", label: "Postal Code", sortable: true },
         { key: "deliveryman", label: "Delivery Man", sortable: true },

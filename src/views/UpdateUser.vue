@@ -15,85 +15,98 @@
         <!-- Begin Page Content -->
 
         <div class="container-fluid">
-          <!-- Main Content -->
-          <div id="content">
-            <div class="row mb-4">
-              <b-container fluid>
-                <b-row class="bg-white text-left" align-h="center" align-v="center">
-                  <b-col cols="8" class="my-5">
-                    <b-form class="resource-form">
-                      <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="User Name">
-                        <input
-                          type="text"
-                          v-model="name"
-                          class="form-control form-control-user"
-                          placeholder="Enter A Name..."
+          <div class="card shadow mb-4">
+            <!-- Main Content -->
+            <div id="content">
+              <div class="row mb-4">
+                <b-container fluid>
+                  <b-row class="bg-white text-left" align-h="center" align-v="center">
+                    <b-col cols="8" class="my-5">
+                      <b-form class="resource-form">
+                        <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
+                        <b-form-group label-cols-sm="3" label="User Name">
+                          <input
+                            type="text"
+                            v-model="name"
+                            class="form-control form-control-user"
+                            placeholder="Enter A Name..."
+                          />
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.name.required"
+                          >Name Is Required</div>
+                        </b-form-group>
+
+                        <b-form-group label-cols-sm="3" label="Email">
+                          <input
+                            type="email"
+                            v-model="email"
+                            class="form-control form-control-user"
+                            placeholder="Enter An Email Address..."
+                          />
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.email.required"
+                          >Email Is Required</div>
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.email.email"
+                          >Please Enter A Valid Email</div>
+                        </b-form-group>
+
+                        <b-form-group label-cols-sm="3" label="Role">
+                          <select
+                            class="custom-select form-control"
+                            name="role"
+                            @change="onSelectChange($event)"
+                          >
+                            <option
+                              v-for="role in roles"
+                              v-bind:key="role.roleName"
+                              :selected="role.roleName == selectedRole"
+                              :value="role.roleId"
+                            >{{ role.roleName}}</option>
+                          </select>
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.selectedRole.required"
+                          >Please choose a role.</div>
+                        </b-form-group>
+
+                        <b-form-group
+                          label-cols-sm="3"
+                          label="Reset Password"
+                          label-for="input-horizontal"
                         >
-                        <div class="error-message" v-if="validate && !$v.name.required" >Name Is Required</div>
-                      </b-form-group>
+                          <b-button v-b-modal.resetPassword class="w-25" variant="danger">Reset</b-button>
+                        </b-form-group>
 
-                      <b-form-group label-cols-sm="3" label="Email">
-                        <input
-                          type="email"
-                          v-model="email"
-                          class="form-control form-control-user"
-                          placeholder="Enter An Email Address..."
+                        <b-form-group
+                          label-cols-sm="3"
+                          label="Is Enabled"
+                          label-for="input-horizontal"
                         >
-                        <div class="error-message" v-if="validate && !$v.email.required" >Email Is Required</div>
-                        <div class="error-message" v-if="validate && !$v.email.email" >Please Enter A Valid Email</div>
+                          <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch></b-form-checkbox>
+                        </b-form-group>
 
-                      </b-form-group>
+                        <b-form-group label-cols-sm="3" label-for="input-horizontal">
+                          <b-button class="w-25" v-on:click="saveUser()" variant="primary">Save</b-button>
+                          <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
+                        </b-form-group>
+                      </b-form>
+                    </b-col>
+                  </b-row>
+                </b-container>
 
-                      <b-form-group label-cols-sm="3" label="Role">
-                        <select
-                          class="custom-select form-control"
-                          name="role"
-                          @change="onSelectChange($event)"
-                        >
-                          <option
-                            v-for="role in roles"
-                            v-bind:key="role.roleName"
-                            :selected="role.roleName == selectedRole"
-                            :value="role.roleId"
-                          >{{ role.roleName}}</option>
-                        </select>
-                        <div class="error-message" v-if="validate && !$v.selectedRole.required" >Please choose a role.</div>
-                      </b-form-group>
+                <b-modal @ok="handleok()" id="resetPassword" title="Reset Password">
+                  <p class="my-4">Are you sure you want to reset this user's password?</p>
+                  <p class="my-4">This action cannot be undone.</p>
+                </b-modal>
 
-                      <b-form-group
-                        label-cols-sm="3"
-                        label="Reset Password"
-                        label-for="input-horizontal"
-                      >
-                        <b-button v-b-modal.resetPassword class="w-25" variant="danger">Reset</b-button>
-                      </b-form-group>
-
-                      <b-form-group
-                        label-cols-sm="3"
-                        label="Is Enabled"
-                        label-for="input-horizontal"
-                      >
-                        <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch></b-form-checkbox>
-                      </b-form-group>
-
-                      <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                        <b-button class="w-25" v-on:click="saveUser()" variant="primary">Save</b-button>
-                        <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
-                      </b-form-group>
-                    </b-form>
-                  </b-col>
-                </b-row>
-              </b-container>
-
-              <b-modal @ok="handleok()" id="resetPassword" title="Reset Password">
-                <p class="my-4">Are you sure you want to reset this user's password?</p>
-                <p class="my-4">This action cannot be undone.</p>
-              </b-modal>
-
-              <b-modal id="disableUser" title="Disable User">
-                <p class="my-4">You are about to disable this user's account</p>
-              </b-modal>
+                <b-modal id="disableUser" title="Disable User">
+                  <p class="my-4">You are about to disable this user's account</p>
+                </b-modal>
+              </div>
             </div>
           </div>
         </div>
@@ -102,13 +115,7 @@
         <!-- End of Main Content -->
       </div>
       <!-- Footer -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
-          </div>
-        </div>
-      </footer>
+      <Footer></Footer>
       <!-- End of Footer -->
     </div>
   </div>
@@ -119,6 +126,7 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
+import Footer from "@/components/Footer";
 import { required, email } from "vuelidate/lib/validators";
 
 import {
@@ -158,7 +166,8 @@ export default {
   },
   components: {
     SideBar,
-    DashboardHeader
+    DashboardHeader,
+    Footer
   },
   methods: {
     message(method, messageText) {
