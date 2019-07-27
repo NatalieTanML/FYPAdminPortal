@@ -480,7 +480,7 @@
                   <span>Save</span>
                 </b-button>
 
-                <b-button class="px-4" @click="cancelProduct">
+                <b-button class="px-4" @click="cancelProduct" :disabled="cancelLoader">
                   <b-spinner small class="mr-2" v-if="cancelLoader"></b-spinner>
                   <span>Cancel</span>
                 </b-button>
@@ -1641,14 +1641,17 @@ export default {
             this.message("success", "successfully deleted all images");
             console.dir(response);
             this.cancelLoader = false;
-            this.previousDeletedImageKeys = [];
-            deleteKeys = [];
+            this.$router.push("/ResourceManagement");
+            // this.previousDeletedImageKeys = [];
+            // deleteKeys = [];
           })
           .catch(error => {
             console.dir(error);
             this.message("danger", error.response.data.message);
             this.cancelLoader = false;
           });
+      } else {
+        this.$router.push("/ResourceManagement");
       }
     },
 
@@ -1746,8 +1749,7 @@ export default {
           console.dir(response);
           this.submitLoader = false;
           this.message("success", "This product has been created successfully");
-          // this.$router.push("/ResourceManagement");
-          // if never route them back, we need to reset the image keys
+          this.$router.push("/ResourceManagement");
         })
         .catch(error => {
           console.dir(error);

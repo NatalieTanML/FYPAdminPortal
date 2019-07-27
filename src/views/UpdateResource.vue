@@ -483,7 +483,7 @@
                   <span>Save</span>
                 </b-button>
 
-                <b-button class="px-4" @click="cancelProduct">
+                <b-button class="px-4" @click="cancelProduct" :disabled="productCancelLoader">
                   <b-spinner small class="mr-2" v-if="productCancelLoader"></b-spinner>
                   <span>Cancel</span>
                 </b-button>
@@ -1477,6 +1477,7 @@ export default {
         this.form.varient = clonedeep(varient);
 
         setTimeout(() => {
+          console.log(this.form.varient);
           this.form.varient.files.forEach(file => {
             var index = this.form.varient.productImages.findIndex(
               image => image.imageKey === file.upload.uuid + ".jpg"
@@ -1742,16 +1743,19 @@ export default {
           .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
           .then(response => {
             this.message("success", "successfully deleted all images");
+            this.$router.push("/ResourceManagement");
             console.dir(response);
-            this.previousNewImageKeys = [];
-            deletedImageKeys = [];
-            this.cancelLoader = false;
+            // this.previousNewImageKeys = [];
+            // deletedImageKeys = [];
+            // this.cancelLoader = false;
           })
           .catch(error => {
             console.dir(error);
             this.message("danger", error.response.data.message);
             this.cancelLoader = false;
           });
+      } else {
+        this.$router.push("/ResourceManagement");
       }
     },
 
@@ -1867,8 +1871,8 @@ export default {
         .dispatch(UPDATE_ONE_PRODUCT, productObj)
         .then(response => {
           this.message("success", "This product has been updated successfully");
-          console.dir(response);
           this.productSubmitLoader = false;
+          this.$router.push("/ResourceManagement");
         })
         .catch(error => {
           console.dir(error);

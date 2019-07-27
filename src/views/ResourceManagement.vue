@@ -40,7 +40,7 @@
           <b-modal
             id="manageQuantity"
             ref="modal"
-            title="Manage Resource Quantity"
+            title="Manage Quantity"
             @ok="updateQuantity"
             ok-title="Save"
           >
@@ -166,7 +166,7 @@ export default {
       arrayOfNumberOfRows: [], // Display the number of rows for each tab
       noOfTabs: 0,
       tabs: [],
-      sortItems: []
+      sortItems: [] // products for each tab
     };
   },
   validations: {
@@ -194,11 +194,11 @@ export default {
     });
 
     eventBus.$on(this.actionButtonClick, jsonData => {
-      if (jsonData.actionButton == "Edit Resource") {
+      if (jsonData.actionButton == "Edit") {
         localStorage.setItem("updateResourceId", jsonData.item.productId);
         this.$router.replace({ name: "UpdateResource" });
       }
-      if (jsonData.actionButton == "Manage Resource Quantity") {
+      if (jsonData.actionButton == "Manage Quantity") {
         this.optionId = jsonData.item.optionId;
         for (var i = 0; i < this.items.length; i++) {
           if (this.items[i].optionId == jsonData.item.optionId) {
@@ -210,7 +210,7 @@ export default {
         this.$v.$reset();
         this.$bvModal.show("manageQuantity");
       }
-      if (jsonData.actionButton == "View Resource") {
+      if (jsonData.actionButton == "View") {
         localStorage.setItem("viewResourceId", jsonData.item.productId);
         // this.$router.replace({ name: "ViewResource" });
         let routeData = this.$router.resolve({
@@ -311,11 +311,7 @@ export default {
 
             console.log(this.items);
 
-            this.items[x].actions = [
-              "Edit Resource",
-              "Manage Resource Quantity",
-              "View Resource"
-            ];
+            this.items[x].actions = ["Edit", "Manage Quantity", "View"];
             x++;
           }
         }
@@ -327,29 +323,13 @@ export default {
   },
   methods: {
     setUpTabs() {
-      let number = 0;
-      console.log(this.products);
-      this.products.forEach(product => {
-        product.options.forEach(option => {
-          number += 1;
-        });
-      });
-      console.log(number);
-      let x;
-      let index;
-      let numberOfRows = 0;
+      // Number of rows for each tab except for the first tab "All Products"
       this.arrayOfNumberOfRows = [, 0, 0, 0];
 
-      // Since we are not going to continue the number of rows for the first tab,
-      // we are going to push a null value
-      this.arrayOfNumberOfRows.push(null);
-      let times = 0;
-
       this.products.forEach(product => {
         product.options.forEach(option => {
-          console.log(option);
+          // An option can have one or more status. Hence, we are declaring an array
           option.status = [];
-          times += 1;
 
           if (option.currentQuantity === 0) {
             this.arrayOfNumberOfRows[1] += 1;
@@ -359,6 +339,7 @@ export default {
           let startDate = product.effectiveStartDate;
           let endDate = product.effectiveEndDate;
 
+          // convert start and end date to date object and initialize them to midnight
           startDate = new Date(new Date(startDate).setHours(0, 0, 0, 0));
           endDate !== null
             ? (endDate = new Date(new Date(endDate).setHours(0, 0, 0, 0)))
@@ -372,25 +353,19 @@ export default {
             this.arrayOfNumberOfRows[2] += 1;
             option.status.push("Visible");
           } else {
-            console.log(startDate);
-            console.log(endDate);
-            console.log(todayDate);
             this.arrayOfNumberOfRows[3] += 1;
             option.status.push("Not Visible");
           }
-
           option.status.push("All Products");
         });
       });
 
-      console.log(times);
-      console.log(this.arrayOfNumberOfRows);
-
       let typesOfTabs = this.typesOfTabs;
       this.Tabs = [];
+      let x;
 
       for (x = 0; x < typesOfTabs.length; x++)
-        // Initialize the tabs to get title, id and isDark.
+        // Initialize each tab
         this.Tabs[x] = {
           title: typesOfTabs[x],
           id: x,
@@ -398,21 +373,12 @@ export default {
           noOfRows: this.arrayOfNumberOfRows[x]
         };
 
-      // selects current tabs. By default, it will be 0
+      // selects current tab. In this case, it will be 0 (default)
       this.onTabChange(this.selectedTab);
     },
 
     onTabChange(id) {
-      //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
-      //reason why i don't use const ^ is because when the data is displayed,
-      //it will become read-only.
-      console.log("on tab change is called");
-      this.sortItems = [];
-      //change background color for the tab
-
-      //will have an error if you remove this if statement.
-      //because the html section will run first, then it will cause an error
-      //because the tabs have not been created.
+      // Change background color for active tab
       if (this.$refs.tabs != undefined)
         this.noOfTabs = this.$refs.tabs.childElementCount;
       if (!this.Tabs[id].isDark) this.Tabs[id].isDark = true;
@@ -423,13 +389,14 @@ export default {
           if (this.Tabs[index].isDark) this.Tabs[index].isDark = false;
       }
 
+      this.sortItems = [];
       let sortBy = this.typesOfTabs[id];
-      //  typesOfTabs: ["All Products", "Out Of Stock", "Visible", "Not Visible"],
       let sortedIndex = 0;
+
+      // Retrieve the product options related to the active tab
       this.products.forEach(product => {
         product.options.forEach(option => {
           if (option.status.includes(sortBy)) {
-            console.log(this.items[sortedIndex]);
             this.sortItems.push(this.items[sortedIndex]);
           }
           ++sortedIndex;
@@ -588,11 +555,7 @@ export default {
                 }
               }
 
-              this.items[x].actions = [
-                "Edit Resource",
-                "Manage Resource Quantity",
-                "View Resource"
-              ];
+              this.items[x].actions = ["Edit", "Manage Quantity", "View"];
               x++;
             }
           }
