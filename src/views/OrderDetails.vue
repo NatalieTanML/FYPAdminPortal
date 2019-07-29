@@ -149,9 +149,6 @@
             </div>
           </div>
         </div>
-
-        <p>{{time}}</p>
-
         <Footer></Footer>
       </div>
     </div>
@@ -174,7 +171,6 @@ export default {
     return {
       pad: null,
       order: null,
-      time: "",
       attribute: []
     };
   },
@@ -256,7 +252,6 @@ export default {
             atr++;
           }
         }
-        console.log("att " + this.attribute);
       })
       .catch(error => {
         alert("error", error.response.data.message);
