@@ -305,6 +305,7 @@ export default {
               var region;
 
               if (response[i].addressId != null) {
+                console.log(response[i])
                 postalcode = response[i].address.postalCode;
                 region = this.getRegionByPostalCode(
                   // response[i].address.postalCode

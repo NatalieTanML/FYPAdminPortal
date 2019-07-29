@@ -33,19 +33,22 @@
                   label="Price"
                   label-for="input-horizontal"
                 >
-                  <b-form-input
-                    id="price"
-                    v-model="$v.form.price.$model"
-                    :state="$v.form.price.$dirty ? !$v.form.price.$error : null"
-                    maxlength="7"
-                  ></b-form-input>
-                  <b-form-invalid-feedback>
-                    <p v-if="!$v.form.price.required">Price is required</p>
-                    <p
-                      v-if="!$v.form.price.twoDecimal"
-                    >Please enter a valid number and not more than 2 decimal places</p>
-                    <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 999</p>
-                  </b-form-invalid-feedback>
+                  <b-input-group prepend="$">
+                    <b-form-input
+                      id="price"
+                      v-model="$v.form.price.$model"
+                      :state="$v.form.price.$dirty ? !$v.form.price.$error : null"
+                      maxlength="7"
+                    ></b-form-input>
+
+                    <b-form-invalid-feedback>
+                      <p v-if="!$v.form.price.required">Price is required</p>
+                      <p
+                        v-if="!$v.form.price.twoDecimal"
+                      >Please enter a valid number and not more than 2 decimal places</p>
+                      <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 999</p>
+                    </b-form-invalid-feedback>
+                  </b-input-group>
                 </b-form-group>
 
                 <b-form-group
@@ -543,7 +546,7 @@ export default {
         discount: {
           effectiveStartDate: "",
           effectiveEndDate: "",
-          discountValue: null,
+          discountValue: "",
           discountType: "Percentage",
           isPercentage: false
         },
@@ -714,7 +717,6 @@ export default {
               }
               value = Number(value);
               let basePrice = Number(this.form.price);
-              console.log(basePrice);
               if (value > basePrice || value <= 0) {
                 this.isMaxFixedValue = true;
                 return false;
@@ -742,9 +744,11 @@ export default {
             if (startDate >= this.form.discount.effectiveEndDate) return false;
             return true;
           },
+
           overlapFound() {
             return !this.isOverlapped;
           },
+
           // Discount start date must not be lesser than base start date
           checkStartDate(startDate) {
             let discountStartDate = new Date(
