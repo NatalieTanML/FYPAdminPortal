@@ -164,9 +164,10 @@ const actions = {
     });
   },
   [UPDATE_ORDER]: ({ commit }, jsonData) => {
+    console.log("jsonDAta in update order",jsonData)
     return new Promise((resolve, reject) => {
       apiCall({
-        url: api_routes.order.updateOrder,
+        url: api_routes.order.updateOrder+"/"+jsonData.OrderId,
         data: jsonData,
         method: "put"
       })

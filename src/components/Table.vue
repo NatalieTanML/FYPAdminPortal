@@ -108,14 +108,14 @@
                       </template>
 
                       <b-dropdown-item-button
-                      v-if="row.item.status == 'Out for Delivery'"
-                        v-on:click="editOrder(row.item.id)"
-                        aria-describedby="dropdown-header-label"
-                      >Delivery Failed</b-dropdown-item-button>
-                         <b-dropdown-item-button
                         v-on:click="editOrder(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Edit Order</b-dropdown-item-button>
+                         <b-dropdown-item-button
+                          v-if="row.item.status == 'Out for Delivery'"
+                        v-on:click="deliveryFailed(row.item.id)"
+                        aria-describedby="dropdown-header-label"
+                      >Delivery Failed</b-dropdown-item-button>
                       <b-dropdown-item-button
                         v-on:click="showCancelOrderDialog(row.item.id)"
                         aria-describedby="dropdown-header-label"
@@ -308,6 +308,12 @@ export default {
     sortChanged(){
        this.checkedCheckBox = [];
         this.checkAll = false;  
+    },
+    deliveryFailed(orderId){
+      //this.headerButton[2].title is "Delivery Failed"
+    //emit the eventBus and set the delivery to faile
+     eventBus.$emit(this.headerButton[2].title,[orderId]);
+
     },
     onHeaderButtonClick(clickedHeaderTitle) {
       //for summaryoforders
