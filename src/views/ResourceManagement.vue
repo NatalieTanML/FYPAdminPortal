@@ -88,7 +88,7 @@
             <b-form-group
               id="currentQuantity"
               label-cols-sm="3"
-              label="Currenct Quantity :"
+              label="Current Quantity :"
               label-for="input-horizontal"
             >
               <b-form-text id="currentQuantity">{{form.currentQuantity}}</b-form-text>
@@ -430,29 +430,26 @@ export default {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
-      } else if (
-        this.form.quantityOption == "Reduce" &&
-        this.form.quantityValue > this.form.currentQuantity
-      ) {
-        alert("Quantity value exceeds limit");
       } else {
         if (this.form.quantityOption == "Increase") {
           this.$store
             .dispatch(UPDATE_STOCK, [this.optionId, this.form.quantityValue])
             .then(response => {
+              this.message("success", "Successfully updated quantity");
               this.refreshTable();
             })
             .catch(error => {
-              alert(error);
+              this.message("danger", error.response.data.message);
             });
         } else {
           this.$store
             .dispatch(UPDATE_STOCK, [this.optionId, -this.form.quantityValue])
             .then(response => {
+              this.message("success", "Successfully updated quantity");
               this.refreshTable();
             })
             .catch(error => {
-              alert(error);
+              this.message("danger", error.response.data.message);
             });
         }
         // Hide the modal manually
@@ -560,6 +557,13 @@ export default {
         .catch(error => {
           alert(error);
         });
+    },
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
     }
   }
 };
