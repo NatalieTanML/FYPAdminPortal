@@ -15,20 +15,22 @@
         <!-- Begin Page Content -->
 
         <div class="container-fluid">
-          <!-- Main Content -->
-          <div id="content">
-            <div class="row mb-4">
-              <ul class="nav" ref="tabs"></ul>
-            </div>
-          </div>
+          <div class="card shadow mb-4">
+        <!-- User Interface controls -->
+        <div class="card-header py-3">
+          <b-row>
+            <b-col class="col-12 col-md-4">
+            <h4>Order Information</h4>
+            </b-col>
+        
+          </b-row>
         </div>
-        <div v-if="order != null">
+          <!-- Main Content -->
+       <div v-if="order != null">
           <b-container fluid class="text-left" align-h="center">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3">
-                <h4 class="mb-3">Order Information</h4>
+         
+                <b-row style="margin-top:1em" class="b1 mb-2">
 
-                <b-row class="b1 mb-2">
                   <b-col>Order No.</b-col>
                   <b-col>Created At</b-col>
                   <b-col>Subtotal</b-col>
@@ -115,8 +117,7 @@
                     <span>{{order.orderTotal | currency}}</span>
                   </b-col>
                 </b-row>
-              </div>
-            </div>
+           
           </b-container>
 
           <b-container fluid class="card2 text-left" align-h="center">
@@ -251,6 +252,9 @@
             </div>
           </b-container>
         </div>
+        </div>
+        </div>
+        
         <p>{{time}}</p>
 
         <Footer></Footer>
