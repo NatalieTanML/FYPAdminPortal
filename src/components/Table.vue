@@ -248,7 +248,7 @@ export default {
     actionButtonClick: String,
     enableCheckbox: Boolean,
     tableName: String,
-    imageClick: String,
+    imageClick: String
   },
   mounted() {
     console.log("this.totalRows : " + this.totalRows);
@@ -281,7 +281,12 @@ export default {
   watch: {
     items: {
       handler() {
+        //when the items for the table changes, i will reset
+        //the totalRows to reset the pagination and
+        //uncheck all the checkbox
         this.totalRows = this.items.length;
+        this.checkedCheckBox = [];
+        this.checkAll = false;
         console.log("watch itemsChange");
       },
       deep: true

@@ -91,7 +91,7 @@
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
                           <b-button class="w-25" v-on:click="saveUser()" variant="primary">Save</b-button>
-                          <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
+                          <b-button class="w-25" v-on:click="cancelButton()" style="margin-left:2em " variant="secondary">Cancel</b-button>
                         </b-form-group>
                       </b-form>
                     </b-col>
@@ -218,6 +218,9 @@ export default {
     onSelectChange(event) {
       this.updatedRole = event.target.value;
       console.log(this.updatedRole);
+    },
+    cancelButton() {
+      this.$router.replace({ name: "UserManagement" });
     },
     saveUser() {
       if (this.name == "") this.name = null;

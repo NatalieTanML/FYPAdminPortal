@@ -56,26 +56,6 @@
                   <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
                   <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
                 </b-row>
-                <b-row class="b4 mb-2">
-                  <b-col class="b3" v-if="getAction(order.status) != null">Actions</b-col>
-                  <b-col class="b3"></b-col>
-                  <b-col class="b3"></b-col>
-                </b-row>
-                <b-row class="mb-2">
-                  <b-col cols="5">
-                    <b-button
-                      type="button"
-                      lg="4"
-                      class="btnAction"
-                      variant="primary"
-                      size="sm"
-                      v-if="getAction(order.status) != null"
-                    >{{getAction(order.status)}}</b-button>
-                  </b-col>
-                  <b-col class="b3"></b-col>
-                  <b-col class="b3"></b-col>
-                  <b-col class="b3"></b-col>
-                </b-row>
 
                 <b-row class="b2">
                   <b-col cols="3">Item(s)</b-col>
