@@ -27,13 +27,7 @@
         <!-- End of Main Content -->
       </div>
       <!-- Footer -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
-          </div>
-        </div>
-      </footer>
+      <Footer></Footer>
       <!-- End of Footer -->
     </div>
   </div>
@@ -45,6 +39,7 @@
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
+import Footer from "@/components/Footer";
 import { eventBus } from "@/eventBus";
 import { GET_ALL_USERS } from "@/store/actions/user";
 
@@ -52,7 +47,8 @@ export default {
   components: {
     SideBar,
     DashboardHeader,
-    Table
+    Table,
+    Footer
   },
   data() {
     return {

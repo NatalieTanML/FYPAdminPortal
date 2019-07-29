@@ -86,33 +86,29 @@
             </b-form-group>
 
             <b-form-group
+              class="quantity"
               id="currentQuantity"
               label-cols-sm="3"
-              label="Currenct Quantity :"
+              label="Current Quantity :"
               label-for="input-horizontal"
             >
-              <b-form-text id="currentQuantity">{{form.currentQuantity}}</b-form-text>
+              <b-form-text class="quantity" id="currentQuantity">{{form.currentQuantity}}</b-form-text>
             </b-form-group>
 
             <b-form-group
+              class="quantity"
               id="effectiveQuantity"
               label-cols-sm="3"
               label="Effective Quantity :"
               label-for="input-horizontal"
               v-model="form.effectiveQuantity"
             >
-              <b-form-text id="effectiveQuantity">{{form.effectiveQuantity}}</b-form-text>
+              <b-form-text class="quantity" id="effectiveQuantity">{{form.effectiveQuantity}}</b-form-text>
             </b-form-group>
           </b-modal>
         </div>
         <!-- Footer -->
-        <footer class="sticky-footer bg-white">
-          <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-              <span>Copyright &copy; Your Website 2019</span>
-            </div>
-          </div>
-        </footer>
+        <Footer></Footer>
         <!-- End of Footer -->
       </div>
     </div>
@@ -123,6 +119,7 @@
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Table from "@/components/Table";
+import Footer from "@/components/Footer";
 import { eventBus } from "@/eventBus";
 import { GET_ALL_PRODUCTS, UPDATE_STOCK } from "@/store/actions/product";
 import { METHODS } from "http";
@@ -134,7 +131,8 @@ export default {
     SideBar,
     DashboardHeader,
     DashboardTabs,
-    Table
+    Table,
+    Footer
   },
   data() {
     return {
@@ -434,29 +432,26 @@ export default {
       this.$v.$touch();
       if (this.$v.$invalid) {
         return;
-      } else if (
-        this.form.quantityOption == "Reduce" &&
-        this.form.quantityValue > this.form.currentQuantity
-      ) {
-        alert("Quantity value exceeds limit");
       } else {
         if (this.form.quantityOption == "Increase") {
           this.$store
             .dispatch(UPDATE_STOCK, [this.optionId, this.form.quantityValue])
             .then(response => {
+              this.message("success", "Successfully updated quantity");
               this.refreshTable();
             })
             .catch(error => {
-              alert(error);
+              this.message("danger", error.response.data.message);
             });
         } else {
           this.$store
             .dispatch(UPDATE_STOCK, [this.optionId, -this.form.quantityValue])
             .then(response => {
+              this.message("success", "Successfully updated quantity");
               this.refreshTable();
             })
             .catch(error => {
-              alert(error);
+              this.message("danger", error.response.data.message);
             });
         }
         // Hide the modal manually
@@ -564,10 +559,20 @@ export default {
         .catch(error => {
           alert(error);
         });
+    },
+    message(method, messageText) {
+      let config = {
+        text: messageText,
+        button: "ok"
+      };
+      this.$snack[method](config);
     }
   }
 };
 </script>
 
 <style>
+.quantity {
+  font-size: 100%;
+}
 </style>

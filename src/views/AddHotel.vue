@@ -1,86 +1,114 @@
 <template>
- <div id="wrapper">
+  <div id="wrapper">
     <SideBar></SideBar>
     <!-- Content Wrapper -->
     <div id="content-wrapper">
       <!-- Main Content -->
       <div id="content">
-    
-          <DashboardHeader title="Add Hotel"></DashboardHeader>
-          <!-- Topbar Navbar -->
-    
+        <DashboardHeader title="Add Hotel"></DashboardHeader>
+        <!-- Topbar Navbar -->
+
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
 
         <div class="container-fluid">
-          <!-- Main Content -->
-          <div id="content">
-            <div class="row mb-4">
-              <b-container fluid>
-                <b-row class="bg-white text-left" align-h="center">
-                  <b-col cols="8" class="my-5">
-                    <b-form class="resource-form">
-                      <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
-                      <b-form-group label-cols-sm="3" label="Hotel Name" label-for="input-horizontal" >
-                         <input type="text" v-model="hotel.name" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter The Hotel Name...">
-                         <div class="error-message" v-if="validate && !$v.hotel.name.required" >Hotel Name Is Required</div>
-                      </b-form-group>
+          <div class="card shadow mb-4">
+            <!-- Main Content -->
+            <div id="content">
+              <div class="row mb-4">
+                <b-container fluid>
+                  <b-row class="bg-white text-left" align-h="center">
+                    <b-col cols="8" class="my-5">
+                      <b-form class="resource-form">
+                        <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
+                        <b-form-group
+                          label-cols-sm="3"
+                          label="Hotel Name"
+                          label-for="input-horizontal"
+                        >
+                          <input
+                            type="text"
+                            v-model="hotel.name"
+                            class="form-control form-control-user"
+                            aria-describedby="emailHelp"
+                            placeholder="Hotel name"
+                          />
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.hotel.name.required"
+                          >Hotel name is required!</div>
+                        </b-form-group>
 
+                        <b-form-group
+                          label-cols-sm="3"
+                          label="Hotel Address"
+                          label-for="input-horizontal"
+                        >
+                          <input
+                            type="text"
+                            v-model="hotel.address"
+                            class="form-control form-control-user"
+                            aria-describedby
+                            placeholder="Hotel address"
+                          />
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.hotel.address.required"
+                          >Hotel address is required!</div>
+                        </b-form-group>
 
-                      <b-form-group label-cols-sm="3" label="Hotel Address" label-for="input-horizontal">
-                         <input type="text" v-model="hotel.address" class="form-control form-control-user" aria-describedby="" placeholder="Enter The Hotel Address...">
-                         <div class="error-message" v-if="validate && !$v.hotel.address.required" >Hotel Address Is Required</div>
-                      </b-form-group>
+                        <b-form-group
+                          label-cols-sm="3"
+                          label="Hotel Postal Code"
+                          label-for="input-horizontal"
+                        >
+                          <input
+                            type="text"
+                            v-model="hotel.postalCode"
+                            class="form-control form-control-user"
+                            aria-describedby
+                            placeholder="Hotel postal code"
+                          />
+                          <div
+                            class="error-message"
+                            v-if="validate && !$v.hotel.postalCode.required"
+                          >Hotel postal code is required!</div>
+                        </b-form-group>
 
-                        <b-form-group label-cols-sm="3" label="Hotel Postal Code" label-for="input-horizontal">
-                         <input type="text" v-model="hotel.postalCode" class="form-control form-control-user" aria-describedby="" placeholder="Enter The Hotel Postal Code...">
-                         <div class="error-message" v-if="validate && !$v.hotel.postalCode.required" >Hotel Postal Code Is Required</div>
-                      </b-form-group>
-
-
-
-                      <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                        <b-button class="w-25"  v-on:click="addHotel" variant="primary">Add Hotel</b-button>
-                      </b-form-group>
-
-                    </b-form>
-                  </b-col>
-                </b-row>
-              </b-container>
-               </div>
+                        <b-form-group label-cols-sm="3" label-for="input-horizontal">
+                          <b-button class="w-25" v-on:click="addHotel" variant="primary">Add Hotel</b-button>
+                        </b-form-group>
+                      </b-form>
+                    </b-col>
+                  </b-row>
+                </b-container>
+              </div>
+            </div>
           </div>
         </div>
         <!-- /.container-fluid -->
 
-
         <!-- End of Main Content -->
       </div>
       <!-- Footer -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
-          </div>
-        </div>
-      </footer>
+      <Footer></Footer>
       <!-- End of Footer -->
     </div>
   </div>
-
-                
-                 
 </template>
 
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
+import Footer from "@/components/Footer";
 import { CREATE_HOTEL } from "@/store/actions/hotel";
 import { required } from "vuelidate/lib/validators";
 export default {
   components: {
     SideBar,
-    DashboardHeader
+    DashboardHeader,
+    Footer
   },
 
   data() {

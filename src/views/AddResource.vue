@@ -40,7 +40,7 @@
                       :state="$v.form.price.$dirty ? !$v.form.price.$error : null"
                       maxlength="7"
                     ></b-form-input>
-                    
+
                     <b-form-invalid-feedback>
                       <p v-if="!$v.form.price.required">Price is required</p>
                       <p

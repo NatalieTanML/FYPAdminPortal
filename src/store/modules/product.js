@@ -51,8 +51,8 @@ const actions = {
         })
         .catch(err => {
           reject(err);
-        })
-    })
+        });
+    });
   },
 
   [UPLOAD_PRODUCT_IMAGES]: ({ commit }, formData) => {
@@ -60,19 +60,19 @@ const actions = {
     if (state.addImage !== null) {
       addImage = state.addImage;
     } else {
-      addImage = formData
+      addImage = formData;
     }
 
     return new Promise((resolve, reject) => {
-      apiCall({ url: api_routes.s3.upload, data: addImage, method: 'post' })
+      apiCall({ url: api_routes.s3.upload, data: addImage, method: "post" })
         .then(resp => {
-          console.dir(resp)
+          console.dir(resp);
           resolve(resp);
         })
         .catch(err => {
           reject(err);
-        })
-    })
+        });
+    });
   },
 
   [DELETE_PRODUCT_IMAGES]: ({ commit }, guids) => {
@@ -90,43 +90,50 @@ const actions = {
         })
         .catch(err => {
           reject(err);
-        })
-    })
+        });
+    });
   },
 
-  [UPLOAD_AND_DELETE_PRODUCT_IMAGES]: ({ commit, dispatch }, { formData, guids }) => {
+  [UPLOAD_AND_DELETE_PRODUCT_IMAGES]: (
+    { commit, dispatch },
+    { formData, guids }
+  ) => {
     let obj = {
       formData,
       guids
-    }
-    commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj)
+    };
+    commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES, obj);
 
     let UPLOAD_PRODUCT_IMAGES = dispatch("UPLOAD_PRODUCT_IMAGES");
     let DELETE_PRODUCT_IMAGES = dispatch("DELETE_PRODUCT_IMAGES");
 
     return Promise.all([UPLOAD_PRODUCT_IMAGES, DELETE_PRODUCT_IMAGES])
       .then(resp => {
-        commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS)
-        console.dir(resp)
+        commit(UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS);
+        console.dir(resp);
         return resp;
       })
       .catch(err => {
-        return err
+        return err;
       });
   },
 
   [CREATE_PRODUCT]: ({ commit }, productObj) => {
-    console.log(productObj)
+    console.log(productObj);
     return new Promise((resolve, reject) => {
-      apiCall({ url: api_routes.product.create, data: productObj, method: 'post' })
+      apiCall({
+        url: api_routes.product.create,
+        data: productObj,
+        method: "post"
+      })
         .then(resp => {
-          console.dir(resp)
+          console.dir(resp);
           resolve(resp);
         })
         .catch(err => {
           reject(err);
-        })
-    })
+        });
+    });
   },
 
   [UPDATE_ONE_PRODUCT]: ({ commit }, productObj) => {
@@ -178,7 +185,10 @@ const actions = {
 
   [GET_ONE_PRODUCT_ECOMMERCE]: ({ commit }, productId) => {
     return new Promise((resolve, reject) => {
-      apiCall({ url: api_routes.product.get_one_ecommerce + productId, method: "get" })
+      apiCall({
+        url: api_routes.product.get_one_ecommerce + productId,
+        method: "get"
+      })
         .then(resp => {
           console.dir(resp);
           resolve(resp);
@@ -200,6 +210,9 @@ const mutations = {
   [UPLOAD_AND_DELETE_PRODUCT_IMAGES_SUCCESS]: state => {
     Object.assign(state, getDefaultState());
     console.log(state);
+  },
+  [UPDATE_STOCK]: state => {
+    state.status = "update stock";
   }
 };
 
