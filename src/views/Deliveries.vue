@@ -315,6 +315,7 @@ export default {
           //deliveries. Admin can see the deliveries also.
 
           if (
+            response[x].Address != "Self-Pick Up" &&
             (response[x].status == "Out for Delivery" &&
               response[x].deliveryManId == this.$store.getters.userId) ||
             (this.$store.getters.userRole == "Admin" &&
