@@ -86,22 +86,24 @@
             </b-form-group>
 
             <b-form-group
+              class="quantity"
               id="currentQuantity"
               label-cols-sm="3"
               label="Current Quantity :"
               label-for="input-horizontal"
             >
-              <b-form-text id="currentQuantity">{{form.currentQuantity}}</b-form-text>
+              <b-form-text class="quantity" id="currentQuantity">{{form.currentQuantity}}</b-form-text>
             </b-form-group>
 
             <b-form-group
+              class="quantity"
               id="effectiveQuantity"
               label-cols-sm="3"
               label="Effective Quantity :"
               label-for="input-horizontal"
               v-model="form.effectiveQuantity"
             >
-              <b-form-text id="effectiveQuantity">{{form.effectiveQuantity}}</b-form-text>
+              <b-form-text class="quantity" id="effectiveQuantity">{{form.effectiveQuantity}}</b-form-text>
             </b-form-group>
           </b-modal>
         </div>
@@ -570,4 +572,7 @@ export default {
 </script>
 
 <style>
+.quantity {
+  font-size: 100%;
+}
 </style>
