@@ -54,6 +54,7 @@
             :sort-direction="sortDirection"
             @row-clicked="myRowClickHandler"
             @row-hovered="myRowHoverHandler"
+            @sort-changed="sortChanged"
             @filtered="onFiltered"
             :bordered="false"
             hover
@@ -107,6 +108,11 @@
                       </template>
 
                       <b-dropdown-item-button
+                      v-if="row.item.status == 'Out for Delivery'"
+                        v-on:click="editOrder(row.item.id)"
+                        aria-describedby="dropdown-header-label"
+                      >Delivery Failed</b-dropdown-item-button>
+                         <b-dropdown-item-button
                         v-on:click="editOrder(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Edit Order</b-dropdown-item-button>
@@ -299,7 +305,10 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-
+    sortChanged(){
+       this.checkedCheckBox = [];
+        this.checkAll = false;  
+    },
     onHeaderButtonClick(clickedHeaderTitle) {
       //for summaryoforders
       if (this.tableName == "Orders") {
