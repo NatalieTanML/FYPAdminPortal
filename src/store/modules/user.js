@@ -140,7 +140,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       commit(UPDATE_ONE_USER);
       apiCall({
-        url: api_routes.user.update_one + jsonData.userId,
+        url: api_routes.user.update_one + jsonData.inUser.userId,
         data: jsonData,
         method: "put"
       })
