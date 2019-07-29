@@ -230,9 +230,6 @@
             </div>
           </div>
         </div>
-
-        <p>{{time}}</p>
-
         <Footer></Footer>
       </div>
     </div>
@@ -261,7 +258,6 @@ export default {
     return {
       pad: null,
       order: null,
-      time: "",
       selectedDeliveryType: null,
       hotels: null,
       specialRequest: null,

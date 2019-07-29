@@ -13,15 +13,19 @@
       </b-form-group>
     </div>
 
-    <b-form-group id="discountValue" label-cols-sm="3" label="Value" label-for="input-horizontal">
-      <b-form-input
-        id="discountValue"
-        v-model="v.discountValue.$model"
-        :state="v.discountValue.$dirty ? !v.discountValue.$error : null"
-        maxlength="7"
-      ></b-form-input>
+    <b-form-group label-cols-sm="3" label="Value" label-for="input-horizontal">
+      <b-input-group
+        :append="value.discountType === 'Percentage' ? '%' : null"
+        :prepend="value.discountType === 'Fixed' ? '$' : null "
+      >
+        <b-form-input
+          v-model="v.discountValue.$model"
+          :state="v.discountValue.$dirty ? !v.discountValue.$error : null"
+          maxlength="7"
+        ></b-form-input>
+      </b-input-group>
 
-      <b-form-invalid-feedback>
+      <b-form-invalid-feedback v-if="v.discountValue.$dirty">
         <p v-if="!v.discountValue.required">Discount value is required</p>
         <p v-if="!v.discountValue.twoDecimal">Please enter a numerical amount up to 2 decimal places</p>
         <p
@@ -127,4 +131,7 @@ export default {
 </script>
 
 <style>
+.input-group ~ .invalid-feedback {
+  display: block;
+}
 </style>

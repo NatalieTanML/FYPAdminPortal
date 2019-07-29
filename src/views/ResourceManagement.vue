@@ -86,22 +86,24 @@
             </b-form-group>
 
             <b-form-group
+              class="quantity"
               id="currentQuantity"
               label-cols-sm="3"
               label="Current Quantity :"
               label-for="input-horizontal"
             >
-              <b-form-text id="currentQuantity">{{form.currentQuantity}}</b-form-text>
+              <b-form-text class="quantity" id="currentQuantity">{{form.currentQuantity}}</b-form-text>
             </b-form-group>
 
             <b-form-group
+              class="quantity"
               id="effectiveQuantity"
               label-cols-sm="3"
               label="Effective Quantity :"
               label-for="input-horizontal"
               v-model="form.effectiveQuantity"
             >
-              <b-form-text id="effectiveQuantity">{{form.effectiveQuantity}}</b-form-text>
+              <b-form-text class="quantity" id="effectiveQuantity">{{form.effectiveQuantity}}</b-form-text>
             </b-form-group>
           </b-modal>
         </div>
@@ -157,7 +159,7 @@ export default {
         { key: "availability", label: "Availability", sortable: true },
         { key: "actions", label: "Actions" }
       ],
-      typesOfTabs: ["All Products", "Out Of Stock", "Visible", "Not Visible"],
+      typesOfTabs: ["All Resources", "Out Of Stock", "Visible", "Not Visible"],
       selectedTab: 0, // Currently selected tab
       arrayOfNumberOfRows: [], // Display the number of rows for each tab
       noOfTabs: 0,
@@ -319,7 +321,7 @@ export default {
   },
   methods: {
     setUpTabs() {
-      // Number of rows for each tab except for the first tab "All Products"
+      // Display the number of rows for each tab except for the first tab "All Resources"
       this.arrayOfNumberOfRows = [, 0, 0, 0];
 
       this.products.forEach(product => {
@@ -352,7 +354,7 @@ export default {
             this.arrayOfNumberOfRows[3] += 1;
             option.status.push("Not Visible");
           }
-          option.status.push("All Products");
+          option.status.push("All Resources");
         });
       });
 
@@ -570,4 +572,7 @@ export default {
 </script>
 
 <style>
+.quantity {
+  font-size: 100%;
+}
 </style>
