@@ -16,21 +16,18 @@
 
         <div class="container-fluid">
           <div class="card shadow mb-4">
-        <!-- User Interface controls -->
-        <div class="card-header py-3">
-          <b-row>
-            <b-col class="col-12 col-md-4">
-            <h4>Order Information</h4>
-            </b-col>
-        
-          </b-row>
-        </div>
-          <!-- Main Content -->
-       <div v-if="order != null">
-          <b-container fluid class="text-left" align-h="center">
-         
+            <!-- User Interface controls -->
+            <div class="card-header py-3">
+              <b-row>
+                <b-col class="col-12 col-md-4">
+                  <h4>Order Information</h4>
+                </b-col>
+              </b-row>
+            </div>
+            <!-- Main Content -->
+            <div v-if="order != null">
+              <b-container fluid class="text-left" align-h="center">
                 <b-row style="margin-top:1em" class="b1 mb-2">
-
                   <b-col>Order No.</b-col>
                   <b-col>Created At</b-col>
                   <b-col>Subtotal</b-col>
@@ -91,12 +88,12 @@
 
                 <b-row
                   style="height: 150px;"
-                  v-for="(orderItem) in order.orderItems"
+                  v-for="(orderItem,index) in order.orderItems"
                   v-bind:key="orderItem.orderId"
                 >
                   <b-col
                     cols="3"
-                  >{{orderItem.options.product.productName}}{{attribute}} {{orderItem.options.skuNumber}}</b-col>
+                  >{{orderItem.options.product.productName}}{{attribute[index]}} {{orderItem.options.skuNumber}}</b-col>
                   <b-col cols="3">
                     <img
                       @click="onImageClick(orderItem.orderImageKey)"
@@ -117,144 +114,143 @@
                     <span>{{order.orderTotal | currency}}</span>
                   </b-col>
                 </b-row>
-           
-          </b-container>
+              </b-container>
 
-          <b-container fluid class="card2 text-left" align-h="center">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3">
-                <h4 class="mb-3">Customer Information</h4>
-                <b-row class="b1 mb-2">
-                  <b-col>Email Address</b-col>
-                </b-row>
+              <b-container fluid class="card2 text-left" align-h="center">
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h4 class="mb-3">Customer Information</h4>
+                    <b-row class="b1 mb-2">
+                      <b-col>Email Address</b-col>
+                    </b-row>
 
-                <b-row class="mb-2">
-                  <b-col v-if="order.emailString == null">N/A</b-col>
-                  <b-col v-else>{{order.emailString}}</b-col>
-                </b-row>
+                    <b-row class="mb-2">
+                      <b-col v-if="order.emailString == null">N/A</b-col>
+                      <b-col v-else>{{order.emailString}}</b-col>
+                    </b-row>
 
-                <b-row class="b1 mb-2">
-                  <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
-                    <b-form-group label="Country">
-                      <b-input v-model="country"></b-input>
-                    </b-form-group>
-                  </b-col>
+                    <b-row class="b1 mb-2">
+                      <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
+                        <b-form-group label="Country">
+                          <b-input v-model="country"></b-input>
+                        </b-form-group>
+                      </b-col>
 
-                  <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
-                    <b-form-group label="State">
-                      <b-input v-model="state"></b-input>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
+                      <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
+                        <b-form-group label="State">
+                          <b-input v-model="state"></b-input>
+                        </b-form-group>
+                      </b-col>
+                    </b-row>
 
-                <b-form-group id="input-group-6">
-                  <span class="b1">Delivery Type :</span>
+                    <b-form-group id="input-group-6">
+                      <span class="b1">Delivery Type :</span>
 
-                  <b-form-radio-group
-                    id="input-6"
-                    v-model="selectedDeliveryType"
-                    name="type"
-                    stacked
-                    style="margin-top: 5px"
-                  >
-                    <b-form-radio
-                      v-for="deliveryType in deliveryTypes"
-                      v-bind:key="deliveryType.deliveryTypeId"
-                      :value="deliveryType.deliveryTypeName"
-                    >{{deliveryType.deliveryTypeName}}</b-form-radio>
-                  </b-form-radio-group>
-                </b-form-group>
-
-                <div v-if="selectedDeliveryType == 'Residential' ">
-                  <b-row class="b1 mb-2">
-                    <b-col cols="4">
-                      <b-form-group label="Postal Code">
-                        <b-input v-model="residential.postalCode"></b-input>
-                      </b-form-group>
-                    </b-col>
-
-                    <b-col cols="4">
-                      <b-form-group label="Address Line 1">
-                        <b-input v-model="residential.addressOne"></b-input>
-                      </b-form-group>
-                    </b-col>
-
-                    <b-col cols="4">
-                      <b-form-group label="Address Line 2">
-                        <b-input v-model="residential.addressTwo"></b-input>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
-
-                  <b-row class="b1 mb-2">
-                    <b-col cols="4">
-                      <b-form-group label="Unit No.">
-                        <b-input v-model="residential.unitNo"></b-input>
-                      </b-form-group>
-                    </b-col>
-
-                    <b-col cols="4">
-                      <b-form-group label="Special Request">
-                        <b-input v-model="specialRequest"></b-input>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
-                </div>
-
-                <b-row v-if="selectedDeliveryType == 'Hotel' " class="b1 mb-2">
-                  <b-col cols="4">
-                    <b-form-group label="Hotel">
-                      <select
-                        class="form-control dropdown"
-                        id="exampleFormControlSelect1"
-                        @change="onSelectChange($event)"
+                      <b-form-radio-group
+                        id="input-6"
+                        v-model="selectedDeliveryType"
+                        name="type"
+                        stacked
+                        style="margin-top: 5px"
                       >
-                        <option
-                          v-for="oneHotel in hotels"
-                          v-bind:key="oneHotel.value"
-                          v-bind:selected="oneHotel.value == selectedHotel.value"
-                          :value="JSON.stringify(oneHotel)"
-                        >{{oneHotel.text}}</option>
-                      </select>
+                        <b-form-radio
+                          v-for="deliveryType in deliveryTypes"
+                          v-bind:key="deliveryType.deliveryTypeId"
+                          :value="deliveryType.deliveryTypeName"
+                        >{{deliveryType.deliveryTypeName}}</b-form-radio>
+                      </b-form-radio-group>
                     </b-form-group>
-                  </b-col>
 
-                  <b-col cols="4">
-                    <b-form-group label="Room No">
-                      <b-input v-model="hotel.roomNo"></b-input>
-                    </b-form-group>
-                  </b-col>
+                    <div v-if="selectedDeliveryType == 'Residential' ">
+                      <b-row class="b1 mb-2">
+                        <b-col cols="4">
+                          <b-form-group label="Postal Code">
+                            <b-input v-model="residential.postalCode"></b-input>
+                          </b-form-group>
+                        </b-col>
 
-                  <b-col cols="4">
-                    <b-form-group label="Special Request">
-                      <b-input v-model="specialRequest"></b-input>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
+                        <b-col cols="4">
+                          <b-form-group label="Address Line 1">
+                            <b-input v-model="residential.addressOne"></b-input>
+                          </b-form-group>
+                        </b-col>
 
-                <b-row>
-                  <b-col>
-                    <b-button v-on:click="saveDetails()" variant="primary">Save</b-button>
+                        <b-col cols="4">
+                          <b-form-group label="Address Line 2">
+                            <b-input v-model="residential.addressTwo"></b-input>
+                          </b-form-group>
+                        </b-col>
+                      </b-row>
 
-                    <b-button style="margin-left:1em" variant="secondary">Cancel</b-button>
-                  </b-col>
-                </b-row>
-              </div>
+                      <b-row class="b1 mb-2">
+                        <b-col cols="4">
+                          <b-form-group label="Unit No.">
+                            <b-input v-model="residential.unitNo"></b-input>
+                          </b-form-group>
+                        </b-col>
+
+                        <b-col cols="4">
+                          <b-form-group label="Special Request">
+                            <b-input v-model="specialRequest"></b-input>
+                          </b-form-group>
+                        </b-col>
+                      </b-row>
+                    </div>
+
+                    <b-row v-if="selectedDeliveryType == 'Hotel' " class="b1 mb-2">
+                      <b-col cols="4">
+                        <b-form-group label="Hotel">
+                          <select
+                            class="form-control dropdown"
+                            id="exampleFormControlSelect1"
+                            @change="onSelectChange($event)"
+                          >
+                            <option
+                              v-for="oneHotel in hotels"
+                              v-bind:key="oneHotel.value"
+                              v-bind:selected="oneHotel.value == selectedHotel.value"
+                              :value="JSON.stringify(oneHotel)"
+                            >{{oneHotel.text}}</option>
+                          </select>
+                        </b-form-group>
+                      </b-col>
+
+                      <b-col cols="4">
+                        <b-form-group label="Room No">
+                          <b-input v-model="hotel.roomNo"></b-input>
+                        </b-form-group>
+                      </b-col>
+
+                      <b-col cols="4">
+                        <b-form-group label="Special Request">
+                          <b-input v-model="specialRequest"></b-input>
+                        </b-form-group>
+                      </b-col>
+                    </b-row>
+
+                    <b-row>
+                      <b-col>
+                        <b-button v-on:click="saveDetails()" variant="primary">Save</b-button>
+
+                        <b-button style="margin-left:1em" variant="secondary">Cancel</b-button>
+                      </b-col>
+                    </b-row>
+                  </div>
+                </div>
+              </b-container>
             </div>
-          </b-container>
-        </div>
-        <div v-else>
-          <b-container fluid class="text-left" align-h="center">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3">
-                <h4 class="mb-3">Error, no order data retrieved!</h4>
-              </div>
+            <div v-else>
+              <b-container fluid class="text-left" align-h="center">
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h4 class="mb-3">Error, no order data retrieved!</h4>
+                  </div>
+                </div>
+              </b-container>
             </div>
-          </b-container>
+          </div>
         </div>
-        </div>
-        </div>
-        
+
         <p>{{time}}</p>
 
         <Footer></Footer>
@@ -310,7 +306,7 @@ export default {
         unitNo: null,
         postalCode: null
       },
-      attribute: ""
+      attribute: []
     };
   },
 
@@ -389,20 +385,20 @@ export default {
         .dispatch(ORDER_GET_REQUEST, orderId)
         .then(response => {
           this.order = response;
-          this.attribute = " (";
           for (var a = 0; a < this.order.orderItems.length; a++) {
             var atr = 1;
+            this.attribute[a] = " (";
             for (
               var b = 0;
               b < this.order.orderItems[a].options.attributes.length;
               b++
             ) {
               if (atr == this.order.orderItems[a].options.attributes.length)
-                this.attribute +=
+                this.attribute[a] +=
                   this.order.orderItems[a].options.attributes[b]
                     .attributeValue + ")";
               else
-                this.attribute +=
+                this.attribute[a] +=
                   this.order.orderItems[a].options.attributes[b]
                     .attributeValue + ",";
               atr++;

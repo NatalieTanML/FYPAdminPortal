@@ -16,28 +16,27 @@
 
         <div class="container-fluid">
           <div class="card shadow mb-4">
-        <!-- User Interface controls -->
-        <div class="card-header py-3">
-          <b-row>
-            <b-col class="col-12 col-md-4">
-            <h4>Order Information</h4>
-            </b-col>
-            <b-col>
-              <div>
-                <b-button
-                 variant="primary"
-                  style="margin-left: 1em"
-                  class="float-right"
-                  @click="editOrder"
-                >Edit Order</b-button>
-              </div>
-            </b-col>
-          </b-row>
-        </div>
-          <!-- Main Content -->
-          <div v-if="order != null">
-          <b-container fluid class="text-left" align-h="center">
-            
+            <!-- User Interface controls -->
+            <div class="card-header py-3">
+              <b-row>
+                <b-col class="col-12 col-md-4">
+                  <h4>Order Information</h4>
+                </b-col>
+                <b-col>
+                  <div>
+                    <b-button
+                      variant="primary"
+                      style="margin-left: 1em"
+                      class="float-right"
+                      @click="editOrder"
+                    >Edit Order</b-button>
+                  </div>
+                </b-col>
+              </b-row>
+            </div>
+            <!-- Main Content -->
+            <div v-if="order != null">
+              <b-container fluid class="text-left" align-h="center">
                 <b-row style="margin-top:1em" class="b1 mb-2">
                   <b-col>Order No.</b-col>
                   <b-col>Created At</b-col>
@@ -67,8 +66,7 @@
                   <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
                   <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
                 </b-row>
-              
-                
+
                 <b-row class="b2">
                   <b-col cols="3">Item(s)</b-col>
                   <b-col cols="3">Image</b-col>
@@ -80,12 +78,12 @@
 
                 <b-row
                   style="height: 150px;"
-                  v-for="(orderItem) in order.orderItems"
+                  v-for="(orderItem,index) in order.orderItems"
                   v-bind:key="orderItem.orderId"
                 >
                   <b-col
                     cols="3"
-                  >{{orderItem.options.product.productName}}{{attribute}} {{orderItem.options.skuNumber}}</b-col>
+                  >{{orderItem.options.product.productName}}{{attribute[index]}} {{orderItem.options.skuNumber}}</b-col>
                   <b-col cols="3">
                     <img
                       @click="onImageClick(orderItem.orderImageKey)"
@@ -106,56 +104,52 @@
                     <span>{{order.orderTotal | currency}}</span>
                   </b-col>
                 </b-row>
-             
-           
-          </b-container>
+              </b-container>
 
-          <b-container fluid class="card2 text-left" align-h="center">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3">
-                <h4 class="mb-3">Customer Information</h4>
+              <b-container fluid class="card2 text-left" align-h="center">
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h4 class="mb-3">Customer Information</h4>
 
-                <b-row class="b1 mb-2">
-                  <b-col>Email Address</b-col>
-                  <b-col>Billing</b-col>
-                  <b-col>Shipping</b-col>
-                  <b-col>Special Request</b-col>
-                </b-row>
+                    <b-row class="b1 mb-2">
+                      <b-col>Email Address</b-col>
+                      <b-col>Billing</b-col>
+                      <b-col>Shipping</b-col>
+                      <b-col>Special Request</b-col>
+                    </b-row>
 
-                <b-row>
-                  <b-col cols="3" v-if="order.emailString == null">N/A</b-col>
-                  <b-col cols="3" v-else>{{order.emailString}}</b-col>
-                  <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
-                  <b-col
-                    cols="3"
-                    v-else
-                  >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
-                  <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
-                  <b-col
-                    cols="3"
-                    v-else
-                  >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
-                  <b-col cols="3" v-if="order.request == null">N/A</b-col>
-                  <b-col cols="3" v-else>{{order.request}}</b-col>
-                </b-row>
-              </div>
+                    <b-row>
+                      <b-col cols="3" v-if="order.emailString == null">N/A</b-col>
+                      <b-col cols="3" v-else>{{order.emailString}}</b-col>
+                      <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
+                      <b-col
+                        cols="3"
+                        v-else
+                      >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
+                      <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
+                      <b-col
+                        cols="3"
+                        v-else
+                      >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
+                      <b-col cols="3" v-if="order.request == null">N/A</b-col>
+                      <b-col cols="3" v-else>{{order.request}}</b-col>
+                    </b-row>
+                  </div>
+                </div>
+              </b-container>
             </div>
-          </b-container>
-        </div>
-        <div v-else>
-          <b-container fluid class="bg-white text-left" align-h="center">
-            <div class="card shadow">
-              <div class="card-header py-3">
-                <h4 class="mb-3">Error, No Order Data Retrived !</h4>
-              </div>
+            <div v-else>
+              <b-container fluid class="bg-white text-left" align-h="center">
+                <div class="card shadow">
+                  <div class="card-header py-3">
+                    <h4 class="mb-3">Error, No Order Data Retrived !</h4>
+                  </div>
+                </div>
+              </b-container>
             </div>
-          </b-container>
+          </div>
         </div>
-         
-        </div>
-        </div>
-        
-        
+
         <p>{{time}}</p>
 
         <Footer></Footer>
@@ -181,7 +175,7 @@ export default {
       pad: null,
       order: null,
       time: "",
-      attribute: ""
+      attribute: []
     };
   },
 
@@ -243,20 +237,20 @@ export default {
       .dispatch(ORDER_GET_REQUEST, orderId)
       .then(response => {
         this.order = response;
-        this.attribute = " (";
         for (var a = 0; a < this.order.orderItems.length; a++) {
           var atr = 1;
+          this.attribute[a] = " (";
           for (
             var b = 0;
             b < this.order.orderItems[a].options.attributes.length;
             b++
           ) {
             if (atr == this.order.orderItems[a].options.attributes.length)
-              this.attribute +=
+              this.attribute[a] +=
                 this.order.orderItems[a].options.attributes[b].attributeValue +
                 ")";
             else
-              this.attribute +=
+              this.attribute[a] +=
                 this.order.orderItems[a].options.attributes[b].attributeValue +
                 ",";
             atr++;
