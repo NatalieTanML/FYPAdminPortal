@@ -413,8 +413,19 @@ export default {
             .dispatch(GET_ALL_HOTELS)
             .then(response => {
               console.log(response);
+              console.log(this.order);
               this.hotels = response;
-              this.selectedHotel = this.hotels[0];
+              if (this.selectedDeliveryType == "Hotel") {
+                this.hotels.forEach(oneHotel => {
+                  if (
+                    oneHotel.hotelAddress ==
+                    this.order.address.hotel.hotelAddress
+                  ) {
+                    this.selectedHotel = oneHotel;
+                  }
+                });
+              }
+              //this.selectedHotel = this.hotels[0];
             })
             .catch(error => {
               console.dir(error);
@@ -449,7 +460,6 @@ export default {
         this.updateOrder(jsonData);
       } else if (this.selectedDeliveryType == "Residential") {
         const jsonData = {
-        
           Address: {
             AddressLine1: this.residential.addressOne,
             AddressLine2: this.residential.addressTwo,
