@@ -46,7 +46,7 @@
                       <p
                         v-if="!$v.form.price.twoDecimal"
                       >Please enter a valid number and not more than 2 decimal places</p>
-                      <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 999</p>
+                      <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 9999.99</p>
                     </b-form-invalid-feedback>
                   </b-input-group>
                 </b-form-group>
