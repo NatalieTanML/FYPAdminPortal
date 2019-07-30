@@ -46,7 +46,7 @@
                       <p
                         v-if="!$v.form.price.twoDecimal"
                       >Please enter a valid number and not more than 2 decimal places</p>
-                      <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 999</p>
+                      <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 9999.99</p>
                     </b-form-invalid-feedback>
                   </b-input-group>
                 </b-form-group>
@@ -994,7 +994,7 @@ export default {
           // check for any overlap
           var previousEnd = previous.effectiveEndDate.getTime();
           var currentStart = current.effectiveStartDate.getTime();
-          var overlap = previousEnd >= currentStart;
+          var overlap = previousEnd > currentStart;
 
           // store the specific ranges that overlap and set boolean to true
           if (overlap) {

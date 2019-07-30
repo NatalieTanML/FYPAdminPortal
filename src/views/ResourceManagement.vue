@@ -321,7 +321,7 @@ export default {
   },
   methods: {
     setUpTabs() {
-      // Display the number of rows for each tab except for the first tab "All Resources"
+      // Number of rows for each tab except for the first tab "All Resources"
       this.arrayOfNumberOfRows = [, 0, 0, 0];
 
       this.products.forEach(product => {
