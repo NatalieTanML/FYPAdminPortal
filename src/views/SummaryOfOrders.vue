@@ -43,6 +43,8 @@
             tableName="Orders"
             :imageClick="this.imageClick"
             :headerButton="this.headerButton"
+            v-bind:sortBy="this.sortBy"
+
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -148,6 +150,7 @@ export default {
       noOfTabs: 0,
       enableCheckbox: true,
       selectedTab: 0,
+      sortBy: "Date",
       arrayOfNumberOfRows: [],
       typesOfTabs: [],
       Tabs: [],

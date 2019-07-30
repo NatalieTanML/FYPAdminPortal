@@ -54,6 +54,7 @@
             :sort-direction="sortDirection"
             @row-clicked="myRowClickHandler"
             @row-hovered="myRowHoverHandler"
+            @sort-changed="sortChanged"
             @filtered="onFiltered"
             :bordered="false"
             hover
@@ -97,6 +98,7 @@
                 <b-col cols="2">
                   <div v-if="tableName == 'Orders'">
                     <b-dropdown
+                     v-if="userRole == 'Admin'"
                       id="dropdown-header"
                       variant="transparent"
                       no-caret
@@ -107,9 +109,15 @@
                       </template>
 
                       <b-dropdown-item-button
+                    
                         v-on:click="editOrder(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Edit Order</b-dropdown-item-button>
+                         <b-dropdown-item-button
+                          v-if="row.item.status == 'Out for Delivery'"
+                        v-on:click="deliveryFailed(row.item.id)"
+                        aria-describedby="dropdown-header-label"
+                      >Delivery Failed</b-dropdown-item-button>
                       <b-dropdown-item-button
                         v-on:click="showCancelOrderDialog(row.item.id)"
                         aria-describedby="dropdown-header-label"
@@ -248,7 +256,7 @@ export default {
     actionButtonClick: String,
     enableCheckbox: Boolean,
     tableName: String,
-    imageClick: String,
+    imageClick: String
   },
   mounted() {
     console.log("this.totalRows : " + this.totalRows);
@@ -268,20 +276,23 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields
-        .filter(f => f.sortable)
-        .map(f => {
-          return {
-            text: f.label,
-            value: f.key
-          };
-        });
+      return this.fields.filter(f => f.sortable).map(f => {
+        return {
+          text: f.label,
+          value: f.key
+        };
+      });
     }
   },
   watch: {
     items: {
       handler() {
+        //when the items for the table changes, i will reset
+        //the totalRows to reset the pagination and
+        //uncheck all the checkbox
         this.totalRows = this.items.length;
+        this.checkedCheckBox = [];
+        this.checkAll = false;
         console.log("watch itemsChange");
       },
       deep: true
@@ -294,7 +305,15 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-
+    sortChanged() {
+      this.checkedCheckBox = [];
+      this.checkAll = false;
+    },
+    deliveryFailed(orderId) {
+      //this.headerButton[2].title is "Delivery Failed"
+      //emit the eventBus and set the delivery to faile
+      eventBus.$emit(this.headerButton[2].title, [orderId]);
+    },
     onHeaderButtonClick(clickedHeaderTitle) {
       //for summaryoforders
       if (this.tableName == "Orders") {

@@ -12,7 +12,7 @@ export const api_routes = {
     change_password: "api/users/changepassword"
   },
   order: {
-    get: "api/orders/",
+    get: "api/orders",
     get_all: "api/orders/",
     get_multiple: "api/orders/multi",
     get_all_status: "api/orders/status",

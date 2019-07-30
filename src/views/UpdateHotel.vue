@@ -88,7 +88,7 @@
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
                           <b-button class="w-25" v-on:click="saveHotel()" variant="primary">Save</b-button>
-                          <b-button class="w-25" style="margin-left:2em " variant="secondary">Cancel</b-button>
+                          <b-button class="w-25" v-on:click="cancelButton()" style="margin-left:2em " variant="secondary">Cancel</b-button>
                         </b-form-group>
                       </b-form>
                     </b-col>
@@ -185,6 +185,9 @@ export default {
           this.message("danger", error);
           //this.$router.replace({name:'SummaryOfOrders'});
         });
+    },
+    cancelButton(){
+      this.$router.replace({name: "HotelManagement"})
     },
     saveHotel() {
       this.validate = true;
