@@ -1136,7 +1136,7 @@ export default {
           // check for any overlap
           var previousEnd = previous.effectiveEndDate.getTime();
           var currentStart = current.effectiveStartDate.getTime();
-          var overlap = previousEnd >= currentStart;
+          var overlap = previousEnd > currentStart;
 
           // store the specific ranges that overlap and set boolean to true
           if (overlap) {
