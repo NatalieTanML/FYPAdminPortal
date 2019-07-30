@@ -165,8 +165,8 @@ export default {
 
         this.$store
           .dispatch(CREATE_HOTEL, hotelStr)
-          .then(() => {
-            this.message("success", "You have added a new hotel!");
+          .then(response => {
+            this.message("success", response.message);
           })
           .catch(error => {
             console.dir(error);

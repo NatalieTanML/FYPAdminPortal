@@ -437,7 +437,7 @@ export default {
           this.$store
             .dispatch(UPDATE_STOCK, [this.optionId, this.form.quantityValue])
             .then(response => {
-              this.message("success", "Successfully updated quantity");
+              this.message("success", response.message);
               this.refreshTable();
             })
             .catch(error => {
@@ -447,7 +447,7 @@ export default {
           this.$store
             .dispatch(UPDATE_STOCK, [this.optionId, -this.form.quantityValue])
             .then(response => {
-              this.message("success", "Successfully updated quantity");
+              this.message("success", response.message);
               this.refreshTable();
             })
             .catch(error => {

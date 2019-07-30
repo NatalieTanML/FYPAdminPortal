@@ -255,7 +255,7 @@ export default {
         this.$store
           .dispatch(UPDATE_ONE_USER, userStr)
           .then(response => {
-            this.message("success", "User is updated!");
+            this.message("success", response.message);
           })
           .catch(error => {
             this.message("danger", error);

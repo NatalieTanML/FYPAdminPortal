@@ -173,7 +173,7 @@ export default {
             console.log(response);
 
             this.updateCurrentOrders(response.orders);
-            this.message("success", "Order(s) status has been updated");
+            this.message("success", response.message);
             this.recipientName = null;
             this.ordertitle = null;
             this.orderids = [];
@@ -289,7 +289,7 @@ export default {
       this.$store
         .dispatch(UPDATE_ORDER_STATUS, jsonData)
         .then(response => {
-          this.message("success", "Order Status(es) is updated successfully!");
+          this.message("success", response.message);
 
           this.updateCurrentOrders(response.orders);
         })
@@ -315,9 +315,9 @@ export default {
           //deliveries. Admin can see the deliveries also.
 
           if (
-            response[x].Address != "Self-Pick Up" &&
-            (response[x].status == "Out for Delivery" &&
-              response[x].deliveryManId == this.$store.getters.userId) ||
+            (response[x].Address != "Self-Pick Up" &&
+              (response[x].status == "Out for Delivery" &&
+                response[x].deliveryManId == this.$store.getters.userId)) ||
             (this.$store.getters.userRole == "Admin" &&
               response[x].status == "Out for Delivery")
           ) {

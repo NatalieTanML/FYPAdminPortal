@@ -301,7 +301,7 @@ export default {
               var region;
 
               if (response[i].addressId != null) {
-                console.log(response[i])
+                console.log(response[i]);
                 postalcode = response[i].address.postalCode;
                 region = this.getRegionByPostalCode(
                   // response[i].address.postalCode
@@ -352,7 +352,7 @@ export default {
           this.$store
             .dispatch(UPDATE_DELIVERYMAN, deliveryDetails)
             .then(response => {
-              this.message("success", "Successfully updated order(s) !");
+              this.message("success", response.message);
               this.orderIds = [];
               this.selected = null;
               // this.getAllOrders();

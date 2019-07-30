@@ -1755,7 +1755,7 @@ export default {
         this.$store
           .dispatch(DELETE_PRODUCT_IMAGES, deletedImageKeys)
           .then(response => {
-            this.message("success", "successfully deleted all images");
+            this.message("success", response.message);
             this.$router.push("/ResourceManagement");
             console.dir(response);
             // this.previousNewImageKeys = [];
@@ -1883,7 +1883,7 @@ export default {
       this.$store
         .dispatch(UPDATE_ONE_PRODUCT, productObj)
         .then(response => {
-          this.message("success", "This product has been updated successfully");
+          this.message("success", response.message);
           this.productSubmitLoader = false;
           this.$router.push("/ResourceManagement");
         })

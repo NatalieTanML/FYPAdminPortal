@@ -77,7 +77,8 @@
                   <b-col cols="3">
                     <img
                       @click="onImageClick(orderItem.orderImageKey)"
-                      style="height: 100px; max-height: 150px; cursor:pointer;"
+                      class="img-fluid"
+                      style="cursor:pointer;"
                       v-bind:src="orderItem.orderImageUrl"
                     />
                   </b-col>
@@ -445,6 +446,7 @@ export default {
         const jsonData = {
           Address: {
             AddressLine1: this.selectedHotel.hotelAddress,
+            AddressLine2: this.selectedHotel.text,
             UnitNo: this.hotel.roomNo,
             PostalCode: this.selectedHotel.hotelPostalCode,
             HotelId: this.selectedHotel.value,
@@ -501,7 +503,7 @@ export default {
         .dispatch(UPDATE_ORDER, jsonData)
         .then(response => {
           console.log(response);
-          this.message("success", "Order Details is updated!");
+          this.message("success", response.message);
         })
         .catch(error => {
           console.dir(error);

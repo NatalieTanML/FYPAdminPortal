@@ -1641,7 +1641,7 @@ export default {
         this.$store
           .dispatch(DELETE_PRODUCT_IMAGES, deleteKeys)
           .then(response => {
-            this.message("success", "successfully deleted all images");
+            this.message("success", response.message);
             console.dir(response);
             this.cancelLoader = false;
             this.$router.push("/ResourceManagement");
@@ -1751,7 +1751,7 @@ export default {
         .then(response => {
           console.dir(response);
           this.submitLoader = false;
-          this.message("success", "This product has been created successfully");
+          this.message("success", response.message);
           this.$router.push("/ResourceManagement");
         })
         .catch(error => {

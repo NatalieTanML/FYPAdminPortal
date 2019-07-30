@@ -87,7 +87,8 @@
                   <b-col cols="3">
                     <img
                       @click="onImageClick(orderItem.orderImageKey)"
-                      style="height: 100px; max-height: 150px; cursor:pointer;"
+                      class="img-fluid"
+                      style="cursor:pointer;"
                       v-bind:src="orderItem.orderImageUrl"
                     />
                   </b-col>
@@ -100,7 +101,7 @@
                 <b-row>
                   <b-col cols="10"></b-col>
                   <b-col cols="2">
-                    <span>Total :</span>
+                    <span>Total:</span>
                     <span>{{order.orderTotal | currency}}</span>
                   </b-col>
                 </b-row>
@@ -122,15 +123,43 @@
                       <b-col cols="3" v-if="order.emailString == null">N/A</b-col>
                       <b-col cols="3" v-else>{{order.emailString}}</b-col>
                       <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
-                      <b-col
-                        cols="3"
-                        v-else
-                      >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
+                      <b-col cols="3" v-else-if="order.deliveryTypeId == 1">
+                        {{order.address.hotel.hotelName}}
+                        <br />
+                        Unit {{order.address.unitNo}}, {{order.address.country}}, {{order.address.state}}
+                        <br />
+                        {{order.address.postalCode}}
+                      </b-col>
+                      <b-col cols="3" v-else-if="order.deliveryTypeId == 2">
+                        {{order.address.addressLine1}}
+                        <br />
+                        {{order.address.addressLine2}}
+                        <br />
+                        {{order.address.unitNo}}
+                        <br />
+                        {{order.address.country}}, {{order.address.state}}
+                        <br />
+                        {{order.address.postalCode}}
+                      </b-col>
                       <b-col cols="3" v-if="order.addressId == null">Self Pick-up</b-col>
-                      <b-col
-                        cols="3"
-                        v-else
-                      >{{order.address.hotel.hotelName}} {{order.address.unitNo}}, {{order.address.addressLine1}} {{order.address.addressLine2}}, {{order.address.postalCode}} {{order.address.state}} {{order.address.country}}</b-col>
+                      <b-col cols="3" v-else-if="order.deliveryTypeId == 1">
+                        {{order.address.hotel.hotelName}}
+                        <br />
+                        Unit {{order.address.unitNo}}, {{order.address.country}}, {{order.address.state}}
+                        <br />
+                        {{order.address.postalCode}}
+                      </b-col>
+                      <b-col cols="3" v-else-if="order.deliveryTypeId == 2">
+                        {{order.address.addressLine1}}
+                        <br />
+                        {{order.address.addressLine2}}
+                        <br />
+                        {{order.address.unitNo}}
+                        <br />
+                        {{order.address.country}}, {{order.address.state}}
+                        <br />
+                        {{order.address.postalCode}}
+                      </b-col>
                       <b-col cols="3" v-if="order.request == null">N/A</b-col>
                       <b-col cols="3" v-else>{{order.request}}</b-col>
                     </b-row>
@@ -142,7 +171,7 @@
               <b-container fluid class="bg-white text-left" align-h="center">
                 <div class="card shadow">
                   <div class="card-header py-3">
-                    <h4 class="mb-3">Error, No Order Data Retrived !</h4>
+                    <h4 class="mb-3">Error, No Order Data Retrived!</h4>
                   </div>
                 </div>
               </b-container>
