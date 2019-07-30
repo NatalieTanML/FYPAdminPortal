@@ -98,6 +98,7 @@
                 <b-col cols="2">
                   <div v-if="tableName == 'Orders'">
                     <b-dropdown
+                     v-if="userRole == 'Admin'"
                       id="dropdown-header"
                       variant="transparent"
                       no-caret
@@ -108,6 +109,7 @@
                       </template>
 
                       <b-dropdown-item-button
+                    
                         v-on:click="editOrder(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Edit Order</b-dropdown-item-button>
@@ -274,14 +276,12 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields
-        .filter(f => f.sortable)
-        .map(f => {
-          return {
-            text: f.label,
-            value: f.key
-          };
-        });
+      return this.fields.filter(f => f.sortable).map(f => {
+        return {
+          text: f.label,
+          value: f.key
+        };
+      });
     }
   },
   watch: {
@@ -305,15 +305,14 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    sortChanged(){
-       this.checkedCheckBox = [];
-        this.checkAll = false;  
+    sortChanged() {
+      this.checkedCheckBox = [];
+      this.checkAll = false;
     },
-    deliveryFailed(orderId){
+    deliveryFailed(orderId) {
       //this.headerButton[2].title is "Delivery Failed"
-    //emit the eventBus and set the delivery to faile
-     eventBus.$emit(this.headerButton[2].title,[orderId]);
-
+      //emit the eventBus and set the delivery to faile
+      eventBus.$emit(this.headerButton[2].title, [orderId]);
     },
     onHeaderButtonClick(clickedHeaderTitle) {
       //for summaryoforders
