@@ -126,7 +126,9 @@
                       <b-col cols="3" v-else-if="order.deliveryTypeId == 1">
                         {{order.address.hotel.hotelName}}
                         <br />
-                        Unit {{order.address.unitNo}}, {{order.address.country}}, {{order.address.state}}
+                        Unit {{order.address.unitNo}}
+                        <br />
+                        {{order.address.country}}, {{order.address.state}}
                         <br />
                         {{order.address.postalCode}}
                       </b-col>
@@ -145,7 +147,9 @@
                       <b-col cols="3" v-else-if="order.deliveryTypeId == 1">
                         {{order.address.hotel.hotelName}}
                         <br />
-                        Unit {{order.address.unitNo}}, {{order.address.country}}, {{order.address.state}}
+                        Unit {{order.address.unitNo}}
+                        <br />
+                        {{order.address.country}}, {{order.address.state}}
                         <br />
                         {{order.address.postalCode}}
                       </b-col>
