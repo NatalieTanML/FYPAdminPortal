@@ -27,12 +27,13 @@
                   variant="primary"
                   style="margin-left: 1em"
                   class="float-right"
-                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' && tableName != 'Delivery Routes' ) ||
+                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' && tableName != 'Delivery Routes' && tableName != 'Resource Management' ) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
                 (tableName == 'Delivery Routes' &&(checkedCheckBox.length != 0))||
-                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))"
+                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))||
+                (tableName == 'Resource Management' && userRole == 'Admin')"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -79,7 +80,7 @@
                   <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
                     <div
                       v-if="(oneActionButton != null && tableName != 'Resource Management') ||
-                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')||
+                (tableName == 'Resource Management' && oneActionButton == 'Manage Quantity'  && userRole == 'Store')||
                  (tableName == 'Resource Management' && userRole == 'Admin')
                  "
                     >
