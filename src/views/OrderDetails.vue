@@ -46,7 +46,7 @@
 
                 <b-row>
                   <b-col cols="3">{{order.orderId}}</b-col>
-                  <b-col cols="3">{{new Date(Date.parse(order.createdAt)).toLocaleString()}}</b-col>
+                  <b-col cols="3">{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</b-col>
                   <b-col cols="3">{{order.orderTotal | currency}}</b-col>
                   <b-col cols="3">{{order.status}}</b-col>
                 </b-row>
@@ -60,7 +60,7 @@
 
                 <b-row>
                   <b-col cols="3">{{order.referenceNo}}</b-col>
-                  <b-col cols="3">{{new Date(Date.parse(order.updatedAt)).toLocaleString()}}</b-col>
+                  <b-col cols="3">{{new Date(Date.parse(order.updatedAt)).toLocaleString("en-SG")}}</b-col>
                   <b-col v-if="order.updatedBy == null" cols="3">N/A</b-col>
                   <b-col v-else cols="3">{{order.updatedBy}}</b-col>
                   <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>

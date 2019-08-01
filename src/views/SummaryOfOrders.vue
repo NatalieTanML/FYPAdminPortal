@@ -438,7 +438,7 @@ export default {
                 refNo: response[x].referenceNo,
                 date: new Date(
                   Date.parse(response[x].createdAt)
-                ).toLocaleString(),
+                ).toLocaleString("en-SG"),
                 items: response[x].orderItems,
                 images: response[x].orderItems,
                 quantity: response[x].orderItems,

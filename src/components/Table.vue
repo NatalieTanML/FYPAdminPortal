@@ -99,7 +99,7 @@
                 <b-col cols="2">
                   <div v-if="tableName == 'Orders'">
                     <b-dropdown
-                     v-if="userRole == 'Admin'"
+                      v-if="userRole == 'Admin'"
                       id="dropdown-header"
                       variant="transparent"
                       no-caret
@@ -110,12 +110,11 @@
                       </template>
 
                       <b-dropdown-item-button
-                    
                         v-on:click="editOrder(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Edit Order</b-dropdown-item-button>
-                         <b-dropdown-item-button
-                          v-if="row.item.status == 'Out for Delivery'"
+                      <b-dropdown-item-button
+                        v-if="row.item.status == 'Out for Delivery'"
                         v-on:click="deliveryFailed(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Delivery Failed</b-dropdown-item-button>
@@ -231,7 +230,7 @@ export default {
     return {
       totalRows: 1,
       currentPage: 1,
-      perPage: 5,
+      perPage: 25,
       pageOptions: [5, 10, 15, 20, 25],
       sortBy: null,
       sortDesc: false,
@@ -277,12 +276,14 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields.filter(f => f.sortable).map(f => {
-        return {
-          text: f.label,
-          value: f.key
-        };
-      });
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => {
+          return {
+            text: f.label,
+            value: f.key
+          };
+        });
     }
   },
   watch: {
