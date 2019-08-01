@@ -88,7 +88,12 @@
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
                           <b-button class="w-25" v-on:click="saveHotel()" variant="primary">Save</b-button>
-                          <b-button class="w-25" v-on:click="cancelButton()" style="margin-left:2em " variant="secondary">Cancel</b-button>
+                          <b-button
+                            class="w-25"
+                            v-on:click="cancelButton()"
+                            style="margin-left:2em "
+                            variant="secondary"
+                          >Cancel</b-button>
                         </b-form-group>
                       </b-form>
                     </b-col>
@@ -96,8 +101,8 @@
                 </b-container>
 
                 <b-modal @ok="handleok()" id="deleteHotel" title="Delete Hotel">
-                  <p class="my-4">Are you sure you want to delete this Hotel?</p>
-                  <p class="my-4">This action cannot be undone.</p>
+                  <p>Are you sure you want to delete this Hotel?</p>
+                  <p>This action cannot be undone.</p>
                 </b-modal>
               </div>
             </div>
@@ -186,8 +191,8 @@ export default {
           //this.$router.replace({name:'SummaryOfOrders'});
         });
     },
-    cancelButton(){
-      this.$router.replace({name: "HotelManagement"})
+    cancelButton() {
+      this.$router.replace({ name: "HotelManagement" });
     },
     saveHotel() {
       this.validate = true;

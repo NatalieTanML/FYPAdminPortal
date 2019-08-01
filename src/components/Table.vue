@@ -209,8 +209,7 @@
 
     <!-- b-modal for cancel order -->
     <b-modal @ok="cancelOrder()" ref="cancelOrder" title="Cancel Order">
-      <p class="my-4">Are you sure you want to cancel this order?</p>
-      <!-- <p class="my-4">This action cannot be undone.</p> -->
+      <p>Are you sure you want to cancel this order?</p>
     </b-modal>
   </div>
 </template>

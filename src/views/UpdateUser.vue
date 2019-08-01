@@ -29,12 +29,12 @@
                             type="text"
                             v-model="name"
                             class="form-control form-control-user"
-                            placeholder="Enter A Name..."
+                            placeholder="Name"
                           />
                           <div
                             class="error-message"
                             v-if="validate && !$v.name.required"
-                          >Name Is Required</div>
+                          >Name is required.</div>
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label="Email">
@@ -42,16 +42,16 @@
                             type="email"
                             v-model="email"
                             class="form-control form-control-user"
-                            placeholder="Enter An Email Address..."
+                            placeholder="Email address"
                           />
                           <div
                             class="error-message"
                             v-if="validate && !$v.email.required"
-                          >Email Is Required</div>
+                          >Email is required.</div>
                           <div
                             class="error-message"
                             v-if="validate && !$v.email.email"
-                          >Please Enter A Valid Email</div>
+                          >Please enter a valid email address.</div>
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label="Role">
@@ -104,12 +104,13 @@
                 </b-container>
 
                 <b-modal @ok="handleok()" id="resetPassword" title="Reset Password">
-                  <p class="my-4">Are you sure you want to reset this user's password?</p>
-                  <p class="my-4">This action cannot be undone.</p>
+                  <p>Are you sure you want to reset this user's password?</p>
+                  <p>This action cannot be undone.</p>
                 </b-modal>
 
                 <b-modal id="disableUser" title="Disable User">
-                  <p class="my-4">You are about to disable this user's account</p>
+                  <p>You are about to disable this user's account.</p>
+                  <p>Click Ok to proceed.</p>
                 </b-modal>
               </div>
             </div>
