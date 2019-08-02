@@ -16,7 +16,7 @@
             <div class="row mb-4">
               <ul class="nav" ref="tabs">
                 <DashboardTabs
-                  v-for="tab in this.Tabs"
+                  v-for="tab in Tabs"
                   v-bind:key="tab.id"
                   v-bind:title="tab.title"
                   v-bind:isDark="tab.isDark"
@@ -222,7 +222,6 @@ export default {
       .dispatch(GET_ALL_PRODUCTS)
       .then(response => {
         this.products = response;
-        console.log(this.products);
         var x = 0;
         for (var i = 0; i < this.products.length; i++) {
           for (var k = 0; k < this.products[i].options.length; k++) {
@@ -306,9 +305,6 @@ export default {
                 } else this.items[x].activeDiscount = "No Active Discount";
               }
             }
-
-            console.log(this.items);
-
             this.items[x].actions = ["Edit", "Manage Quantity", "View"];
             x++;
           }
@@ -465,7 +461,6 @@ export default {
       this.$store
         .dispatch(GET_ALL_PRODUCTS)
         .then(response => {
-          console.log(response);
           this.products = response;
           var x = 0;
           for (var i = 0; i < this.products.length; i++) {
