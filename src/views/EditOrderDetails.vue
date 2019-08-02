@@ -213,7 +213,7 @@
                       <b-col>
                         <b-button v-on:click="saveDetails()" variant="primary">Save</b-button>
 
-                        <b-button style="margin-left:1em" variant="secondary">Cancel</b-button>
+                        <b-button   v-on:click="cancelButton()" style="margin-left:1em" variant="secondary">Cancel</b-button>
                       </b-col>
                     </b-row>
                   </div>
@@ -297,7 +297,9 @@ export default {
       };
       this.$snack[method](config);
     },
-
+ cancelButton() {
+      this.$router.replace({ name: "SummaryOfOrders" });
+    },
     onImageClick(thumbNailUrl) {
       console.log(thumbNailUrl);
       var listOfThumbNailUrl = [];
