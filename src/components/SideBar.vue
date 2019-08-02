@@ -1,8 +1,8 @@
 <template>
-  <b-collapse id="nav-collapse" visible>
+  <b-collapse id="nav-collapse">
     <ul id="accordionSidebar" class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href>
         <div class="sidebar-brand-icon rotate-n-15">
           <i class="fas fa-laugh-wink"></i>
         </div>
@@ -12,7 +12,8 @@
       <!-- Divider -->
       <hr class="sidebar-divider" />
 
-   <li class="nav-item" v-if="userRole == 'Admin' || userRole == 'Store' ">        <router-link to="SummaryOfOrders">
+      <li class="nav-item" v-if="userRole == 'Admin' || userRole == 'Store' ">
+        <router-link to="SummaryOfOrders">
           <a class="nav-link">
             <!-- icon -->
             <i class="mr-2 fas fa-tachometer-alt"></i>
@@ -21,7 +22,7 @@
         </router-link>
       </li>
 
-    <li class="nav-item"  v-if="userRole == 'Admin' ">
+      <li class="nav-item" v-if="userRole == 'Admin' ">
         <router-link to="DeliveryRoutes">
           <a class="nav-link">
             <!-- icon -->
@@ -31,7 +32,7 @@
         </router-link>
       </li>
 
-    <li class="nav-item"  v-if="userRole == 'Admin' || userRole == 'Delivery' ">
+      <li class="nav-item" v-if="userRole == 'Admin' || userRole == 'Delivery' ">
         <router-link to="Deliveries">
           <a class="nav-link">
             <!-- icon -->
@@ -41,7 +42,7 @@
         </router-link>
       </li>
 
-    <li class="nav-item"  v-if="userRole == 'Admin' ">
+      <li class="nav-item" v-if="userRole == 'Admin' ">
         <router-link to="UserManagement">
           <a class="nav-link">
             <!-- icon -->
@@ -51,7 +52,7 @@
         </router-link>
       </li>
 
-    <li class="nav-item"  v-if="userRole == 'Admin' || userRole == 'Store' ">
+      <li class="nav-item" v-if="userRole == 'Admin' || userRole == 'Store' ">
         <router-link to="ResourceManagement">
           <a class="nav-link">
             <!-- icon -->
@@ -61,7 +62,7 @@
         </router-link>
       </li>
 
-        <li class="nav-item"  v-if="userRole == 'Admin' ">
+      <li class="nav-item" v-if="userRole == 'Admin' ">
         <router-link to="HotelManagement">
           <a class="nav-link">
             <!-- icon -->
@@ -86,8 +87,17 @@ export default {
       userRole: ""
     };
   },
+  methods: {
+    showNav() {
+      const navbar = document.querySelector("#nav-collapse");
+      if (window.innerWidth > 767) {
+        navbar.classList.add("collapse", "show", "d-block");
+      }
+    }
+  },
   mounted() {
     this.userRole = this.$store.getters.userRole;
+    this.showNav();
   }
 };
 </script>

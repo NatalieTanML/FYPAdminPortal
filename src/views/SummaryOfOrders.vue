@@ -44,7 +44,6 @@
             :imageClick="this.imageClick"
             :headerButton="this.headerButton"
             v-bind:sortBy="this.sortBy"
-
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -63,7 +62,7 @@
         <b-form-group label="Received By">
           <b-form-input v-model="recipientName"></b-form-input>
         </b-form-group>
-        <b-form-group label="recipient's Signature">
+        <b-form-group label="Recipient's Signature">
           <VueSignaturePad
             :options="{onBegin: () => {$refs.signaturePad.resizeCanvas()}}"
             class="pad"
@@ -697,10 +696,7 @@ export default {
         this.$store
           .dispatch(UPDATE_RECIPIENT, jsonData)
           .then(response => {
-            this.message(
-              "success",
-              "Order Status(es) is updated successfully!"
-            );
+            this.message("success", response.message);
             console.log(response);
             this.updateCurrentOrders(response.orders);
             //reset the tabs.
