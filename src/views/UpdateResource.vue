@@ -894,8 +894,6 @@ export default {
     this.$store
       .dispatch(GET_ONE_PRODUCT, productId)
       .then(response => {
-        console.dir(response);
-
         // Retrieve all the general information first
         this.form.productId = response.productId;
         this.form.name = response.productName;
@@ -966,7 +964,6 @@ export default {
                 .toString(36)
                 .substring(7)
             };
-            console.log(value);
           });
         });
 
@@ -1002,15 +999,9 @@ export default {
           // Assign new properties and return
           return Object.assign(discount, discountTypeProp);
         });
-
-        console.log(response);
-        console.log(this.varientSections);
-        console.log(this.varientDetails);
-        console.log(this.discountDetails);
       })
       .catch(error => {
         this.message("danger", error.response.data.message);
-        console.dir(error);
       });
   },
 
@@ -1240,6 +1231,12 @@ export default {
       let index = this.discountIndex;
       this.formatDiscountDate(discount);
 
+      if (discount.discountType === "Percentage") {
+        discount.isPercentage = true;
+      } else {
+        discount.isPercentage = false;
+      }
+
       // Update the discount object based on the index in the array
       this.$set(this.discountDetails, index, discount);
 
@@ -1338,7 +1335,6 @@ export default {
           // If the combination is found, update it while retaining
           // the product details such as sku, quantity and etc (if any)
           if (varientDetail !== undefined) {
-            console.log(varientDetail);
             let newCombination = varientResult.combination;
             let newAttributes = varientResult.attributes;
             // Update specific attributes while retanining the attributeId
@@ -1352,24 +1348,17 @@ export default {
           }
         });
 
-        console.log(this.varientDetails);
-        console.log(varientResults);
-
         // Loop through the old list (this.varientDetails, If can't be found in the new list)
         // it means that the images were deleted
         this.varientDetails.forEach(vd => {
-          console.log(vd);
           // If combination is not found in the new list, it means that it is deleted
           const index = varientResults.findIndex(
             vr => vr.combination === vd.combination
           );
 
-          console.log(index);
-
           if (index === -1) {
             if (vd.productImages !== undefined) {
               vd.productImages.forEach(image => {
-                console.log(image);
                 if (image.isNew !== undefined) {
                   this.previousNewImageKeys.push(image.imageKey);
                 }
@@ -1382,9 +1371,6 @@ export default {
                 }
               });
             }
-            console.log(vd);
-            console.log(this.previousNewImageKeys);
-            console.log(this.deletedImageKeys);
           }
         });
 
@@ -1490,7 +1476,6 @@ export default {
         this.form.varient = clonedeep(varient);
 
         setTimeout(() => {
-          console.log(this.form.varient);
           this.form.varient.files.forEach(file => {
             var index = this.form.varient.productImages.findIndex(
               image => image.imageKey === file.upload.uuid + ".jpg"
@@ -1519,7 +1504,6 @@ export default {
 
       let index = this.selectedVarientIndex;
       if (index === 0) {
-        console.log(this.form.varient.files);
         if (this.form.varient.files.length === 0) {
           this.isImageRequired = true;
         }
@@ -1563,7 +1547,6 @@ export default {
       this.$store
         .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
         .then(response => {
-          console.dir(response);
           response.productImages.forEach((productImage, index) => {
             // Attach a property called isNew, which is used to signify
             // that this image have not been saved to the database
@@ -1573,16 +1556,10 @@ export default {
               imageUrl: productImage.imageUrl,
               imageSize: newImages[index].size
             });
-            console.log(this.form.varient.productImages);
           });
-
-          console.log("add done called");
-          console.log(this.form.varient);
-          console.log(this.form.varient.productImages);
           this.updateVarientTable(this.form.varient);
         })
         .catch(error => {
-          console.dir(error);
           this.message("danger", error.response.data.message);
           this.varientSubmitLoader = false;
         });
@@ -1614,7 +1591,6 @@ export default {
         productImages: []
       };
 
-      console.log(this.deletedImageKeys);
       this.varientSubmitLoader = false;
       this.varientTableError = false;
 
@@ -1643,51 +1619,27 @@ export default {
       this.isImageRequired = false;
       this.$v.form.varient.$reset();
       this.deletedImageKeys = Object.assign([], this.previousDeletedImageKeys);
-      console.log(this.deletedImageKeys);
     },
-
-    // cancelDialogOnTouchOutside() {
-    //   this.form.varient = {
-    //     SKUNumber: null,
-    //     varientName: "",
-    //     currentQuantity: null,
-    //     minimumQuantity: null,
-    //     combination: "",
-    //     type: "",
-    //     value: "",
-    //     files: [],
-    //     productImages: []
-    //   };
-    //   this.isImageRequired = false;
-    //   this.$v.form.varient.$reset();
-    // },
 
     duplicateFileCheck(file) {
       this.isFileDuplicate = true;
     },
 
     addFileToDropzone(file) {
-      console.log(file);
       if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
-        console.log("Added file into files array ");
         this.form.varient.files.push(file);
-        console.dir(this.form.varient.files);
       }
-      console.log(this.form.varient);
       this.isImageRequired = false;
       this.isFileDuplicate = false;
     },
 
     deleteFileFromDropzone(file) {
-      console.log(file);
       // Remove the deleted file from the array that have not yet been uploaded to S3
       if (file.manuallyAdded !== true) {
         this.form.varient.files = this.form.varient.files.filter(
           el => el.upload.uuid != file.upload.uuid
         );
       } else {
-        console.log(this.form.varient.files);
-
         // Remove the deleted file from the array
         this.form.varient.files = this.form.varient.files.filter(
           el => el.name !== file.name && el.size !== file.size
@@ -1696,7 +1648,6 @@ export default {
         this.form.varient.productImages.forEach(image => {
           let parts = image.imageKey.split(".");
           let uuid = parts[0];
-          console.log(uuid);
 
           // Check to see if uuid is present in the deletedImageKeys array
           const deletedIndex = this.deletedImageKeys.findIndex(
@@ -1713,10 +1664,6 @@ export default {
             }
           }
         });
-
-        console.log(this.deletedImageKeys);
-        console.log(this.form.varient.productImages);
-        console.log(this.varientDetails[this.selectedVarientIndex]);
       }
     },
 
@@ -1732,7 +1679,6 @@ export default {
     cancelProduct() {
       let deletedImageKeys = [];
       this.varientDetails.forEach(varientDetail => {
-        console.log(varientDetail);
         if (varientDetail.productImages !== undefined) {
           varientDetail.productImages.forEach(productImage => {
             if (productImage.isNew !== undefined) {
@@ -1741,9 +1687,6 @@ export default {
           });
         }
       });
-
-      console.log(this.previousNewImageKeys);
-      console.log(deletedImageKeys);
 
       // If there are images of previously deleted varients, we will concat it
       // with the images in the current varient and delete them from S3
@@ -1757,13 +1700,8 @@ export default {
           .then(response => {
             this.message("success", response.message);
             this.$router.push("/ResourceManagement");
-            console.dir(response);
-            // this.previousNewImageKeys = [];
-            // deletedImageKeys = [];
-            // this.cancelLoader = false;
           })
           .catch(error => {
-            console.dir(error);
             this.message("danger", error.response.data.message);
             this.cancelLoader = false;
           });
@@ -1818,13 +1756,9 @@ export default {
         DiscountPrices: discountDetails
       };
 
-      console.log(productObj);
-      console.log(this.form);
-      console.log(this.varientDetails);
-      console.log(this.discountDetails);
+      console.dir(productObj);
 
       this.productSubmitLoader = true;
-      console.log(this.deletedImageKeys);
 
       if (this.deletedImageKeys.length > 0) {
         this.$store
@@ -1839,13 +1773,11 @@ export default {
               );
               return varientDetail;
             });
-            console.log(this.varientDetails);
             productObj.options = this.getOptions();
             this.updateProduct(productObj);
           })
           .catch(error => {
             this.productSubmitLoader = false;
-            console.dir(error);
             this.message("danger", error.response.data.message);
           });
       } else {
@@ -1888,7 +1820,6 @@ export default {
           this.$router.push("/ResourceManagement");
         })
         .catch(error => {
-          console.dir(error);
           this.message("danger", error.response.data.message);
           this.productSubmitLoader = false;
         });

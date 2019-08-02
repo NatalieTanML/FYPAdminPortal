@@ -239,7 +239,6 @@ export default {
       this.$store
         .dispatch(GET_ONE_PRODUCT_ECOMMERCE, productId)
         .then(response => {
-          console.dir(response);
           this.productDetail.id = response.productId;
           this.productDetail.name = response.productName;
           this.productDetail.price = response.price;
@@ -254,13 +253,12 @@ export default {
 
           // Dynamically load the images to carousel slides
           response.options.forEach(option => {
-            console.log(option.productImages);
             option.productImages.forEach(image => {
-              console.log(image);
               this.slides.push(image.imageUrl);
             });
           });
 
+          // If there is only one image, we will not set up the thumbnail carousel
           if (this.slides.length <= 1) {
             this.onlyOneImage = true;
           } else {
@@ -269,11 +267,9 @@ export default {
             if (this.slides.length > 3) {
               this.thumbnailOptions.slidesToShow = 3;
             } else {
-              this.thumbnailOptions.slidesToShow = 0;
+              this.thumbnailOptions.slidesToShow = this.slides.length;
             }
           }
-
-          console.log(this.thumbnailOptions);
 
           // Once done, set the boolean to true which will render the carousel
           this.isSlideLoaded = true;
@@ -290,7 +286,6 @@ export default {
           }
         })
         .catch(error => {
-          console.dir(error);
           alert("error");
         });
     },

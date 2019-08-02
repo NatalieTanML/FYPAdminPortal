@@ -873,10 +873,6 @@ export default {
     }
   },
 
-  mounted() {
-    console.log(new Date(Date.now() - 8640000));
-  },
-
   methods: {
     // Disable previous dates for end date according to selected start date
     disabledDates() {
@@ -1231,8 +1227,6 @@ export default {
           }
         });
 
-        console.log(this.previousDeletedImageKeys);
-
         this.varientDetails = varientResults;
         this.varientTableError = false;
       } else {
@@ -1362,7 +1356,6 @@ export default {
 
       let index = this.selectedVarientIndex;
       if (index === 0) {
-        console.log(this.form.varient.files);
         if (this.form.varient.files.length === 0) {
           this.isImageRequired = true;
         }
@@ -1433,8 +1426,10 @@ export default {
           this.updateVarientTable(this.form.varient);
         })
         .catch(error => {
-          console.dir(error);
-          alert("error");
+          this.message(
+            "danger",
+            "An error has occured, please try again later."
+          );
           this.varientSubmitLoader = false;
         });
     },
@@ -1452,24 +1447,20 @@ export default {
       this.$store
         .dispatch(UPLOAD_PRODUCT_IMAGES, formData)
         .then(response => {
-          console.dir(response);
           response.productImages.forEach((productImage, index) => {
             this.form.varient.productImages.push({
               imageKey: productImage.imageKey,
               imageUrl: productImage.imageUrl,
               imageSize: newImages[index].size
             });
-            console.log(this.form.varient.productImages);
           });
-
-          console.log("add done called");
-          console.log(this.form.varient);
-          console.log(this.form.varient.productImages);
           this.updateVarientTable(this.form.varient);
         })
         .catch(error => {
-          console.dir(error);
-          alert("error");
+          this.message(
+            "danger",
+            "An error has occured. Please try again later."
+          );
           this.varientSubmitLoader = false;
         });
     },
@@ -1478,21 +1469,17 @@ export default {
       this.$store
         .dispatch(DELETE_PRODUCT_IMAGES, this.deletedImageKeys)
         .then(response => {
-          console.dir(response);
-          console.log(this.form.varient);
-
           // Filter and return the array of productImages that does not contain the deleted guid
           this.form.varient.productImages = this.form.varient.productImages.filter(
             image => !this.deletedImageKeys.includes(image.imageKey)
           );
-
-          console.log(this.form.varient);
-          console.log("delete done called");
           this.updateVarientTable(this.form.varient);
         })
         .catch(error => {
-          console.dir(error);
-          alert("error");
+          this.message(
+            "danger",
+            "An error has occured. Please try again later."
+          );
         });
     },
 
@@ -1555,21 +1542,14 @@ export default {
     },
 
     addFileToDropzone(file) {
-      console.log(file);
       if (file.manuallyAdded !== true && this.isFileDuplicate !== true) {
-        // Add the user upload file into the array
-        console.log("Added file into files array ");
         this.form.varient.files.push(file);
-        console.dir(this.form.varient.files);
       }
-      console.log(this.form.varient);
       this.isFileDuplicate = false;
       this.isImageRequired = false;
     },
 
     deleteFileFromDropzone(file) {
-      console.log("delete called");
-      console.log(file);
       // Remove the deleted file from the array by checking the uuid
       if (file.manuallyAdded !== true) {
         this.form.varient.files = this.form.varient.files.filter(
@@ -1586,7 +1566,6 @@ export default {
         this.form.varient.productImages.forEach(image => {
           let parts = image.imageKey.split(".");
           let uuid = parts[0];
-          console.log(uuid);
 
           // Check to see if uuid is present in the deletedImageKeys array
           const deletedIndex = this.deletedImageKeys.findIndex(
@@ -1603,9 +1582,6 @@ export default {
             }
           }
         });
-        console.log(this.deletedImageKeys);
-        console.log(this.form.varient.productImages);
-        console.log(this.varientDetails[this.selectedVarientIndex]);
       }
     },
 
@@ -1634,22 +1610,16 @@ export default {
         deleteKeys = this.previousDeletedImageKeys.concat(deleteKeys);
       }
 
-      console.log(deleteKeys);
-
       if (deleteKeys.length > 0) {
         this.cancelLoader = true;
         this.$store
           .dispatch(DELETE_PRODUCT_IMAGES, deleteKeys)
           .then(response => {
             this.message("success", response.message);
-            console.dir(response);
             this.cancelLoader = false;
             this.$router.push("/ResourceManagement");
-            // this.previousDeletedImageKeys = [];
-            // deleteKeys = [];
           })
           .catch(error => {
-            console.dir(error);
             this.message("danger", error.response.data.message);
             this.cancelLoader = false;
           });
@@ -1709,8 +1679,6 @@ export default {
         options: this.getOptions()
       };
 
-      console.log(productObj);
-
       this.submitLoader = true;
       if (this.previousDeletedImageKeys.length > 0) {
         this.$store
@@ -1719,7 +1687,6 @@ export default {
             this.createProduct(productObj);
           })
           .catch(error => {
-            console.dir(error);
             this.message("danger", error.response.data.message);
             this.submitLoader = false;
           });
@@ -1749,13 +1716,11 @@ export default {
       this.$store
         .dispatch(CREATE_PRODUCT, productObj)
         .then(response => {
-          console.dir(response);
           this.submitLoader = false;
           this.message("success", response.message);
           this.$router.push("/ResourceManagement");
         })
         .catch(error => {
-          console.dir(error);
           this.message("danger", error.response.data.message);
           this.submitLoader = false;
         });
