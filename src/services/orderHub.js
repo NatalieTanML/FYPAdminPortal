@@ -3,7 +3,7 @@ const signalR = require("@aspnet/signalr");
 class OrderHub {
   async connectToOrderHub() {
     return new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:44393/order-hub")
+      .withUrl(process.env.VUE_APP_API_ENDPOINT + "order-hub")
       .configureLogging(signalR.LogLevel.Error)
       .build();
   }

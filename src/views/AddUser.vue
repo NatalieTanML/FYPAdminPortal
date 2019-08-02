@@ -33,7 +33,7 @@
                           <div
                             class="error-message"
                             v-if="validate && !$v.user.username.required"
-                          >Name is required!</div>
+                          >Name is required.</div>
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label="Email" label-for="input-horizontal">
@@ -47,11 +47,11 @@
                           <div
                             class="error-message"
                             v-if="validate && !$v.user.email.required"
-                          >Email is required!</div>
+                          >Email is required.</div>
                           <div
                             class="error-message"
                             v-if="validate && !$v.user.email.email"
-                          >Please enter a valid email!</div>
+                          >Please enter a valid email address.</div>
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label="Role" label-for="input-horizontal">
@@ -66,7 +66,7 @@
                           <div
                             class="error-message"
                             v-if="validate && !$v.selectedRole.required"
-                          >Please pick a role!</div>
+                          >Please choose a role.</div>
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">

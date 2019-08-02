@@ -48,10 +48,7 @@ export const api_routes = {
 export const apiCall = ({ url, method, ...args }) =>
   new Promise((resolve, reject) => {
     let token = localStorage.getItem("token") || "";
-    console.log(
-      "api.js axios url",
-      process.env.VUE_APP_API_ENDPOINT + url + " " + method
-    );
+    console.log("api.js axios url: ", url + " method: " + method);
     if (token)
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 

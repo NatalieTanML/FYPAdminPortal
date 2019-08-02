@@ -27,12 +27,13 @@
                   variant="primary"
                   style="margin-left: 1em"
                   class="float-right"
-                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' && tableName != 'Delivery Routes' ) ||
+                  v-if="(tableName != 'Orders' && tableName != 'Deliveries' && tableName != 'Delivery Routes' && tableName != 'Resource Management' ) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showHeaderButton && oneHeaderButton.title == 'Update Order Status') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDownloadImageButton && oneHeaderButton.title=='Download Images') )) ||
                 (tableName == 'Orders' &&(checkedCheckBox.length != 0 &&(showDeliveryFailedButton && oneHeaderButton.title=='Delivery Failed') )) ||
                 (tableName == 'Delivery Routes' &&(checkedCheckBox.length != 0))||
-                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))"
+                (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))||
+                (tableName == 'Resource Management' && userRole == 'Admin')"
                 >{{oneHeaderButton.title}}</b-button>
               </div>
             </b-col>
@@ -79,7 +80,7 @@
                   <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
                     <div
                       v-if="(oneActionButton != null && tableName != 'Resource Management') ||
-                (tableName == 'Resource Management' && oneActionButton == 'Manage Resource Quantity'  && userRole == 'Store')||
+                (tableName == 'Resource Management' && oneActionButton == 'Manage Quantity'  && userRole == 'Store')||
                  (tableName == 'Resource Management' && userRole == 'Admin')
                  "
                     >
@@ -98,7 +99,7 @@
                 <b-col cols="2">
                   <div v-if="tableName == 'Orders'">
                     <b-dropdown
-                     v-if="userRole == 'Admin'"
+                      v-if="userRole == 'Admin'"
                       id="dropdown-header"
                       variant="transparent"
                       no-caret
@@ -109,12 +110,11 @@
                       </template>
 
                       <b-dropdown-item-button
-                    
                         v-on:click="editOrder(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Edit Order</b-dropdown-item-button>
-                         <b-dropdown-item-button
-                          v-if="row.item.status == 'Out for Delivery'"
+                      <b-dropdown-item-button
+                        v-if="row.item.status == 'Out for Delivery'"
                         v-on:click="deliveryFailed(row.item.id)"
                         aria-describedby="dropdown-header-label"
                       >Delivery Failed</b-dropdown-item-button>
@@ -209,8 +209,7 @@
 
     <!-- b-modal for cancel order -->
     <b-modal @ok="cancelOrder()" ref="cancelOrder" title="Cancel Order">
-      <p class="my-4">Are you sure you want to cancel this order?</p>
-      <!-- <p class="my-4">This action cannot be undone.</p> -->
+      <p>Are you sure you want to cancel this order?</p>
     </b-modal>
   </div>
 </template>
@@ -230,7 +229,7 @@ export default {
     return {
       totalRows: 1,
       currentPage: 1,
-      perPage: 5,
+      perPage: 25,
       pageOptions: [5, 10, 15, 20, 25],
       sortBy: null,
       sortDesc: false,
@@ -276,12 +275,14 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields.filter(f => f.sortable).map(f => {
-        return {
-          text: f.label,
-          value: f.key
-        };
-      });
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => {
+          return {
+            text: f.label,
+            value: f.key
+          };
+        });
     }
   },
   watch: {

@@ -326,7 +326,7 @@ export default {
                 refNo: response[i].referenceNo,
                 createdAt: new Date(
                   Date.parse(response[i].createdAt)
-                ).toLocaleString(),
+                ).toLocaleString("en-SG"),
                 region: region,
                 postalcode: postalcode,
                 deliveryman: deliveryman,

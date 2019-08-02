@@ -32,6 +32,7 @@ Vue.use(Router);
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
 let router = new Router({
+  mode: "history",
   routes: [
     {
       path: "/Login",
