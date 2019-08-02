@@ -57,6 +57,20 @@
                   <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
                 </b-row>
 
+                <div v-if="this.order.status == 'Completed'">
+                  <b-row class="b1 mb-2">
+                    <b-col class="b3">Customer Signature</b-col>
+                  </b-row>
+
+                  <b-row class="b1 mb-2">
+                    <b-col class="b2">
+                      <img
+                        :src="'data:image/png;base64,'+this.order.orderRecipient.recipientSignature"
+                      />
+                    </b-col>
+                  </b-row>
+                </div>
+
                 <b-row class="b2">
                   <b-col cols="3">Item(s)</b-col>
                   <b-col cols="3">Image</b-col>
@@ -213,7 +227,11 @@
                       <b-col>
                         <b-button v-on:click="saveDetails()" variant="primary">Save</b-button>
 
-                        <b-button   v-on:click="cancelButton()" style="margin-left:1em" variant="secondary">Cancel</b-button>
+                        <b-button
+                          v-on:click="cancelButton()"
+                          style="margin-left:1em"
+                          variant="secondary"
+                        >Cancel</b-button>
                       </b-col>
                     </b-row>
                   </div>
@@ -297,7 +315,7 @@ export default {
       };
       this.$snack[method](config);
     },
- cancelButton() {
+    cancelButton() {
       this.$router.replace({ name: "SummaryOfOrders" });
     },
     onImageClick(thumbNailUrl) {
