@@ -42,7 +42,7 @@
       <b-form-group label="Received By">
         <b-form-input v-model="recipientName"></b-form-input>
       </b-form-group>
-      <b-form-group label="recipient's Signature">
+      <b-form-group label="Recipient's Signature">
         <VueSignaturePad
           :options="{onBegin: () => {$refs.signaturePad.resizeCanvas()}}"
           class="pad"
