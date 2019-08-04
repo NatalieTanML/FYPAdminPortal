@@ -6,70 +6,76 @@
       <!-- Main Content -->
       <div id="content">
         <!-- Topbar -->
-
         <DashboardHeader title="Orders"></DashboardHeader>
         <!-- Topbar Navbar -->
-
         <!-- End of Topbar -->
-
         <!-- Begin Page Content -->
-
         <div class="container-fluid">
           <div class="card shadow mb-4">
             <!-- User Interface controls -->
             <div class="card-header py-3">
               <b-row>
-                <b-col class="col-12 col-md-4">
-                  <h4>Order Information</h4>
+                <b-col>
+                  <h4>Order Details</h4>
                 </b-col>
               </b-row>
             </div>
             <!-- Main Content -->
             <div v-if="order != null">
-              <b-container fluid class="text-left" align-h="center">
-                <b-row style="margin-top:1em" class="b1 mb-2">
-                  <b-col>Order No.</b-col>
-                  <b-col>Created At</b-col>
-                  <b-col>Subtotal</b-col>
-                  <b-col>Status</b-col>
+              <b-container fluid class="text-left card-body" align-h="center">
+                <b-row class="mb-3">
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Order ID</h6>
+                    <p>{{order.orderId}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Created At</h6>
+                    <p>{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Subtotal</h6>
+                    <p>{{order.orderTotal | currency}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Status</h6>
+                    <p>{{order.status}}</p>
+                  </b-col>
                 </b-row>
 
-                <b-row>
-                  <b-col cols="3">{{order.orderId}}</b-col>
-                  <b-col cols="3">{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</b-col>
-                  <b-col cols="3">{{order.orderTotal | currency}}</b-col>
-                  <b-col cols="3">{{order.status}}</b-col>
+                <b-row class="my-3">
+                  <b-col sm="3">
+                    <h6 class="font-weight-bold">Reference No.</h6>
+                    <p>{{order.referenceNo}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Updated At</h6>
+                    <p>{{new Date(Date.parse(order.updatedAt)).toLocaleString("en-SG")}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Updated By</h6>
+                    <p v-if="order.updatedBy == null">N/A</p>
+                    <p v-else>{{order.updatedBy}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Delivered By</h6>
+                    <p v-if="order.deliveryMan.name == null">Unassigned</p>
+                    <p v-else>{{order.deliveryMan.name}}</p>
+                  </b-col>
                 </b-row>
 
-                <b-row class="b1 mb-2">
-                  <b-col class="b3">Reference No.</b-col>
-                  <b-col class="b3">Updated At</b-col>
-                  <b-col class="b3">Updated By</b-col>
-                  <b-col class="b3">Deliver By</b-col>
+                <b-row v-if="this.order.status == 'Completed'" class="my-3">
+                  <b-col sm="3">
+                    <h6 class="font-weight-bold">Received By</h6>
+                    <p>{{order.orderRecipient.receivedBy}}</p>
+                  </b-col>
+                  <b-col sm>
+                    <h6 class="font-weight-bold">Recipient Signature</h6>
+                    <img
+                      :src="'data:image/png;base64,'+this.order.orderRecipient.recipientSignature"
+                      class="img-fluid"
+                    />
+                  </b-col>
                 </b-row>
-
-                <b-row>
-                  <b-col cols="3">{{order.referenceNo}}</b-col>
-                  <b-col cols="3">{{new Date(Date.parse(order.updatedAt)).toLocaleString("en-SG")}}</b-col>
-                  <b-col v-if="order.updatedBy == null" cols="3">N/A</b-col>
-                  <b-col v-else cols="3">{{order.updatedBy}}</b-col>
-                  <b-col v-if="order.deliveryMan.name == null" cols="3">Not Assigned</b-col>
-                  <b-col v-else cols="3">{{order.deliveryMan.name}}</b-col>
-                </b-row>
-
-                <div v-if="this.order.status == 'Completed'">
-                  <b-row class="b1 mb-2">
-                    <b-col class="b3">Customer Signature</b-col>
-                  </b-row>
-
-                  <b-row class="b1 mb-2">
-                    <b-col class="b2">
-                      <img
-                        :src="'data:image/png;base64,'+this.order.orderRecipient.recipientSignature"
-                      />
-                    </b-col>
-                  </b-row>
-                </div>
 
                 <b-row class="b2">
                   <b-col cols="3">Item(s)</b-col>
