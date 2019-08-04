@@ -24,39 +24,35 @@
             <div v-if="order != null">
               <b-container fluid class="text-left card-body" align-h="center">
                 <b-row class="mb-3">
-                  <b-col sm>
+                  <b-col md="3">
                     <h6 class="font-weight-bold">Order ID</h6>
                     <p>{{order.orderId}}</p>
                   </b-col>
-                  <b-col sm>
-                    <h6 class="font-weight-bold">Created At</h6>
-                    <p>{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</p>
+                  <b-col lg>
+                    <h6 class="font-weight-bold">Reference No.</h6>
+                    <p>{{order.referenceNo}}</p>
                   </b-col>
-                  <b-col sm>
-                    <h6 class="font-weight-bold">Subtotal</h6>
-                    <p>{{order.orderTotal | currency}}</p>
-                  </b-col>
-                  <b-col sm>
+                  <b-col md="3">
                     <h6 class="font-weight-bold">Status</h6>
                     <p>{{order.status}}</p>
                   </b-col>
                 </b-row>
 
                 <b-row class="my-3">
-                  <b-col sm="3">
-                    <h6 class="font-weight-bold">Reference No.</h6>
-                    <p>{{order.referenceNo}}</p>
+                  <b-col md>
+                    <h6 class="font-weight-bold">Created At</h6>
+                    <p>{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Updated At</h6>
                     <p>{{new Date(Date.parse(order.updatedAt)).toLocaleString("en-SG")}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Updated By</h6>
                     <p v-if="order.updatedBy == null">N/A</p>
                     <p v-else>{{order.updatedBy}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Delivered By</h6>
                     <p v-if="order.deliveryMan.name == null">Unassigned</p>
                     <p v-else>{{order.deliveryMan.name}}</p>
@@ -64,11 +60,11 @@
                 </b-row>
 
                 <b-row v-if="this.order.status == 'Completed'" class="my-3">
-                  <b-col sm="3">
+                  <b-col md="3">
                     <h6 class="font-weight-bold">Received By</h6>
                     <p>{{order.orderRecipient.receivedBy}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Recipient Signature</h6>
                     <img
                       :src="'data:image/png;base64,'+this.order.orderRecipient.recipientSignature"
@@ -77,120 +73,134 @@
                   </b-col>
                 </b-row>
 
-                <b-row class="b2">
-                  <b-col cols="3">Item(s)</b-col>
-                  <b-col cols="3">Image</b-col>
-                  <b-col cols="2">Cost</b-col>
-                  <b-col cols="2">Qty</b-col>
-                  <b-col cols="2">Discount</b-col>
-                </b-row>
-                <hr class="mb-3" />
+                <div>
+                  <b-row class="font-weight-bold">
+                    <b-col>Item(s)</b-col>
+                    <b-col>Image</b-col>
+                    <b-col cols="3">Qty</b-col>
+                  </b-row>
 
-                <b-row
-                  style="height: 150px;"
-                  v-for="(orderItem,index) in order.orderItems"
-                  v-bind:key="orderItem.orderId"
-                >
-                  <b-col
-                    cols="3"
-                  >{{orderItem.options.product.productName}}{{attribute[index]}} {{orderItem.options.skuNumber}}</b-col>
-                  <b-col cols="3">
-                    <img
-                      @click="onImageClick(orderItem.orderImageKey)"
-                      class="img-fluid"
-                      style="cursor:pointer;"
-                      v-bind:src="orderItem.orderImageUrl"
-                    />
-                  </b-col>
-                  <b-col cols="2">{{orderItem.options.product.price | currency}}</b-col>
-                  <b-col cols="2">{{orderItem.quantity}}</b-col>
-                  <b-col cols="2">N/A</b-col>
-                </b-row>
-                <hr class="mb-3" />
+                  <hr class="mb-3" />
 
-                <b-row>
-                  <b-col cols="10"></b-col>
-                  <b-col cols="2">
-                    <span>Total :</span>
-                    <span>{{order.orderTotal | currency}}</span>
-                  </b-col>
-                </b-row>
+                  <b-row
+                    style="height: 150px;"
+                    v-for="(orderItem,index) in order.orderItems"
+                    v-bind:key="orderItem.orderId"
+                  >
+                    <b-col>{{orderItem.options.product.productName}}{{attribute[index]}} {{orderItem.options.skuNumber}}</b-col>
+                    <b-col>
+                      <img
+                        @click="onImageClick(orderItem.orderImageKey)"
+                        class="img-fluid"
+                        style="cursor:pointer;"
+                        v-bind:src="orderItem.orderImageUrl"
+                      />
+                    </b-col>
+                    <b-col cols="3">{{orderItem.quantity}}</b-col>
+                  </b-row>
+
+                  <hr class="mb-3" />
+
+                  <b-row class="mb-3">
+                    <b-col lg="9"></b-col>
+                    <b-col lg>
+                      <h6 class="font-weight-bold">Subtotal:</h6>
+                    </b-col>
+                    <b-col lg>
+                      <span class="text-right">{{ order.orderSubtotal | currency}}</span>
+                    </b-col>
+                  </b-row>
+
+                  <b-row>
+                    <b-col lg="9"></b-col>
+                    <b-col lg>
+                      <h6 class="font-weight-bold">Total:</h6>
+                    </b-col>
+                    <b-col lg>
+                      <span class="text-right">{{ order.orderTotal | currency}}</span>
+                    </b-col>
+                  </b-row>
+                </div>
               </b-container>
 
-              <b-container fluid class="card2 text-left" align-h="center">
-                <div class="card shadow mb-4">
-                  <div class="card-header py-3">
+              <b-container fluid class="mt-3 text-left" align-h="center">
+                <div class="card mb-4">
+                  <div class="card-body py-3">
                     <h4 class="mb-3">Customer Information</h4>
-                    <b-row class="b1 mb-2">
-                      <b-col>Email Address</b-col>
+
+                    <b-row>
+                      <b-col lg>
+                        <h6 class="font-weight-bold">Email Address</h6>
+                        <p v-if="order.emailString == null">N/A</p>
+                        <p v-else>{{order.emailString}}</p>
+                      </b-col>
                     </b-row>
 
-                    <b-row class="mb-2">
-                      <b-col v-if="order.emailString == null">N/A</b-col>
-                      <b-col v-else>{{order.emailString}}</b-col>
-                    </b-row>
-
-                    <b-row class="b1 mb-2">
-                      <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
+                    <b-row class="font-weight-bold mb-2">
+                      <b-col md="4" v-if="selectedDeliveryType != 'Self Pick-up'">
                         <b-form-group label="Country">
                           <b-input v-model="country"></b-input>
                         </b-form-group>
                       </b-col>
 
-                      <b-col cols="4" v-if="selectedDeliveryType != 'Self Pick-up'">
+                      <b-col md="4" v-if="selectedDeliveryType != 'Self Pick-up'">
                         <b-form-group label="State">
                           <b-input v-model="state"></b-input>
                         </b-form-group>
                       </b-col>
                     </b-row>
 
-                    <b-form-group id="input-group-6">
-                      <span class="b1">Delivery Type :</span>
+                    <b-row>
+                      <b-col md>
+                        <b-form-group id="input-group-6">
+                          <h6 class="font-weight-bold">Delivery Type:</h6>
 
-                      <b-form-radio-group
-                        id="input-6"
-                        v-model="selectedDeliveryType"
-                        name="type"
-                        stacked
-                        style="margin-top: 5px"
-                      >
-                        <b-form-radio
-                          v-for="deliveryType in deliveryTypes"
-                          v-bind:key="deliveryType.deliveryTypeId"
-                          :value="deliveryType.deliveryTypeName"
-                        >{{deliveryType.deliveryTypeName}}</b-form-radio>
-                      </b-form-radio-group>
-                    </b-form-group>
+                          <b-form-radio-group
+                            id="input-6"
+                            v-model="selectedDeliveryType"
+                            name="type"
+                            stacked
+                            class="mt-2"
+                          >
+                            <b-form-radio
+                              v-for="deliveryType in deliveryTypes"
+                              v-bind:key="deliveryType.deliveryTypeId"
+                              :value="deliveryType.deliveryTypeName"
+                            >{{deliveryType.deliveryTypeName}}</b-form-radio>
+                          </b-form-radio-group>
+                        </b-form-group>
+                      </b-col>
+                    </b-row>
 
-                    <div v-if="selectedDeliveryType == 'Residential' ">
-                      <b-row class="b1 mb-2">
-                        <b-col cols="4">
+                    <div v-if="selectedDeliveryType == 'Residential' " class="font-weight-bold">
+                      <b-row class="mb-2">
+                        <b-col md>
                           <b-form-group label="Postal Code">
                             <b-input v-model="residential.postalCode"></b-input>
                           </b-form-group>
                         </b-col>
 
-                        <b-col cols="4">
+                        <b-col md>
                           <b-form-group label="Address Line 1">
                             <b-input v-model="residential.addressOne"></b-input>
                           </b-form-group>
                         </b-col>
 
-                        <b-col cols="4">
+                        <b-col md>
                           <b-form-group label="Address Line 2">
                             <b-input v-model="residential.addressTwo"></b-input>
                           </b-form-group>
                         </b-col>
                       </b-row>
 
-                      <b-row class="b1 mb-2">
-                        <b-col cols="4">
+                      <b-row class="mb-2">
+                        <b-col md="4">
                           <b-form-group label="Unit No.">
                             <b-input v-model="residential.unitNo"></b-input>
                           </b-form-group>
                         </b-col>
 
-                        <b-col cols="4">
+                        <b-col md="4">
                           <b-form-group label="Special Request">
                             <b-input v-model="specialRequest"></b-input>
                           </b-form-group>
@@ -198,8 +208,8 @@
                       </b-row>
                     </div>
 
-                    <b-row v-if="selectedDeliveryType == 'Hotel' " class="b1 mb-2">
-                      <b-col cols="4">
+                    <b-row v-if="selectedDeliveryType == 'Hotel' " class="font-weight-bold mb-2">
+                      <b-col md>
                         <b-form-group label="Hotel">
                           <select
                             class="form-control dropdown"
@@ -216,13 +226,13 @@
                         </b-form-group>
                       </b-col>
 
-                      <b-col cols="4">
+                      <b-col md>
                         <b-form-group label="Room No">
                           <b-input v-model="hotel.roomNo"></b-input>
                         </b-form-group>
                       </b-col>
 
-                      <b-col cols="4">
+                      <b-col md>
                         <b-form-group label="Special Request">
                           <b-input v-model="specialRequest"></b-input>
                         </b-form-group>
@@ -232,10 +242,9 @@
                     <b-row>
                       <b-col>
                         <b-button v-on:click="saveDetails()" variant="primary">Save</b-button>
-
                         <b-button
                           v-on:click="cancelButton()"
-                          style="margin-left:1em"
+                          class="ml-3"
                           variant="secondary"
                         >Cancel</b-button>
                       </b-col>
@@ -245,13 +254,7 @@
               </b-container>
             </div>
             <div v-else>
-              <b-container fluid class="text-left" align-h="center">
-                <div class="card shadow mb-4">
-                  <div class="card-header py-3">
-                    <h4 class="mb-3">Error, no order data retrieved!</h4>
-                  </div>
-                </div>
-              </b-container>
+              <h4 class="m-4">Error, no order data retrieved!</h4>
             </div>
           </div>
         </div>
@@ -554,31 +557,4 @@ export default {
 </script>
 
 <style>
-.pad {
-  border: 2px solid #cbc9c6;
-  border-radius: 5px;
-}
-.b1 {
-  font-weight: bold;
-}
-.b2 {
-  font-weight: bold;
-  padding-top: 30px;
-}
-.b3 {
-  padding-top: 10px;
-}
-.b4 {
-  font-weight: bold;
-  padding-top: 10px;
-}
-.card2 {
-  padding-top: 20px;
-}
-.btnAction {
-  width: 30%;
-}
-.orderInfo {
-  max-width: 100%;
-}
 </style>

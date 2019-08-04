@@ -6,491 +6,497 @@
         <DashboardHeader title="Resource Management - Add Resource"></DashboardHeader>
 
         <b-container fluid>
-          <b-row class="bg-white text-left shadow" align-h="center">
-            <b-col cols="10" class="my-5">
-              <h4 class="text-uppercase">General</h4>
-              <hr class="mb-5" />
+          <div class="card shadow mb-4">
+            <b-row class="text-left" align-h="center">
+              <b-col lg="9" md="10" cols="11" class="my-5">
+                <h4 class="text-uppercase">General</h4>
+                <hr class="mb-5" />
 
-              <b-form class="resource-form">
-                <b-form-group
-                  id="productName"
-                  label-cols-sm="3"
-                  label="Product Name"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input
+                <b-form class="resource-form">
+                  <b-form-group
                     id="productName"
-                    v-model="$v.form.name.$model"
-                    :state="$v.form.name.$dirty ? !$v.form.name.$error : null"
-                  ></b-form-input>
-
-                  <b-form-invalid-feedback>Name is required</b-form-invalid-feedback>
-                </b-form-group>
-
-                <b-form-group
-                  id="price"
-                  label-cols-sm="3"
-                  label="Price"
-                  label-for="input-horizontal"
-                >
-                  <b-input-group prepend="$">
+                    label-cols-sm="3"
+                    label="Product Name"
+                    label-for="input-horizontal"
+                  >
                     <b-form-input
-                      id="price"
-                      v-model="$v.form.price.$model"
-                      :state="$v.form.price.$dirty ? !$v.form.price.$error : null"
-                      maxlength="7"
+                      id="productName"
+                      v-model="$v.form.name.$model"
+                      :state="$v.form.name.$dirty ? !$v.form.name.$error : null"
+                    ></b-form-input>
+
+                    <b-form-invalid-feedback>Name is required</b-form-invalid-feedback>
+                  </b-form-group>
+
+                  <b-form-group
+                    id="price"
+                    label-cols-sm="3"
+                    label="Price"
+                    label-for="input-horizontal"
+                  >
+                    <b-input-group prepend="$">
+                      <b-form-input
+                        id="price"
+                        v-model="$v.form.price.$model"
+                        :state="$v.form.price.$dirty ? !$v.form.price.$error : null"
+                        maxlength="7"
+                      ></b-form-input>
+
+                      <b-form-invalid-feedback>
+                        <p v-if="!$v.form.price.required">Price is required</p>
+                        <p
+                          v-if="!$v.form.price.twoDecimal"
+                        >Please enter a valid number and not more than 2 decimal places</p>
+                        <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 9999.99</p>
+                      </b-form-invalid-feedback>
+                    </b-input-group>
+                  </b-form-group>
+
+                  <b-form-group
+                    id="imageWidth"
+                    label-cols-sm="3"
+                    label="Width"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-input
+                      id="imageWidth"
+                      v-model="$v.form.imageWidth.$model"
+                      :state="$v.form.imageWidth.$dirty ? !$v.form.imageWidth.$error : null"
                     ></b-form-input>
 
                     <b-form-invalid-feedback>
-                      <p v-if="!$v.form.price.required">Price is required</p>
+                      <p v-if="!$v.form.imageWidth.required">Width is required</p>
                       <p
-                        v-if="!$v.form.price.twoDecimal"
-                      >Please enter a valid number and not more than 2 decimal places</p>
-                      <p v-if="!$v.form.price.maxValue">Price cannot exceed more than 9999.99</p>
-                    </b-form-invalid-feedback>
-                  </b-input-group>
-                </b-form-group>
-
-                <b-form-group
-                  id="imageWidth"
-                  label-cols-sm="3"
-                  label="Width"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input
-                    id="imageWidth"
-                    v-model="$v.form.imageWidth.$model"
-                    :state="$v.form.imageWidth.$dirty ? !$v.form.imageWidth.$error : null"
-                  ></b-form-input>
-
-                  <b-form-invalid-feedback>
-                    <p v-if="!$v.form.imageWidth.required">Width is required</p>
-                    <p
-                      v-if="!$v.form.imageWidth.decimal
+                        v-if="!$v.form.imageWidth.decimal
                       ||
                       !$v.form.imageWidth.minValue"
-                    >Please enter a valid number</p>
-                  </b-form-invalid-feedback>
-                </b-form-group>
+                      >Please enter a valid number</p>
+                    </b-form-invalid-feedback>
+                  </b-form-group>
 
-                <b-form-group
-                  id="imageHeight"
-                  label-cols-sm="3"
-                  label="Height"
-                  label-for="input-horizontal"
-                >
-                  <b-form-input
+                  <b-form-group
                     id="imageHeight"
-                    v-model="$v.form.imageHeight.$model"
-                    :state="$v.form.imageHeight.$dirty ? !$v.form.imageHeight.$error : null"
-                  ></b-form-input>
+                    label-cols-sm="3"
+                    label="Height"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-input
+                      id="imageHeight"
+                      v-model="$v.form.imageHeight.$model"
+                      :state="$v.form.imageHeight.$dirty ? !$v.form.imageHeight.$error : null"
+                    ></b-form-input>
 
-                  <b-form-invalid-feedback>
-                    <p v-if="!$v.form.imageHeight.required">Height is required</p>
-                    <p
-                      v-if="!$v.form.imageHeight.decimal || !$v.form.imageHeight.minValue"
-                    >Please enter a valid number</p>
-                  </b-form-invalid-feedback>
-                </b-form-group>
+                    <b-form-invalid-feedback>
+                      <p v-if="!$v.form.imageHeight.required">Height is required</p>
+                      <p
+                        v-if="!$v.form.imageHeight.decimal || !$v.form.imageHeight.minValue"
+                      >Please enter a valid number</p>
+                    </b-form-invalid-feedback>
+                  </b-form-group>
 
-                <b-form-group
-                  id="startDate"
-                  label-cols-sm="3"
-                  label="Start Date"
-                  label-for="input-horizontal"
-                >
-                  <datepicker
-                    :id="(!$v.form.effectiveStartDate.$dirty) ? 'startDate' : ($v.form.effectiveStartDate.$error) ? 'date-invalid' : 'date-valid' "
-                    :value="datePicker.date"
-                    :bootstrap-styling="datePicker.style"
-                    :format="datePicker.format"
-                    :placeholder="datePicker.placeHolder"
-                    v-model="$v.form.effectiveStartDate.$model"
-                    :class="(!$v.form.effectiveStartDate.$dirty) ? null : ($v.form.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
-                  ></datepicker>
+                  <b-form-group
+                    id="startDate"
+                    label-cols-sm="3"
+                    label="Start Date"
+                    label-for="input-horizontal"
+                  >
+                    <datepicker
+                      :id="(!$v.form.effectiveStartDate.$dirty) ? 'startDate' : ($v.form.effectiveStartDate.$error) ? 'date-invalid' : 'date-valid' "
+                      :value="datePicker.date"
+                      :bootstrap-styling="datePicker.style"
+                      :format="datePicker.format"
+                      :placeholder="datePicker.placeHolder"
+                      v-model="$v.form.effectiveStartDate.$model"
+                      :class="(!$v.form.effectiveStartDate.$dirty) ? null : ($v.form.effectiveStartDate.$error) ? 'is-invalid-icon' : 'is-valid-icon' "
+                    ></datepicker>
 
-                  <div v-if="$v.form.effectiveStartDate.$dirty" class="date-invalid-feedback">
-                    <div v-if="!$v.form.effectiveStartDate.required">Start Date is required.</div>
-                    <div
-                      v-if="!$v.form.effectiveStartDate.checkDate"
-                    >Start date must not be the same or greater than end date</div>
-                  </div>
-                </b-form-group>
-
-                <b-form-group
-                  id="endDate"
-                  label-cols-sm="3"
-                  label="End Date"
-                  label-for="input-horizontal"
-                >
-                  <datepicker
-                    id="endDate"
-                    :clear-button="true"
-                    :value="datePicker.date"
-                    :bootstrap-styling="datePicker.style"
-                    :format="datePicker.format"
-                    :disabledDates="disabledDates()"
-                    :placeholder="datePicker.placeHolder"
-                    v-model="form.effectiveEndDate"
-                  ></datepicker>
-                </b-form-group>
-
-                <b-form-group
-                  id="description"
-                  label-cols-sm="3"
-                  label="Description"
-                  label-for="input-horizontal"
-                >
-                  <b-form-textarea
-                    id="description"
-                    rows="6"
-                    v-model="$v.form.description.$model"
-                    :state="$v.form.description.$dirty ? !$v.form.description.$error : null"
-                  ></b-form-textarea>
-
-                  <b-form-invalid-feedback>Description is required</b-form-invalid-feedback>
-                </b-form-group>
-
-                <h4 class="text-uppercase mt-5">Discount</h4>
-                <hr class="mb-5" />
-
-                <b-container class="px-0">
-                  <div class="table-wrapper">
-                    <div class="table-title">
-                      <b-row class="mx-auto">
-                        <b-col col-sm="5" class="text-left">
-                          <h5>Discounts</h5>
-                        </b-col>
-                        <b-col col-sm="7">
-                          <b-button
-                            size="sm"
-                            id="add-discount"
-                            class="px-4 float-right"
-                            variant="primary"
-                            v-b-modal.addDiscount
-                          >Add</b-button>
-                        </b-col>
-                      </b-row>
-                    </div>
-
-                    <b-table responsive striped :items="discountDetails" :fields="discountFields">
-                      <template slot="actions" slot-scope="row">
-                        <b-button
-                          @click="editDiscountInfo(row.item, row.index)"
-                          v-b-modal.editDiscount
-                          size="sm"
-                          class="px-4"
-                          variant="primary"
-                        >Edit</b-button>
-                        <b-button
-                          @click="deleteDiscountInfo(row.index)"
-                          v-b-modal.deleteDiscount
-                          size="sm"
-                          class="px-3 ml-3"
-                          variant="danger"
-                        >Delete</b-button>
-                      </template>
-                    </b-table>
-                  </div>
-                </b-container>
-
-                <!-- modal dialog for add discount -->
-                <b-modal
-                  id="addDiscount"
-                  title="Add Discount"
-                  ref="discountDialog"
-                  @ok="handleAddDiscount"
-                  @hidden="cancelDiscountDialog"
-                >
-                  <DiscountForm v-model="form.discount" :v="$v.form.discount"></DiscountForm>
-                </b-modal>
-
-                <!-- modal dialog for edit discount -->
-                <b-modal
-                  id="editDiscount"
-                  title="Edit Discount"
-                  ref="discountDialog"
-                  @ok="handleEditDiscount"
-                  @hidden="cancelDiscountDialog"
-                >
-                  <DiscountForm v-model="form.discount" :v="$v.form.discount"></DiscountForm>
-                </b-modal>
-
-                <!-- modal dialog for delete discount -->
-                <b-modal
-                  id="deleteDiscount"
-                  title="Discount"
-                  @ok="handleDeleteDiscount"
-                >Are you sure you want to delete this discount?</b-modal>
-
-                <h4 class="text-uppercase mt-5">Variation</h4>
-                <hr class="mb-5" />
-
-                <b-button
-                  class="px-4"
-                  v-b-modal.addVarient
-                  @click="openVarientModal"
-                >+ Add Variant Option</b-button>
-
-                <!-- modal dialog for variant option -->
-                <b-modal
-                  id="addVarient"
-                  size="lg"
-                  title="Variant Options"
-                  ref="varientModal"
-                  @ok="handleVarientSubmit"
-                  @cancel="cancelVarientDialog"
-                  @close="cancelVarientDialog"
-                >
-                  <form>
-                    <div class="container">
+                    <div v-if="$v.form.effectiveStartDate.$dirty" class="date-invalid-feedback">
+                      <div v-if="!$v.form.effectiveStartDate.required">Start Date is required.</div>
                       <div
-                        v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
-                        :key="varientIndex"
-                      >
-                        <b-row>
-                          <b-col>
-                            <form>
-                              <div class="offset-md-1">
-                                <div class="row">
-                                  <b-col cols="5">
-                                    <b-form-group label="Type" label-for="varientType">
-                                      <b-form-input
-                                        v-model="varientSection.type.$model"
-                                        id="varientType"
-                                        :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
-                                      ></b-form-input>
-
-                                      <b-form-invalid-feedback>
-                                        <p v-if="!varientSection.type.required">Type is required</p>
-                                        <p
-                                          v-if="!varientSection.type.isDuplicateType"
-                                        >There is an existing option with the same type</p>
-                                      </b-form-invalid-feedback>
-                                    </b-form-group>
-                                    <p
-                                      class="btn-delete-varient text-danger"
-                                      @click="deleteType(varientIndex)"
-                                    >Delete Type</p>
-                                  </b-col>
-
-                                  <div class="col-6 offset-md-1">
-                                    <div
-                                      class="row"
-                                      v-for="(value, valueIndex) in varientSection.values.$each.$iter"
-                                      :key="valueIndex"
-                                    >
-                                      <div class="col-10">
-                                        <b-form-group label="Value" label-for="varientValue">
-                                          <b-form-input
-                                            id="varientValue"
-                                            v-model="value.individualValue.$model"
-                                            :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
-                                          ></b-form-input>
-
-                                          <b-form-invalid-feedback>
-                                            <p
-                                              v-if="!value.individualValue.required"
-                                            >Value is required</p>
-                                            <p
-                                              v-if="!value.individualValue.isDuplicateValue"
-                                            >There is an existing option with the same value</p>
-                                          </b-form-invalid-feedback>
-                                        </b-form-group>
-                                      </div>
-
-                                      <div class="col-2 col-sm-2">
-                                        <b-button
-                                          v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
-                                          size="sm"
-                                          class="btn-delete-value"
-                                          variant="danger"
-                                          @click="removeValue(varientIndex, valueIndex)"
-                                        >-</b-button>
-                                      </div>
-                                    </div>
-                                    <p
-                                      @click="addValue(varientIndex)"
-                                      class="btn-add-value text-primary"
-                                    >+ Add Another Value</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-                          </b-col>
-                        </b-row>
-                      </div>
-                      <b-row>
-                        <b-col class="offset-md-1">
-                          <b-button
-                            variant="outline-primary mt-3"
-                            @click="addVarient()"
-                          >+ Add Varient Option</b-button>
-                        </b-col>
-                      </b-row>
+                        v-if="!$v.form.effectiveStartDate.checkDate"
+                      >Start date must not be the same or greater than end date</div>
                     </div>
-                  </form>
-                </b-modal>
+                  </b-form-group>
 
-                <div class="text-center" v-if="this.varientTableError">
-                  <p
-                    v-if="varientDetails.length === 0"
-                    class="table-varient-error"
-                  >Please add at least one variant option</p>
-                  <p
-                    v-else
-                    class="table-varient-error"
-                  >Please fill in all the necessary variant details</p>
-                </div>
+                  <b-form-group
+                    id="endDate"
+                    label-cols-sm="3"
+                    label="End Date"
+                    label-for="input-horizontal"
+                  >
+                    <datepicker
+                      id="endDate"
+                      :clear-button="true"
+                      :value="datePicker.date"
+                      :bootstrap-styling="datePicker.style"
+                      :format="datePicker.format"
+                      :disabledDates="disabledDates()"
+                      :placeholder="datePicker.placeHolder"
+                      v-model="form.effectiveEndDate"
+                    ></datepicker>
+                  </b-form-group>
 
-                <b-container class="px-0" fluid>
-                  <div class="table-wrapper">
-                    <div :class="{'border border-danger' : this.varientTableError}">
+                  <b-form-group
+                    id="description"
+                    label-cols-sm="3"
+                    label="Description"
+                    label-for="input-horizontal"
+                  >
+                    <b-form-textarea
+                      id="description"
+                      rows="6"
+                      v-model="$v.form.description.$model"
+                      :state="$v.form.description.$dirty ? !$v.form.description.$error : null"
+                    ></b-form-textarea>
+
+                    <b-form-invalid-feedback>Description is required</b-form-invalid-feedback>
+                  </b-form-group>
+
+                  <h4 class="text-uppercase mt-5">Discount</h4>
+                  <hr class="mb-5" />
+
+                  <b-container class="px-0">
+                    <div class="table-wrapper">
                       <div class="table-title">
                         <b-row class="mx-auto">
-                          <b-col col-sm="3" class="text-left">
-                            <h5>Variants</h5>
+                          <b-col col-sm="5" class="text-left">
+                            <h5>Discounts</h5>
+                          </b-col>
+                          <b-col col-sm="7">
+                            <b-button
+                              size="sm"
+                              class="px-4 mr-3 float-right"
+                              variant="primary"
+                              v-b-modal.addDiscount
+                            >Add</b-button>
                           </b-col>
                         </b-row>
                       </div>
 
-                      <!-- Varient Table -->
-                      <b-table responsive striped :items="varientDetails" :fields="varientFields">
+                      <b-table responsive striped :items="discountDetails" :fields="discountFields">
                         <template slot="actions" slot-scope="row">
                           <b-button
-                            @click="varientInfo(row.item, row.index)"
-                            v-b-modal.editVarient
+                            @click="editDiscountInfo(row.item, row.index)"
+                            v-b-modal.editDiscount
                             size="sm"
                             class="px-4"
                             variant="primary"
                           >Edit</b-button>
+                          <b-button
+                            @click="deleteDiscountInfo(row.index)"
+                            v-b-modal.deleteDiscount
+                            size="sm"
+                            class="px-3 ml-3"
+                            variant="danger"
+                          >Delete</b-button>
                         </template>
                       </b-table>
-
-                      <b-modal
-                        id="editVarient"
-                        ref="editVarientModal"
-                        title="Edit Variant"
-                        @ok="editVarientTableDialog"
-                        @hidden="cancelEditVarientTableDialog"
-                      >
-                        <form>
-                          <b-form-group label="SKU Number">
-                            <b-form-input
-                              id="productSKU"
-                              v-model="$v.form.varient.SKUNumber.$model"
-                              :state="$v.form.varient.SKUNumber.$dirty ? !$v.form.varient.SKUNumber.$error : null"
-                            ></b-form-input>
-
-                            <b-form-invalid-feedback>
-                              <p v-if="!$v.form.varient.SKUNumber.required">SKU Number is required</p>
-                              <p
-                                v-if="!$v.form.varient.SKUNumber.isDuplicateSKU"
-                              >SKU Number already exist</p>
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-
-                          <b-form-group label="Variant">
-                            <b-form-input
-                              id="varientCombination"
-                              v-model="form.varient.combination"
-                              disabled
-                            ></b-form-input>
-                          </b-form-group>
-
-                          <b-form-group label="Current Qty">
-                            <b-form-input
-                              id="currentQuantity"
-                              v-model="$v.form.varient.currentQuantity.$model"
-                              :state="$v.form.varient.currentQuantity.$dirty ? !$v.form.varient.currentQuantity.$error : null"
-                            ></b-form-input>
-
-                            <b-form-invalid-feedback>
-                              <p
-                                v-if="!$v.form.varient.currentQuantity.required"
-                              >Current quantity is required</p>
-                              <p
-                                v-if="!$v.form.varient.currentQuantity.integer || !$v.form.varient.currentQuantity.minValue"
-                              >Please enter a valid number</p>
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-
-                          <b-form-group label="Min. Qty">
-                            <b-form-input
-                              id="minimumQuantity"
-                              v-model="$v.form.varient.minimumQuantity.$model"
-                              :state="$v.form.varient.minimumQuantity.$dirty ? !$v.form.varient.minimumQuantity.$error : null"
-                            ></b-form-input>
-
-                            <b-form-invalid-feedback>
-                              <p
-                                v-if="!$v.form.varient.minimumQuantity.required"
-                              >Minimum quantity is required</p>
-                              <p
-                                v-if="!$v.form.varient.minimumQuantity.integer || !$v.form.varient.minimumQuantity.minValue"
-                              >Please enter a valid number</p>
-                            </b-form-invalid-feedback>
-                          </b-form-group>
-
-                          <b-form-group label="Image">
-                            <div :class="{'border border-danger' : this.isImageRequired}">
-                              <vue-dropzone
-                                id="dropzone"
-                                ref="myVueDropzone"
-                                :options="dropOptions"
-                                :useCustomSlot="true"
-                                @vdropzone-file-added="addFileToDropzone"
-                                @vdropzone-removed-file="deleteFileFromDropzone"
-                                @vdropzone-duplicate-file="duplicateFileCheck"
-                                :destroyDropzone="false"
-                                :duplicateCheck="true"
-                              >
-                                <div class="dropzone-custom-content">
-                                  <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                                  <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
-                                  <div class="subtitle">or click to add your image</div>
-                                </div>
-                              </vue-dropzone>
-                            </div>
-                            <div v-if="this.isImageRequired" class="image-invalid-feedback">
-                              <p>Image is required for first varient</p>
-                            </div>
-                          </b-form-group>
-                        </form>
-
-                        <template slot="modal-footer" slot-scope="{ ok, cancel }">
-                          <!-- Emulate built in modal footer ok and cancel button actions -->
-                          <b-button variant="secondary" @click="cancel()">Cancel</b-button>
-                          <b-button variant="primary" @click="ok()" :disabled="varientSubmitLoader">
-                            <b-spinner small class="mr-2" v-if="varientSubmitLoader"></b-spinner>
-                            <span>Ok</span>
-                          </b-button>
-                        </template>
-                      </b-modal>
                     </div>
+                  </b-container>
+
+                  <!-- modal dialog for add discount -->
+                  <b-modal
+                    id="addDiscount"
+                    title="Add Discount"
+                    ref="discountDialog"
+                    @ok="handleAddDiscount"
+                    @hidden="cancelDiscountDialog"
+                  >
+                    <DiscountForm v-model="form.discount" :v="$v.form.discount"></DiscountForm>
+                  </b-modal>
+
+                  <!-- modal dialog for edit discount -->
+                  <b-modal
+                    id="editDiscount"
+                    title="Edit Discount"
+                    ref="discountDialog"
+                    @ok="handleEditDiscount"
+                    @hidden="cancelDiscountDialog"
+                  >
+                    <DiscountForm v-model="form.discount" :v="$v.form.discount"></DiscountForm>
+                  </b-modal>
+
+                  <!-- modal dialog for delete discount -->
+                  <b-modal
+                    id="deleteDiscount"
+                    title="Discount"
+                    @ok="handleDeleteDiscount"
+                  >Are you sure you want to delete this discount?</b-modal>
+
+                  <h4 class="text-uppercase mt-5">Variation</h4>
+                  <hr class="mb-5" />
+
+                  <b-button
+                    class="px-4"
+                    v-b-modal.addVarient
+                    @click="openVarientModal"
+                  >+ Add Variant Option</b-button>
+
+                  <!-- modal dialog for variant option -->
+                  <b-modal
+                    id="addVarient"
+                    size="lg"
+                    title="Variant Options"
+                    ref="varientModal"
+                    @ok="handleVarientSubmit"
+                    @cancel="cancelVarientDialog"
+                    @close="cancelVarientDialog"
+                  >
+                    <form>
+                      <div class="container">
+                        <div
+                          v-for="(varientSection, varientIndex) in $v.varientSections.$each.$iter"
+                          :key="varientIndex"
+                        >
+                          <b-row>
+                            <b-col>
+                              <form>
+                                <div class="offset-md-1">
+                                  <div class="row">
+                                    <b-col cols="5">
+                                      <b-form-group label="Type" label-for="varientType">
+                                        <b-form-input
+                                          v-model="varientSection.type.$model"
+                                          id="varientType"
+                                          :state="varientSection.type.$dirty ? !varientSection.type.$error : null"
+                                        ></b-form-input>
+
+                                        <b-form-invalid-feedback>
+                                          <p v-if="!varientSection.type.required">Type is required</p>
+                                          <p
+                                            v-if="!varientSection.type.isDuplicateType"
+                                          >There is an existing option with the same type</p>
+                                        </b-form-invalid-feedback>
+                                      </b-form-group>
+                                      <p
+                                        class="btn-delete-varient text-danger"
+                                        @click="deleteType(varientIndex)"
+                                      >Delete Type</p>
+                                    </b-col>
+
+                                    <div class="col-6 offset-md-1">
+                                      <div
+                                        class="row"
+                                        v-for="(value, valueIndex) in varientSection.values.$each.$iter"
+                                        :key="valueIndex"
+                                      >
+                                        <div class="col-10">
+                                          <b-form-group label="Value" label-for="varientValue">
+                                            <b-form-input
+                                              id="varientValue"
+                                              v-model="value.individualValue.$model"
+                                              :state="value.individualValue.$dirty ? !value.individualValue.$error : null"
+                                            ></b-form-input>
+
+                                            <b-form-invalid-feedback>
+                                              <p
+                                                v-if="!value.individualValue.required"
+                                              >Value is required</p>
+                                              <p
+                                                v-if="!value.individualValue.isDuplicateValue"
+                                              >There is an existing option with the same value</p>
+                                            </b-form-invalid-feedback>
+                                          </b-form-group>
+                                        </div>
+
+                                        <div class="col-2 col-sm-2">
+                                          <b-button
+                                            v-if="Object.keys(varientSection.values.$each.$iter).length !== 1"
+                                            size="sm"
+                                            class="btn-delete-value"
+                                            variant="danger"
+                                            @click="removeValue(varientIndex, valueIndex)"
+                                          >-</b-button>
+                                        </div>
+                                      </div>
+                                      <p
+                                        @click="addValue(varientIndex)"
+                                        class="btn-add-value text-primary"
+                                      >+ Add Another Value</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                            </b-col>
+                          </b-row>
+                        </div>
+                        <b-row>
+                          <b-col class="offset-md-1">
+                            <b-button
+                              variant="outline-primary mt-3"
+                              @click="addVarient()"
+                            >+ Add Varient Option</b-button>
+                          </b-col>
+                        </b-row>
+                      </div>
+                    </form>
+                  </b-modal>
+
+                  <div class="text-center" v-if="this.varientTableError">
+                    <p
+                      v-if="varientDetails.length === 0"
+                      class="table-varient-error"
+                    >Please add at least one variant option</p>
+                    <p
+                      v-else
+                      class="table-varient-error"
+                    >Please fill in all the necessary variant details</p>
                   </div>
-                </b-container>
-              </b-form>
 
-              <div class="text-right">
-                <b-button
-                  @click="submitProduct"
-                  variant="primary"
-                  class="mr-3 px-4"
-                  :disabled="submitLoader"
-                >
-                  <b-spinner small class="mr-2" v-if="submitLoader"></b-spinner>
-                  <span>Save</span>
-                </b-button>
+                  <b-container class="px-0" fluid>
+                    <div class="table-wrapper">
+                      <div :class="{'border border-danger' : this.varientTableError}">
+                        <div class="table-title">
+                          <b-row class="mx-auto">
+                            <b-col col-sm="3" class="text-left">
+                              <h5>Variants</h5>
+                            </b-col>
+                          </b-row>
+                        </div>
 
-                <b-button class="px-4" @click="cancelProduct" :disabled="cancelLoader">
-                  <b-spinner small class="mr-2" v-if="cancelLoader"></b-spinner>
-                  <span>Cancel</span>
-                </b-button>
-              </div>
-            </b-col>
-          </b-row>
+                        <!-- Varient Table -->
+                        <b-table responsive striped :items="varientDetails" :fields="varientFields">
+                          <template slot="actions" slot-scope="row">
+                            <b-button
+                              @click="varientInfo(row.item, row.index)"
+                              v-b-modal.editVarient
+                              size="sm"
+                              class="px-4"
+                              variant="primary"
+                            >Edit</b-button>
+                          </template>
+                        </b-table>
+
+                        <b-modal
+                          id="editVarient"
+                          ref="editVarientModal"
+                          title="Edit Variant"
+                          @ok="editVarientTableDialog"
+                          @hidden="cancelEditVarientTableDialog"
+                        >
+                          <form>
+                            <b-form-group label="SKU Number">
+                              <b-form-input
+                                id="productSKU"
+                                v-model="$v.form.varient.SKUNumber.$model"
+                                :state="$v.form.varient.SKUNumber.$dirty ? !$v.form.varient.SKUNumber.$error : null"
+                              ></b-form-input>
+
+                              <b-form-invalid-feedback>
+                                <p v-if="!$v.form.varient.SKUNumber.required">SKU Number is required</p>
+                                <p
+                                  v-if="!$v.form.varient.SKUNumber.isDuplicateSKU"
+                                >SKU Number already exist</p>
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+
+                            <b-form-group label="Variant">
+                              <b-form-input
+                                id="varientCombination"
+                                v-model="form.varient.combination"
+                                disabled
+                              ></b-form-input>
+                            </b-form-group>
+
+                            <b-form-group label="Current Qty">
+                              <b-form-input
+                                id="currentQuantity"
+                                v-model="$v.form.varient.currentQuantity.$model"
+                                :state="$v.form.varient.currentQuantity.$dirty ? !$v.form.varient.currentQuantity.$error : null"
+                              ></b-form-input>
+
+                              <b-form-invalid-feedback>
+                                <p
+                                  v-if="!$v.form.varient.currentQuantity.required"
+                                >Current quantity is required</p>
+                                <p
+                                  v-if="!$v.form.varient.currentQuantity.integer || !$v.form.varient.currentQuantity.minValue"
+                                >Please enter a valid number</p>
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+
+                            <b-form-group label="Min. Qty">
+                              <b-form-input
+                                id="minimumQuantity"
+                                v-model="$v.form.varient.minimumQuantity.$model"
+                                :state="$v.form.varient.minimumQuantity.$dirty ? !$v.form.varient.minimumQuantity.$error : null"
+                              ></b-form-input>
+
+                              <b-form-invalid-feedback>
+                                <p
+                                  v-if="!$v.form.varient.minimumQuantity.required"
+                                >Minimum quantity is required</p>
+                                <p
+                                  v-if="!$v.form.varient.minimumQuantity.integer || !$v.form.varient.minimumQuantity.minValue"
+                                >Please enter a valid number</p>
+                              </b-form-invalid-feedback>
+                            </b-form-group>
+
+                            <b-form-group label="Image">
+                              <div :class="{'border border-danger' : this.isImageRequired}">
+                                <vue-dropzone
+                                  id="dropzone"
+                                  ref="myVueDropzone"
+                                  :options="dropOptions"
+                                  :useCustomSlot="true"
+                                  @vdropzone-file-added="addFileToDropzone"
+                                  @vdropzone-removed-file="deleteFileFromDropzone"
+                                  @vdropzone-duplicate-file="duplicateFileCheck"
+                                  :destroyDropzone="false"
+                                  :duplicateCheck="true"
+                                >
+                                  <div class="dropzone-custom-content">
+                                    <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                    <h4 class="dropzone-custom-title mb-0 mt-3">Drag & Drop</h4>
+                                    <div class="subtitle">or click to add your image</div>
+                                  </div>
+                                </vue-dropzone>
+                              </div>
+                              <div v-if="this.isImageRequired" class="image-invalid-feedback">
+                                <p>Image is required for first varient</p>
+                              </div>
+                            </b-form-group>
+                          </form>
+
+                          <template slot="modal-footer" slot-scope="{ ok, cancel }">
+                            <!-- Emulate built in modal footer ok and cancel button actions -->
+                            <b-button variant="secondary" @click="cancel()">Cancel</b-button>
+                            <b-button
+                              variant="primary"
+                              @click="ok()"
+                              :disabled="varientSubmitLoader"
+                            >
+                              <b-spinner small class="mr-2" v-if="varientSubmitLoader"></b-spinner>
+                              <span>Ok</span>
+                            </b-button>
+                          </template>
+                        </b-modal>
+                      </div>
+                    </div>
+                  </b-container>
+                </b-form>
+
+                <div class="text-right">
+                  <b-button
+                    @click="submitProduct"
+                    variant="primary"
+                    class="mr-3 px-4"
+                    :disabled="submitLoader"
+                  >
+                    <b-spinner small class="mr-2" v-if="submitLoader"></b-spinner>
+                    <span>Save</span>
+                  </b-button>
+
+                  <b-button class="px-4" @click="cancelProduct" :disabled="cancelLoader">
+                    <b-spinner small class="mr-2" v-if="cancelLoader"></b-spinner>
+                    <span>Cancel</span>
+                  </b-button>
+                </div>
+              </b-col>
+            </b-row>
+          </div>
         </b-container>
+        <Footer></Footer>
       </div>
     </div>
   </div>
@@ -499,6 +505,7 @@
 <script>
 import SideBar from "@/components/SideBar";
 import DashboardHeader from "@/components/DashboardHeader";
+import Footer from "@/components/Footer";
 import vueDropzone from "vue2-dropzone";
 import Datepicker from "vuejs-datepicker";
 import clonedeep from "lodash.clonedeep"; // Install lodash.clonedeep as a single module
@@ -525,7 +532,8 @@ export default {
     DashboardHeader,
     vueDropzone,
     Datepicker,
-    DiscountForm
+    DiscountForm,
+    Footer
   },
 
   data() {
@@ -1768,10 +1776,6 @@ h4 {
 
 .table {
   margin-bottom: 0 !important;
-}
-
-#add-discount {
-  margin-right: 63px;
 }
 
 .vdp-datepicker .input-group .form-control[readonly] {

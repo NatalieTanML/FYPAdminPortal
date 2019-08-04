@@ -29,39 +29,35 @@
             <div v-if="order != null">
               <b-container fluid class="text-left card-body" align-h="center">
                 <b-row class="mb-3">
-                  <b-col sm>
+                  <b-col md="3">
                     <h6 class="font-weight-bold">Order ID</h6>
                     <p>{{order.orderId}}</p>
                   </b-col>
-                  <b-col sm>
-                    <h6 class="font-weight-bold">Created At</h6>
-                    <p>{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</p>
+                  <b-col lg>
+                    <h6 class="font-weight-bold">Reference No.</h6>
+                    <p>{{order.referenceNo}}</p>
                   </b-col>
-                  <b-col sm>
-                    <h6 class="font-weight-bold">Subtotal</h6>
-                    <p>{{order.orderTotal | currency}}</p>
-                  </b-col>
-                  <b-col sm>
+                  <b-col md="3">
                     <h6 class="font-weight-bold">Status</h6>
                     <p>{{order.status}}</p>
                   </b-col>
                 </b-row>
 
                 <b-row class="my-3">
-                  <b-col sm="3">
-                    <h6 class="font-weight-bold">Reference No.</h6>
-                    <p>{{order.referenceNo}}</p>
+                  <b-col md>
+                    <h6 class="font-weight-bold">Created At</h6>
+                    <p>{{new Date(Date.parse(order.createdAt)).toLocaleString("en-SG")}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Updated At</h6>
                     <p>{{new Date(Date.parse(order.updatedAt)).toLocaleString("en-SG")}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Updated By</h6>
                     <p v-if="order.updatedBy == null">N/A</p>
                     <p v-else>{{order.updatedBy}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Delivered By</h6>
                     <p v-if="order.deliveryMan.name == null">Unassigned</p>
                     <p v-else>{{order.deliveryMan.name}}</p>
@@ -69,11 +65,11 @@
                 </b-row>
 
                 <b-row v-if="this.order.status == 'Completed'" class="my-3">
-                  <b-col sm="3">
+                  <b-col md="3">
                     <h6 class="font-weight-bold">Received By</h6>
                     <p>{{order.orderRecipient.receivedBy}}</p>
                   </b-col>
-                  <b-col sm>
+                  <b-col md>
                     <h6 class="font-weight-bold">Recipient Signature</h6>
                     <img
                       :src="'data:image/png;base64,'+this.order.orderRecipient.recipientSignature"
@@ -82,45 +78,54 @@
                   </b-col>
                 </b-row>
 
-                <b-table responsive :items="orderItems" :fields="orderFields"></b-table>
-                <!-- <b-row class="b2">
-                  <b-col cols="3">Item(s)</b-col>
-                  <b-col cols="3">Image</b-col>
-                  <b-col cols="2">Cost</b-col>
-                  <b-col cols="2">Qty</b-col>
-                  <b-col cols="2">Discount</b-col>
-                </b-row>
-                <hr class="mb-3" />
+                <div>
+                  <b-row class="font-weight-bold">
+                    <b-col>Item(s)</b-col>
+                    <b-col>Image</b-col>
+                    <b-col cols="3">Qty</b-col>
+                  </b-row>
 
-                <b-row
-                  style="height: 150px;"
-                  v-for="(orderItem,index) in order.orderItems"
-                  v-bind:key="orderItem.orderId"
-                >
-                  <b-col
-                    cols="3"
-                  >{{orderItem.options.product.productName}}{{attribute[index]}} {{orderItem.options.skuNumber}}</b-col>
-                  <b-col cols="3">
-                    <img
-                      @click="onImageClick(orderItem.orderImageKey)"
-                      class="img-fluid"
-                      style="cursor:pointer;"
-                      v-bind:src="orderItem.orderImageUrl"
-                    />
-                  </b-col>
-                  <b-col cols="2">{{orderItem.options.product.price | currency}}</b-col>
-                  <b-col cols="2">{{orderItem.quantity}}</b-col>
-                  <b-col cols="2">N/A</b-col>
-                </b-row>
-                <hr class="mb-3" />
+                  <hr class="mb-3" />
 
-                <b-row>
-                  <b-col cols="10"></b-col>
-                  <b-col cols="2">
-                    <span>Total:</span>
-                    <span>{{order.orderTotal | currency}}</span>
-                  </b-col>
-                </b-row>-->
+                  <b-row
+                    style="height: 150px;"
+                    v-for="(orderItem,index) in order.orderItems"
+                    v-bind:key="orderItem.orderId"
+                  >
+                    <b-col>{{orderItem.options.product.productName}}{{attribute[index]}} {{orderItem.options.skuNumber}}</b-col>
+                    <b-col>
+                      <img
+                        @click="onImageClick(orderItem.orderImageKey)"
+                        class="img-fluid"
+                        style="cursor:pointer;"
+                        v-bind:src="orderItem.orderImageUrl"
+                      />
+                    </b-col>
+                    <b-col cols="3">{{orderItem.quantity}}</b-col>
+                  </b-row>
+
+                  <hr class="mb-3" />
+
+                  <b-row class="mb-3">
+                    <b-col lg="9"></b-col>
+                    <b-col lg>
+                      <h6 class="font-weight-bold">Subtotal:</h6>
+                    </b-col>
+                    <b-col lg>
+                      <span class="text-right">{{ order.orderSubtotal | currency}}</span>
+                    </b-col>
+                  </b-row>
+
+                  <b-row>
+                    <b-col lg="9"></b-col>
+                    <b-col lg>
+                      <h6 class="font-weight-bold">Total:</h6>
+                    </b-col>
+                    <b-col lg>
+                      <span class="text-right">{{ order.orderTotal | currency}}</span>
+                    </b-col>
+                  </b-row>
+                </div>
               </b-container>
 
               <b-container fluid class="mt-3 text-left" align-h="center">
@@ -129,12 +134,12 @@
                     <h4 class="mb-3">Customer Information</h4>
 
                     <b-row>
-                      <b-col sm>
+                      <b-col lg>
                         <h6 class="font-weight-bold">Email Address</h6>
                         <p v-if="order.emailString == null">N/A</p>
                         <p v-else>{{order.emailString}}</p>
                       </b-col>
-                      <b-col sm>
+                      <b-col lg>
                         <h6 class="font-weight-bold">Shipping Address</h6>
                         <p v-if="order.addressId == null">Self Pickup</p>
                         <p v-else-if="order.deliveryTypeId == 1">
@@ -149,8 +154,10 @@
                         <p v-else-if="order.deliveryTypeId == 2">
                           {{order.address.addressLine1}}
                           <br />
-                          {{order.address.addressLine2}}
-                          <br />
+                          <span v-if="order.address.addressLine2" class="my-0">
+                            {{order.address.addressLine2}}
+                            <br />
+                          </span>
                           {{order.address.unitNo}}
                           <br />
                           {{order.address.country}}, {{order.address.state}}
@@ -158,7 +165,7 @@
                           {{order.address.postalCode}}
                         </p>
                       </b-col>
-                      <b-col sm>
+                      <b-col lg>
                         <h6 class="font-weight-bold">Special Request</h6>
                         <p v-if="order.request == null" class="mb-0">N/A</p>
                         <p v-else class="mb-0">{{order.request}}</p>
@@ -169,13 +176,7 @@
               </b-container>
             </div>
             <div v-else>
-              <b-container fluid class="text-left" align-h="center">
-                <div class="card shadow">
-                  <div class="card-body py-3">
-                    <h4 class="mb-3">Error - No order data retrived!</h4>
-                  </div>
-                </div>
-              </b-container>
+              <h4 class="m-4">Error - No order data retrived!</h4>
             </div>
           </div>
         </div>
@@ -201,14 +202,7 @@ export default {
     return {
       pad: null,
       order: null,
-      attribute: [],
-      orderItems: [],
-      orderFields: [
-        { key: "", label: "" },
-        { key: "", label: "" },
-        { key: "", label: "" },
-        { key: "", label: "" }
-      ]
+      attribute: []
     };
   },
 
@@ -243,9 +237,6 @@ export default {
               clearInterval(interval);
             }
           }
-
-          // this.presignedUrl = response.imgUrls[0];
-          // this.$bvModal.show("viewPresignedImage");
         })
         .catch(error => {
           console.dir(error);
@@ -262,6 +253,20 @@ export default {
       else if (status == "Cancelled") return null;
       else return null;
     }
+    // populateTable() {
+    //   for (var i = 0; i < this.orderItems.length; i++) {
+    //     this.orderItems.push({
+    //       item:
+    //         this.order[i].options.product.productName +
+    //         this.attribute[i] +
+    //         this.order[i].options.skuNumber,
+    //       image: this.order[i].orderImageKey,
+    //       qty: this.order[i].quantity
+    //     });
+    //   }
+
+    //   console.log("orderItems: ", this.orderItems);
+    // }
   },
   mounted() {
     const orderId = localStorage.getItem("viewOrderId");

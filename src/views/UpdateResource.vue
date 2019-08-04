@@ -8,7 +8,7 @@
         <b-container fluid>
           <div class="card shadow mb-4">
             <b-row class="text-left" align-h="center">
-              <b-col cols="10" class="my-5">
+              <b-col lg="9" md="10" cols="11" class="my-5">
                 <h4 class="text-uppercase">General</h4>
                 <hr class="mb-5" />
 
@@ -165,8 +165,7 @@
                           <b-col col-sm="7">
                             <b-button
                               size="sm"
-                              id="add-discount"
-                              class="px-4 float-right"
+                              class="px-4 mr-3 float-right"
                               variant="primary"
                               v-b-modal.addDiscount
                             >Add</b-button>
@@ -621,11 +620,11 @@ export default {
         { key: "SKUNumber", label: "SKU" },
         {
           key: "attributes",
-          label: "Varient",
+          label: "Variant",
           thClass: "d-none",
           tdClass: "d-none"
         },
-        { key: "combination", label: "Varient" },
+        { key: "combination", label: "Variant" },
         { key: "currentQuantity", label: "Current Qty" },
         { key: "minimumQuantity", label: "Min Qty" },
         { key: "imageCount", label: "Image" },

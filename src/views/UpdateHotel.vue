@@ -18,10 +18,10 @@
           <div class="card shadow mb-4">
             <!-- Main Content -->
             <div id="content">
-              <div class="row mb-4">
+              <div class="row my-4">
                 <b-container fluid>
                   <b-row class="bg-white text-left" align-h="center" align-v="center">
-                    <b-col cols="8" class="my-5">
+                    <b-col lg="8" md="10" cols="11">
                       <b-form class="resource-form">
                         <!-- b-form-group is a wrapper that helps to support labels, help text and feedback -->
                         <b-form-group
@@ -87,11 +87,10 @@
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                          <b-button class="w-25" v-on:click="saveHotel()" variant="primary">Save</b-button>
+                          <b-button v-on:click="saveHotel()" variant="primary">Save</b-button>
                           <b-button
-                            class="w-25"
+                            class="ml-2"
                             v-on:click="cancelButton()"
-                            style="margin-left:2em "
                             variant="secondary"
                           >Cancel</b-button>
                         </b-form-group>
