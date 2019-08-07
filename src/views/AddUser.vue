@@ -140,6 +140,8 @@ export default {
       };
       this.$snack[method](config);
     },
+
+    //add user when admin clicks on the add button.
     addUser() {
       this.validate = true;
       if (this.user.username == "") this.user.username = null;
@@ -172,6 +174,7 @@ export default {
     }
   },
 
+  //get all roles to be displayed as a drop down.
   mounted() {
     this.$store
       .dispatch(GET_ALL_ROLES)

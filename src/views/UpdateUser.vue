@@ -182,6 +182,8 @@ export default {
       };
       this.$snack[method](config);
     },
+
+    //get one user data
     getUserInformation() {
       let id = localStorage.getItem("updateUserId");
 
@@ -207,6 +209,8 @@ export default {
           //this.$router.replace({name:'SummaryOfOrders'});
         });
     },
+
+    //get all roles to be displayed in the dropdown
     getRoles() {
       this.$store
         .dispatch(GET_ALL_ROLES)

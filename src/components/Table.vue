@@ -35,6 +35,12 @@
                 (tableName == 'Deliveries' && (checkedCheckBox.length != 0 && (oneHeaderButton.title=='Update Order Status' || oneHeaderButton.title == 'Delivery Failed')))||
                 (tableName == 'Resource Management' && userRole == 'Admin')"
                 >{{oneHeaderButton.title}}</b-button>
+                <!-- whenever i set up a headerbutton for a new table, i will need to include a table name
+                and make sure the tableName!= 'NewTable'. Then for each table, i can manually control how and when the 
+                headerbutton will appear.
+                
+                checkCheckBox is just an array that contains the item id that are selected.
+                 -->
               </div>
             </b-col>
           </b-row>
@@ -63,6 +69,8 @@
             <!-- <template slot="name" slot-scope="row">
         {{ row.value }} {{ row.value }}
             </template>-->
+
+            <!-- checks all the check box IF the enableCheckBox is true. -->
             <template v-if="enableCheckbox" slot="HEAD_checkbox">
               <b-form-checkbox @change="checkAllCheckBox()" v-model="checkAll"></b-form-checkbox>
             </template>
@@ -77,6 +85,7 @@
             <template slot="actions" slot-scope="row">
               <b-row>
                 <b-col cols="10">
+                  <!-- action button is very similar to the header button. -->
                   <div v-for="oneActionButton in row.item.actions" v-bind:key="oneActionButton">
                     <div
                       v-if="(oneActionButton != null && tableName != 'Resource Management') ||
@@ -97,6 +106,8 @@
                 </b-col>
 
                 <b-col cols="2">
+                  <!-- the drop down at the right side of the row
+                  is only present in the orders table. -->
                   <div v-if="tableName == 'Orders'">
                     <b-dropdown
                       v-if="userRole == 'Admin'"
@@ -128,10 +139,23 @@
               </b-row>
             </template>
 
+          <!-- you can manually control the slot.
+          notice that in the orders table, there is this line of code:
+           {
+          key: "refNo",
+          label: "Ref. No",
+          sortable: true
+        },
+
+        the key is used here to control the columns
+           -->
             <template slot="refNo" slot-scope="row">
               <div style="max-width:80px;">{{row.item.refNo}}</div>
             </template>
 
+            <!-- if there are multiple items, i will do a for loop
+           and it will display multiple items. 
+             -->
             <template slot="items" slot-scope="row">
               <div
                 ref="itemdiv"
@@ -146,6 +170,9 @@
               </div>
             </template>
 
+
+            <!-- images are shown in the orders table, and it has a on
+            click method which downloads the photo. -->
             <template slot="images" slot-scope="row">
               <div
                 ref="imagediv"
@@ -258,31 +285,17 @@ export default {
     imageClick: String
   },
   mounted() {
-    console.log("this.totalRows : " + this.totalRows);
-    console.log(this.enableCheckbox);
     this.userRole = this.$store.getters.userRole;
-    //to redraw the hr line.
-    // if(this.$refs.itemdiv != undefined){
-    //   console.log(this.$refs.itemdiv[0].clientWidth)
-    // this.arrayOfTdWidth.push((this.$refs.itemdiv[0].clientWidth  + (this.$refs.itemdiv[0].clientWidth * 0.75 )) + 'px')
-    // this.arrayOfTdWidth.push((this.$refs.imagediv[0].clientWidth + (this.$refs.imagediv[0].clientWidth * 0.75)) + 'px')
-    // this.arrayOfTdWidth.push((this.$refs.quantitydiv[0].clientWidth + (this.$refs.quantitydiv[0].clientWidth * 0.75 )) + 'px')
-    // console.log(this.arrayOfTdWidth)
-    // this.mounted = true;
-    // console.log(this.mounted)
-    // }
   },
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields
-        .filter(f => f.sortable)
-        .map(f => {
-          return {
-            text: f.label,
-            value: f.key
-          };
-        });
+      return this.fields.filter(f => f.sortable).map(f => {
+        return {
+          text: f.label,
+          value: f.key
+        };
+      });
     }
   },
   watch: {
@@ -307,6 +320,8 @@ export default {
       this.currentPage = 1;
     },
     sortChanged() {
+      //whnever user sort the table based on the columns, i will need to reset
+      //the checkboxes.
       this.checkedCheckBox = [];
       this.checkAll = false;
     },
@@ -315,13 +330,17 @@ export default {
       //emit the eventBus and set the delivery to faile
       eventBus.$emit(this.headerButton[2].title, [orderId]);
     },
+    //this method is used to determine which button was clicked and from which table.
+    //event bus emit events and it will be detected in the orders table.
     onHeaderButtonClick(clickedHeaderTitle) {
       //for summaryoforders
       if (this.tableName == "Orders") {
+        //headerButton[0] is the update status button.
         if (this.headerButton[0].title == clickedHeaderTitle) {
           eventBus.$emit(this.headerButton[0].title, this.checkedCheckBox);
           this.checkedCheckBox = [];
           this.checkAll = false;
+          //headerbutton[1] in this case is download images.
         } else if (this.headerButton[1].title == clickedHeaderTitle) {
           const listOfThumbNailUrl = [];
           let index;
@@ -336,7 +355,6 @@ export default {
               }
             });
           }
-          console.log(listOfThumbNailUrl);
           eventBus.$emit(this.headerButtonClick[1], listOfThumbNailUrl);
         } else if (this.headerButton[2].title == clickedHeaderTitle) {
           eventBus.$emit(this.headerButton[2].title, this.checkedCheckBox);
@@ -383,6 +401,8 @@ export default {
         this.showHeaderButton = false;
       }
 
+      //when items are received or awaiting printing, it will show the header
+      //button: Download Images.
       if (item.status == "Received" || item.status == "Awaiting Printing") {
         this.showDownloadImageButton = true;
       }
@@ -391,18 +411,17 @@ export default {
         this.showDeliveryFailedButton = true;
       }
 
-      console.log(this.showHeaderButton);
       if (this.checkedCheckBox.includes(item.id)) {
         for (index; index < this.checkedCheckBox.length; index++)
           if (this.checkedCheckBox[index] == item.id)
             this.checkedCheckBox.splice(index, 1);
       } else this.checkedCheckBox.push(item.id);
-      console.log(this.checkedCheckBox);
     },
     checkAllCheckBox() {
       console.log(this.items);
       if (this.items.length > 0) {
         let index = 0;
+        //count the no of rows and check all of them.
         let rowsPerPage = this.perPage;
         let shownItems = (this.currentPage - 1) * rowsPerPage;
         // console.log(shownItems)
@@ -447,17 +466,13 @@ export default {
             this.checkedCheckBox[index] = this.items[shownItems + index].id;
           }
         }
-        console.log(this.checkAll);
-        console.log(this.checkedCheckBox);
       }
     },
+    //when a row is click in the orders table, it will redirect them to the orders details.
     myRowClickHandler(record, index) {
       if (this.tableName == "Orders") {
-        console.log(this.items);
-        console.log(index);
         //get orderid to show in the orderdetails
         localStorage.setItem("viewOrderId", record.id);
-        console.log(localStorage.getItem("viewOrderId"));
         this.$router.replace({
           name: "OrderDetails"
         });

@@ -99,10 +99,6 @@
                   </b-row>
                 </b-container>
 
-                <b-modal @ok="handleok()" id="deleteHotel" title="Delete Hotel">
-                  <p>Are you sure you want to delete this Hotel?</p>
-                  <p>This action cannot be undone.</p>
-                </b-modal>
               </div>
             </div>
           </div>
@@ -171,6 +167,7 @@ export default {
       };
       this.$snack[method](config);
     },
+    //get hotel using hotel id that is stored in the local storage.
     getHotelInformation() {
       this.hotel.id = localStorage.getItem("updateHotelId");
 
@@ -223,18 +220,6 @@ export default {
             this.message("danger", error);
           });
       }
-    },
-    handleok() {
-      this.$store
-        .dispatch(DELETE_HOTEL, this.hotel.id)
-        .then(response => {
-          this.message("success", response.message);
-          this.$router.replace({ name: "HotelManagement" });
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error.response.data.message);
-        });
     }
   },
   mounted() {

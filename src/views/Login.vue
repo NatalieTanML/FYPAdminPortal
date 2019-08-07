@@ -91,6 +91,8 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
+
+    //checks whether the email and password is correct or not.
     validate() {
       const { email, password } = this;
 

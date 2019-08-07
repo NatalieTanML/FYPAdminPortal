@@ -82,14 +82,14 @@ export default {
   },
   data() {
     return {
-      noOfTabs: 0,
-      selectedTab: 0,
       pad: null,
       sortBy: "date",
       ordertitle: null,
       orderIds: [],
       enableCheckbox: true,
 
+      // headerbutton is the button at the top right of the table
+      //headerbuttonclick will be used to determine which button was clicked.
       headerButtonClick: ["Update Order Status", "Delivery Failed"],
       headerButton: [
         {
@@ -101,6 +101,7 @@ export default {
           title: "Delivery Failed"
         }
       ],
+
       actionButtonClick: "Delivery Signature",
       recipientName: null,
       items: [],
@@ -146,12 +147,14 @@ export default {
       this.$snack[method](config);
       // this.$snack[method](config)
     },
+    //resets the modal dialog details
     resetDetails() {
       this.recipientName = null;
       this.ordertitle = null;
       this.orderids = [];
     },
 
+    //get modal details to be saved in the database.
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 
@@ -183,104 +186,102 @@ export default {
             this.message("danger", error);
           });
       }
-    },
-    highlightRows(orders) {
-      for (var i = 0; i < orders.length; i++) {
-        for (var y = 0; y < this.items.length; y++)
-          if (orders[i].orderId == this.items[y].id)
-            this.$set(this.items[y], "_rowVariant", "primary");
-      }
-    },
-    getAddressOrHotelName(response) {
-      console.log("getaddressorhotel", response);
-      var addressOrHotel = null;
+    }
+  },
+  //check whether the order is to be delivered to hotel or an address.
+  getAddressOrHotelName(response) {
+    console.log("getaddressorhotel", response);
+    var addressOrHotel = null;
 
-      if (response.address.hotel.hotelName != null)
-        addressOrHotel = response.address.hotel.hotelName;
-      else
-        addressOrHotel =
-          response.address.addressLine1 + ", " + response.address.addressLine2;
+    if (response.address.hotel.hotelName != null)
+      addressOrHotel = response.address.hotel.hotelName;
+    else
+      addressOrHotel =
+        response.address.addressLine1 + ", " + response.address.addressLine2;
 
-      if (
-        response.address.addressLine1 == null ||
-        response.address.addressLine1 == ""
-      )
-        addressOrHotel = "Self-Pick Up";
+    if (
+      response.address.addressLine1 == null ||
+      response.address.addressLine1 == ""
+    )
+      addressOrHotel = "Self-Pick Up";
 
-      return addressOrHotel;
-    },
-    getAndUpdateMultipleOrders(ids) {
-      this.$store
-        .dispatch(GET_MULTIPLE_ORDERS, ids)
-        .then(response => {
-          console.log("Get multiple orders : ", response);
+    return addressOrHotel;
+  },
 
-          // let updatedOrderList = [];
-          // response.forEach(updatedOrder => {
-          //   updatedOrderList.push({
-          //     orderId: updatedOrder.orderId,
-          //     statusId: updatedOrder.statusId,
-          //     statusName: updatedOrder.status
-          //   });
-          // });
+  //when multiple orders are updated, this method will be used to update the table.
+  getAndUpdateMultipleOrders(ids) {
+    this.$store
+      .dispatch(GET_MULTIPLE_ORDERS, ids)
+      .then(response => {
+        console.log("Get multiple orders : ", response);
 
-          this.updateCurrentOrders(response);
-        })
-        .catch(error => {
-          console.dir(error);
-          this.message("danger", error);
-        });
-    },
-    updateCurrentOrders(orders) {
-      console.log("updateCurrentOrders : ", orders);
-      //update current items's statuses and actions
-      let updatedOrders = orders;
-      let x;
-      for (x = 0; x < this.items.length; x++) {
-        updatedOrders.forEach((oneUpdatedOrder, index) => {
-          //if there are new records of orders that needs to be delivered,
-          //i will populate the table, or else i will take the item out from the
-          //table. this is because i use this method when i update the status from out for delivery to completed
-          //of the order too.
-          console.log("one updated order : ", oneUpdatedOrder);
-          if (this.items[x].id == oneUpdatedOrder.orderId) {
-            this.items.splice(x, 1);
-          }
-        });
-      }
+        this.updateCurrentOrders(response);
+      })
+      .catch(error => {
+        console.dir(error);
+        this.message("danger", error);
+      });
+  },
 
+  //update current orders if there is a change in database records.
+  updateCurrentOrders(orders) {
+    console.log("updateCurrentOrders : ", orders);
+    //update current items's statuses and actions
+    let updatedOrders = orders;
+    let x;
+
+    for (x = 0; x < this.items.length; x++) {
       updatedOrders.forEach((oneUpdatedOrder, index) => {
-        console.log(index + ". ", oneUpdatedOrder);
-        if (
-          oneUpdatedOrder.status == "Out for Delivery" &&
-          oneUpdatedOrder.deliveryManId == this.$store.getters.userId
-        ) {
-          var itemLength = this.items.push({
-            id: oneUpdatedOrder.orderId,
-            refNo: oneUpdatedOrder.referenceNo,
-            date: new Date(
-              Date.parse(oneUpdatedOrder.createdAt)
-            ).toLocaleString(),
-            items: oneUpdatedOrder.orderItems,
-            address: this.getAddressOrHotelName(oneUpdatedOrder),
-            actions: ["Delivered"]
-          });
-
-          this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
-          console.log("one new updated item : ", this.items);
+        //if there are new records of orders that needs to be delivered,
+        //i will populate the table, or else i will take the item out from the
+        //table. this is because i use this method when i update the status from out for delivery to completed
+        //of the order too.
+        console.log("one updated order : ", oneUpdatedOrder);
+        if (this.items[x].id == oneUpdatedOrder.orderId) {
+          this.items.splice(x, 1);
         }
       });
     }
+
+    //if there are new orders, it will be pushed to the table instead of updating
+    //current records.
+    updatedOrders.forEach((oneUpdatedOrder, index) => {
+      console.log(index + ". ", oneUpdatedOrder);
+      if (
+        oneUpdatedOrder.status == "Out for Delivery" &&
+        oneUpdatedOrder.deliveryManId == this.$store.getters.userId
+      ) {
+        var itemLength = this.items.push({
+          id: oneUpdatedOrder.orderId,
+          refNo: oneUpdatedOrder.referenceNo,
+          date: new Date(
+            Date.parse(oneUpdatedOrder.createdAt)
+          ).toLocaleString(),
+          items: oneUpdatedOrder.orderItems,
+          address: this.getAddressOrHotelName(oneUpdatedOrder),
+          actions: ["Delivered"]
+        });
+
+        this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
+        console.log("one new updated item : ", this.items);
+      }
+    });
   },
+
   async mounted() {
+    //headerButtonClick[0] is when the first header button is clicked.
+    //in this case, it is the Update Order Status button
     eventBus.$on(this.headerButtonClick[0], listOfOrderIds => {
       this.ordertitle = "Multiple Orders";
       this.orderIds = listOfOrderIds;
       this.$bvModal.show("showSignatureDialog");
     });
 
+    //headerButtonClick[0] is when the first header button is clicked.
+    //in this case, it is the Delivery Failed button
     eventBus.$on(this.headerButtonClick[1], listOfOrderIds => {
       var isSuccessful = false;
+      //isSuccessful is false because delivery failed
 
       const jsonData = {
         orderIds: listOfOrderIds,
@@ -306,6 +307,7 @@ export default {
       this.$bvModal.show("showSignatureDialog");
     });
 
+    //get all orders to be displated in the table.
     this.$store
       .dispatch(GET_ALL_ORDERS)
       .then(response => {
@@ -313,7 +315,6 @@ export default {
         for (x = 0; x < response.length; x++) {
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
-
           if (
             (response[x].Address != "Self-Pick Up" &&
               (response[x].status == "Out for Delivery" &&
@@ -326,9 +327,9 @@ export default {
             this.items.push({
               id: response[x].orderId,
               refNo: response[x].referenceNo,
-              date: new Date(
-                Date.parse(response[x].createdAt)
-              ).toLocaleString("en-SG"),
+              date: new Date(Date.parse(response[x].createdAt)).toLocaleString(
+                "en-SG"
+              ),
               items: response[x].orderItems,
               address: addressOrHotel,
               actions: ["Delivered"]

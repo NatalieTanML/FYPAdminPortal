@@ -19,6 +19,7 @@
           <div id="content">
             <div class="row mb-4">
               <ul class="nav" ref="tabs">
+                <!-- Example of tabs are Printed, Awaiting Printing, etc. -->
                 <DashboardTabs
                   v-for="tab in this.Tabs"
                   v-bind:key="tab.id"
@@ -125,6 +126,9 @@ export default {
     return {
       connection: null,
       //have multiple buttons
+
+      // summary of orders contains 3 headerbuttons. Different buttons for different
+      //kind of tabs.
       headerButtonClick: [
         "Update Order Status",
         "Download Images",
@@ -208,11 +212,14 @@ export default {
   computed: {},
 
   async mounted() {
+    //get user role to show different tabs for differnt users.
     this.userRole = this.$store.getters.userRole;
 
     //to be shown in a modal dialog when order status
     this.getAllDeliveryMan();
 
+    //get all status in the database to set up the tabs.
+    // the status ARE the tabs.
     this.$store
       .dispatch(GET_ALL_STATUS)
       .then(response => {
@@ -221,6 +228,9 @@ export default {
         let x = 1;
         console.log(response);
 
+        //typeoftabs are an aarray of strings that contains all the
+        //status in the database.
+        //first one being All.
         this.typesOfTabs[0] = "All";
         for (x; x < response.length + 1; x++)
           if (
@@ -228,8 +238,6 @@ export default {
           )
             this.typesOfTabs.push(response[x - 1].statusName);
 
-        //had to hardcode the last tab string.
-        // this.typesOfTabs[x] = response[x - 1].statusName;
         this.getAllOrders();
       })
       .catch(error => {
@@ -253,9 +261,7 @@ export default {
             } else if (oneItem.status == "Printed") {
               console.log(oneItem.deliveryManId);
               if (oneItem.deliveryManId == null) {
-                console.log("isnullboys");
                 showDeliveryModal = true;
-                console.log(showDeliveryModal);
               }
               needAssignDeliveryMan = true;
             }
@@ -263,6 +269,8 @@ export default {
         });
       });
 
+      //is successful is needed to let controller know that
+      //the status is successfully uploaded.
       var isSuccessful = true;
       if (!needsSignature && !needAssignDeliveryMan) {
         this.updateStatusTabsAndTable(orderIds, isSuccessful);
@@ -314,8 +322,9 @@ export default {
       this.downloadImages(listOfThumbNailUrl);
     });
 
+    //cancelorder is called when the admin dropdown the 3 dots at the end of the row
+    //and click cancel order
     eventBus.$on("cancelOrder", orderIds => {
-      console.log("eventbus cancelorder", orderIds);
       var isSuccessful = false;
       this.updateStatusTabsAndTable(orderIds, isSuccessful);
     });
@@ -386,6 +395,9 @@ export default {
         })
         .catch(error => {});
     },
+    //is used when the order is Printed and admin tries to update
+    //the status. and if the order has not been assigned a delivery person
+    //the modal dialog will appear.
     updateDeliveryman() {
       for (var i = 0; i < this.allDeliverymen.length; i++) {
         if (this.allDeliverymen[i].email == this.selectedDeliveryMan) {
@@ -480,6 +492,7 @@ export default {
 
           this.highlightRows(response);
           this.updateCurrentOrders(response);
+          //setUpTabs is called whenever the items are changed.
           this.setUpTabs();
         })
         .catch(error => {
@@ -487,6 +500,7 @@ export default {
           this.message("danger", error);
         });
     },
+    //on tab change is called when user presses a tab or when the setUpTabs is called.
     onTabChange(id) {
       //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
       //reason why i don't use const ^ is because when the data is displayed,
@@ -521,10 +535,13 @@ export default {
       else this.enableCheckbox = true;
     },
 
+    //setuptabs again.
     setUpTabs() {
       let x;
       let index;
       let numberOfRows = 0;
+      //this array will be sent to the DashboardTabs component.
+      //is it used to count how many items there are in the tab and display it.
       this.arrayOfNumberOfRows = [];
       //index is 1 so as to skip the All tab. then i push a 0 on the first
       //number of the arrayofNumberOfRows.
@@ -546,6 +563,7 @@ export default {
       this.Tabs = [];
       for (x = 0; x < typesOfTabs.length; x++)
         //initialize the tabs to get title, id and isDark.
+        //and be sent the the dashboard tab component to render.
         this.Tabs[x] = {
           title: typesOfTabs[x],
           id: x,
@@ -594,6 +612,9 @@ export default {
           this.message("danger", error);
         });
     },
+    //update current orders gets orders that are updated, and update the
+    //current items. this only causes items that are affected to change, and
+    //not the whole table.
     updateCurrentOrders(orders) {
       //update current items's statuses and actions
       console.log("updated orders : ", orders);
@@ -612,6 +633,8 @@ export default {
         });
       }
 
+      //if the updated orders does not contain any of the exisitng items
+      //it will be pushed to the table instead, because the item does not exist.
       if (!itemsContainsUpdatedOrder) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
           console.log("updated order(@)", oneUpdatedOrder);
@@ -633,6 +656,9 @@ export default {
         });
       }
     },
+
+    //is used to down the images, whenever the user click on the image itself
+    //or when the user selects multiple items and click on the header button.
     downloadImages(listOfThumbNailUrl) {
       console.log("downloadImages : " + listOfThumbNailUrl);
       this.$store
@@ -678,6 +704,8 @@ export default {
       console.log("skus", skus);
       this.message("danger", "Low stock count for" + skus + "!");
     },
+    //when items are out for delivery and admin tries to update the status
+    //it will prompt the modal dialog.
     getModalDetails() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 

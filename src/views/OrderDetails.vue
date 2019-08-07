@@ -207,11 +207,13 @@ export default {
   },
 
   methods: {
+    //if the admin clicks on the edit button at the top right.
     editOrder() {
       const orderId = localStorage.getItem("viewOrderId");
       localStorage.setItem("editOrderId", orderId);
       this.$router.replace({ name: "EditOrderDetails" });
     },
+    //if admin clicks on the image, it will be downloaded to their computer.
     onImageClick(thumbNailUrl) {
       console.log(thumbNailUrl);
       var listOfThumbNailUrl = [];
@@ -242,35 +244,12 @@ export default {
           console.dir(error);
           this.message("danger", error);
         });
-    },
-    getAction(status) {
-      if (status == "Received") return "Accept Order";
-      else if (status == "Awaiting Printing") return "Print";
-      else if (status == "Printed") return "Deliver";
-      else if (status == "Out for Delivery") return "Delivered";
-      else if (status == "Completed") return null;
-      else if (status == "Delivery Failed") return "Re-Deliver";
-      else if (status == "Cancelled") return null;
-      else return null;
     }
-    // populateTable() {
-    //   for (var i = 0; i < this.orderItems.length; i++) {
-    //     this.orderItems.push({
-    //       item:
-    //         this.order[i].options.product.productName +
-    //         this.attribute[i] +
-    //         this.order[i].options.skuNumber,
-    //       image: this.order[i].orderImageKey,
-    //       qty: this.order[i].quantity
-    //     });
-    //   }
-
-    //   console.log("orderItems: ", this.orderItems);
-    // }
   },
   mounted() {
     const orderId = localStorage.getItem("viewOrderId");
 
+    //get order using order id.
     this.$store
       .dispatch(ORDER_GET_REQUEST, orderId)
       .then(response => {

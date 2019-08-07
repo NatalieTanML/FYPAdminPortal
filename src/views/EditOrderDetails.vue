@@ -216,6 +216,7 @@
                             id="exampleFormControlSelect1"
                             @change="onSelectChange($event)"
                           >
+                          <!-- JSON.stringify the oneHotel to be shown as a hotel object. -->
                             <option
                               v-for="oneHotel in hotels"
                               v-bind:key="oneHotel.value"
@@ -327,6 +328,8 @@ export default {
     cancelButton() {
       this.$router.replace({ name: "SummaryOfOrders" });
     },
+
+    //when user clicks on the image, the image will be downloded to his computer.
     onImageClick(thumbNailUrl) {
       console.log(thumbNailUrl);
       var listOfThumbNailUrl = [];
@@ -339,6 +342,7 @@ export default {
 
           var interval = setInterval(download, 300, response.imgUrls);
 
+          //create a <a> element to download the image in a new tab.
           function download(urls) {
             var url = urls.pop();
             console.log(url);
@@ -358,19 +362,11 @@ export default {
           this.message("danger", error);
         });
     },
+    //the event was stringify in the html portion. it is used to get the hotel obkect.
     onSelectChange(event) {
       this.selectedHotel = JSON.parse(event.target.value);
     },
-    getAction(status) {
-      if (status == "Received") return "Accept Order";
-      else if (status == "Awaiting Printing") return "Print";
-      else if (status == "Printed") return "Deliver";
-      else if (status == "Out for Delivery") return "Delivered";
-      else if (status == "Completed") return null;
-      else if (status == "Delivery Failed") return "Re-Deliver";
-      else if (status == "Cancelled") return null;
-      else return null;
-    },
+
     getAllDeliveryTypes() {
       this.$store
         .dispatch(GET_ALL_DELIVERY_TYPES)
@@ -539,6 +535,8 @@ export default {
           this.message("danger", error);
         });
     },
+
+    //get whether the order is to be deliverd to hotel, address or just self-pick up.
     getDeliveryTypeId() {
       let id;
       this.deliveryTypes.forEach((element, index) => {

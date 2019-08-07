@@ -75,6 +75,9 @@ export default {
     return {
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
+
+      // headerbutton is the button at the top right of the table
+      //headerbuttonclick will be used to determine which button was clicked.
       headerButton: [{ id: 1, title: "Assign/Update Delivery Man" }],
       headerButtonClick: ["Assign/Update Delivery Man"],
       id: "",
@@ -280,6 +283,7 @@ export default {
       } else return "Postalcode does not match any district in Singapore";
     },
 
+    //get all orders to be displayed in the table.
     getAllOrders() {
       this.items = [];
       this.$store
@@ -342,6 +346,7 @@ export default {
         });
     },
 
+    //this method is used to assign the delivery person to one or multiple orders.
     updateDeliveryman() {
       for (var i = 0; i < this.allDeliverymen.length; i++) {
         if (this.allDeliverymen[i].email == this.selected) {
@@ -364,6 +369,7 @@ export default {
       }
     },
 
+    //highlight rows when you orders are updated.
     highlightRows(orders) {
       let idsToUpdate = [];
       for (var i = 0; i < orders.length; i++) {
@@ -379,6 +385,8 @@ export default {
         }
       }
     },
+
+    //check whether the order is to be delivered to hotel or an address.
     getAddressOrHotelName(response) {
       console.log("getaddressorhotel", response);
       var addressOrHotel = null;
@@ -400,15 +408,23 @@ export default {
   },
 
   async mounted() {
+    //when action button is clicked, it will show the modal dialog.
     eventBus.$on(this.actionButtonClick, id => {
       this.$bvModal.show("delivery-routes-modal");
       this.orderIds.push(id);
     });
+
+    //when header button is clicked, it will show the modal dialog.
+    //header button allows multiple orders to be signed at once.
     eventBus.$on(this.headerButtonClick[0], orderIds => {
       this.orderIds = orderIds;
       this.$bvModal.show("delivery-routes-modal");
     });
+
+    //get all orders to be shown in the table.
     this.getAllOrders();
+
+    //get delivery persons to be shown in the drop down in the modal dialog.
     this.$store
       .dispatch(GET_ALL_DELIVERYMEN)
       .then(response => {

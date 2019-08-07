@@ -97,14 +97,13 @@ export default {
       this.$router.replace({ name: "UpdateHotel" });
     });
 
+    //get all hotels to be displayed in the table.
     this.$store
       .dispatch(GET_ALL_HOTELS)
       .then(response => {
         console.log(response);
 
         for (var x = 0; x < response.length; x++) {
-          //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
-          //item: response[x].orderItems[0].options[0].product.productName,
           this.items.push({
             id: response[x].value,
             name: response[x].text,

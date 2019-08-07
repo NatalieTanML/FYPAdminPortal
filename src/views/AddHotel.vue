@@ -144,6 +144,8 @@ export default {
       };
       this.$snack[method](config);
     },
+
+    //add a new hotel
     addHotel() {
       this.validate = true;
       if (this.hotel.name == "") this.hotel.name = null;

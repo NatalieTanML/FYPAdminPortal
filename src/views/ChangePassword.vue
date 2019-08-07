@@ -115,7 +115,10 @@ export default {
       };
       this.$snack[method](config);
     },
+
+    //calls the update user controller.
     changePassword() {
+      //if validate is true, it will start validating the inputs
       this.validate = true;
       console.log(this.$v.newConfirmPassword.samePassword);
       if (this.oldPassword == "") this.oldPassword = null;
@@ -154,6 +157,7 @@ export default {
       }
     },
 
+    //let the user go back to the previous page(where he/she was from.)
     goBack() {
       let previousPathName = localStorage.getItem("previousPathName");
       console.log(previousPathName);
