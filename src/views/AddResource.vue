@@ -673,7 +673,7 @@ export default {
 
       effectiveStartDate: {
         required,
-        // Check if start date is equal or greater than end date
+        // Check if start date is greater than or equal to end date
         checkDate(startDate) {
           let endDate = this.form.effectiveEndDate;
           if (endDate == "" || endDate == null) return true;
@@ -700,7 +700,8 @@ export default {
             let regex = /^\d+(\.\d{1,2})?$/;
             return regex.test(value);
           },
-          // Check if value is greater than 0 and less than or equal to 100 for percentage discount
+          // Ensure that discount price is greater than 0
+          // and less than or equal to 100 for percentage discount
           maxPercentageValue(value, discountObject) {
             if (value === "") return true;
             if (discountObject.discountType === "Percentage") {

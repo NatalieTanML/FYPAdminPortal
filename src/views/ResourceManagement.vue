@@ -210,7 +210,6 @@ export default {
       }
       if (jsonData.actionButton == "View") {
         localStorage.setItem("viewResourceId", jsonData.item.productId);
-        // this.$router.replace({ name: "ViewResource" });
         let routeData = this.$router.resolve({
           name: "ViewResource"
         });
@@ -317,12 +316,13 @@ export default {
   },
   methods: {
     setUpTabs() {
-      // Number of rows for each tab except for the first tab "All Resources"
+      // Initialize the number of rows for each tab except for the first tab: "All Resources"
       this.arrayOfNumberOfRows = [, 0, 0, 0];
 
       this.products.forEach(product => {
         product.options.forEach(option => {
-          // An option can have one or more status. Hence, we are declaring an array
+          // A product can belong in one or more statuses (tab). For example,
+          // "Out of Stock" and "Not Visible". Hence, we are declaring an array
           option.status = [];
 
           if (option.currentQuantity === 0) {
@@ -350,6 +350,7 @@ export default {
             this.arrayOfNumberOfRows[3] += 1;
             option.status.push("Not Visible");
           }
+          // All products will belong to the "All Resources" tab
           option.status.push("All Resources");
         });
       });
@@ -387,7 +388,7 @@ export default {
       let sortBy = this.typesOfTabs[id];
       let sortedIndex = 0;
 
-      // Retrieve the product options related to the active tab
+      // Retrieve the product based on their status
       this.products.forEach(product => {
         product.options.forEach(option => {
           if (option.status.includes(sortBy)) {
