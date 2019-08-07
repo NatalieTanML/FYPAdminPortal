@@ -17,7 +17,6 @@
               :class="`slide--${index}`"
             >
               <ExpandableImage :src="slide"></ExpandableImage>
-              <!-- <img :src="slide" /> -->
             </div>
           </agile>
 
@@ -258,7 +257,7 @@ export default {
             });
           });
 
-          // If there is only one image, we will not set up the thumbnail carousel
+          // If there is none/one image, we will not set up the thumbnail carousel
           if (this.slides.length <= 1) {
             this.onlyOneImage = true;
           } else {

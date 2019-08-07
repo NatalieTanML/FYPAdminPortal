@@ -525,7 +525,6 @@ import DiscountForm from "@/components/DiscountForm";
 import {
   UPLOAD_PRODUCT_IMAGES,
   DELETE_PRODUCT_IMAGES,
-  UPLOAD_AND_DELETE_PRODUCT_IMAGES,
   GET_ONE_PRODUCT,
   UPDATE_ONE_PRODUCT
 } from "@/store/actions/product";
