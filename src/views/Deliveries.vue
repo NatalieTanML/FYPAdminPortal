@@ -186,8 +186,8 @@ export default {
             this.message("danger", error);
           });
       }
-    }
-  },
+    },
+  
   //check whether the order is to be delivered to hotel or an address.
   getAddressOrHotelName(response) {
     console.log("getaddressorhotel", response);
@@ -266,6 +266,7 @@ export default {
         console.log("one new updated item : ", this.items);
       }
     });
+  },
   },
 
   async mounted() {
