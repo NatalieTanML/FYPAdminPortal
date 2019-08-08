@@ -98,7 +98,6 @@
                     </b-col>
                   </b-row>
                 </b-container>
-
               </div>
             </div>
           </div>
@@ -214,6 +213,7 @@ export default {
           .dispatch(UPDATE_ONE_HOTEL, hotelStr)
           .then(response => {
             this.message("success", response.message);
+            this.$router.replace({ name: "HotelManagement" });
           })
           .catch(error => {
             this.message("danger", error);

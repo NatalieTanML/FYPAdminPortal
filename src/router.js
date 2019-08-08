@@ -32,7 +32,7 @@ Vue.use(Router);
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
 let router = new Router({
-  mode: "history",
+  // mode: "history",
   routes: [
     {
       path: "/Login",
@@ -303,8 +303,12 @@ router.beforeEach((to, from, next) => {
 
   //if people try to access the updateuser page by typing in the url, it will just
   //redirect them to usermanagement
-  if (to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
+  if (
+    to.name == "UpdateUser" &&
+    localStorage.getItem("updateUserId") == "null"
+  ) {
     next({ path: "/UserManagement" });
+  }
 
   //if admin leaves the orderdetails page, orderdetails page will reset.
   if (to.name != "OrderDetails" && localStorage.getItem("viewOrderId") != null)
@@ -402,6 +406,17 @@ router.beforeEach((to, from, next) => {
       eventBus.$off(Deliveries.data().headerButtonClick[index]);
     }
     eventBus.$off(Deliveries.data().actionButtonClick);
+  }
+
+  if (from.name == "ResourceManagement") {
+    eventBus.$off(ResourceManagement.data().headerButtonClick[index]);
+    for (
+      index = 0;
+      index < ResourceManagement.data().actionButtonClick.length;
+      index++
+    ) {
+      eventBus.$off(ResourceManagement.data().actionButtonClick);
+    }
   }
 });
 

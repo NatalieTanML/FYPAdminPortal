@@ -15,7 +15,7 @@ export default {
   created() {
     this.hasLogin = true;
     if (this.hasLogin) {
-      this.$router.push("/Login");
+      // this.$router.push("/Login");
     }
   }
 };

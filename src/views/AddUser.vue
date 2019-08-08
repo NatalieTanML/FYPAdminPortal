@@ -71,6 +71,11 @@
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
                           <b-button v-on:click="addUser" variant="primary">Add User</b-button>
+                          <b-button
+                            v-on:click="cancelButton()"
+                            class="ml-2"
+                            variant="secondary"
+                          >Cancel</b-button>
                         </b-form-group>
                       </b-form>
                     </b-col>
@@ -140,7 +145,9 @@ export default {
       };
       this.$snack[method](config);
     },
-
+    cancelButton() {
+      this.$router.replace({ name: "UserManagement" });
+    },
     //add user when admin clicks on the add button.
     addUser() {
       this.validate = true;
@@ -164,11 +171,11 @@ export default {
           .dispatch(ADD_USER, userStr)
           .then(response => {
             this.message("success", response.message);
+            this.$router.replace({ name: "UserManagement" });
           })
           .catch(error => {
             console.dir(error);
             this.message("danger", error.response.data.message);
-            //this.$router.replace({name:'SummaryOfOrders'});
           });
       }
     }

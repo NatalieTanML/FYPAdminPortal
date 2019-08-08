@@ -76,8 +76,21 @@
                           >Hotel postal code is required!</div>
                         </b-form-group>
 
+                        <b-form-group
+                          label-cols-sm="3"
+                          label="Is Enabled"
+                          label-for="input-horizontal"
+                        >
+                          <b-form-checkbox v-model="isEnabled" name="check-button" size="lg" switch></b-form-checkbox>
+                        </b-form-group>
+
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
                           <b-button v-on:click="addHotel" variant="primary">Add Hotel</b-button>
+                          <b-button
+                            class="ml-2"
+                            v-on:click="cancelButton()"
+                            variant="secondary"
+                          >Cancel</b-button>
                         </b-form-group>
                       </b-form>
                     </b-col>
@@ -118,7 +131,8 @@ export default {
         name: null,
         address: null,
         postalCode: null
-      }
+      },
+      isEnabled: false
     };
   },
 
@@ -144,7 +158,9 @@ export default {
       };
       this.$snack[method](config);
     },
-
+    cancelButton() {
+      this.$router.replace({ name: "HotelManagement" });
+    },
     //add a new hotel
     addHotel() {
       this.validate = true;
@@ -162,13 +178,15 @@ export default {
         const hotelStr = {
           HotelName: this.hotel.name,
           HotelAddress: this.hotel.address,
-          HotelPostalCode: this.hotel.postalCode
+          HotelPostalCode: this.hotel.postalCode,
+          IsActive: this.isEnabled
         };
 
         this.$store
           .dispatch(CREATE_HOTEL, hotelStr)
           .then(response => {
             this.message("success", response.message);
+            this.$router.replace({ name: "HotelManagement" });
           })
           .catch(error => {
             console.dir(error);

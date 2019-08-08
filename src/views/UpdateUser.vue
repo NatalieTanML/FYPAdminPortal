@@ -253,6 +253,7 @@ export default {
           .dispatch(UPDATE_ONE_USER, userStr)
           .then(response => {
             this.message("success", response.message);
+            this.$router.replace({ name: "UserManagement" });
           })
           .catch(error => {
             this.message("danger", error);
