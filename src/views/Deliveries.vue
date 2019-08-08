@@ -183,81 +183,81 @@ export default {
             this.message("danger", error);
           });
       }
-    }
-  },
-  //check whether the order is to be delivered to hotel or an address.
-  getAddressOrHotelName(response) {
-    var addressOrHotel = null;
+    },
 
-    if (response.address.hotel.hotelName != null)
-      addressOrHotel = response.address.hotel.hotelName;
-    else
-      addressOrHotel =
-        response.address.addressLine1 + ", " + response.address.addressLine2;
+    //check whether the order is to be delivered to hotel or an address.
+    getAddressOrHotelName(response) {
+      var addressOrHotel = null;
 
-    if (
-      response.address.addressLine1 == null ||
-      response.address.addressLine1 == ""
-    )
-      addressOrHotel = "Self-Pick Up";
+      if (response.address.hotel.hotelName != null)
+        addressOrHotel = response.address.hotel.hotelName;
+      else
+        addressOrHotel =
+          response.address.addressLine1 + ", " + response.address.addressLine2;
 
-    return addressOrHotel;
-  },
+      if (
+        response.address.addressLine1 == null ||
+        response.address.addressLine1 == ""
+      )
+        addressOrHotel = "Self-Pick Up";
 
-  //when multiple orders are updated, this method will be used to update the table.
-  getAndUpdateMultipleOrders(ids) {
-    this.$store
-      .dispatch(GET_MULTIPLE_ORDERS, ids)
-      .then(response => {
-        this.updateCurrentOrders(response);
-      })
-      .catch(error => {
-        console.dir(error);
-        this.message("danger", error);
-      });
-  },
+      return addressOrHotel;
+    },
 
-  //update current orders if there is a change in database records.
-  updateCurrentOrders(orders) {
-    //update current items's statuses and actions
-    let updatedOrders = orders;
-    let x;
+    //when multiple orders are updated, this method will be used to update the table.
+    getAndUpdateMultipleOrders(ids) {
+      this.$store
+        .dispatch(GET_MULTIPLE_ORDERS, ids)
+        .then(response => {
+          this.updateCurrentOrders(response);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
 
-    for (x = 0; x < this.items.length; x++) {
+    //update current orders if there is a change in database records.
+    updateCurrentOrders(orders) {
+      //update current items's statuses and actions
+      let updatedOrders = orders;
+      let x;
+
+      for (x = 0; x < this.items.length; x++) {
+        updatedOrders.forEach((oneUpdatedOrder, index) => {
+          //if there are new records of orders that needs to be delivered,
+          //i will populate the table, or else i will take the item out from the
+          //table. this is because i use this method when i update the status from out for delivery to completed
+          //of the order too.
+          if (this.items[x].id == oneUpdatedOrder.orderId) {
+            this.items.splice(x, 1);
+          }
+        });
+      }
+
+      //if there are new orders, it will be pushed to the table instead of updating
+      //current records.
       updatedOrders.forEach((oneUpdatedOrder, index) => {
-        //if there are new records of orders that needs to be delivered,
-        //i will populate the table, or else i will take the item out from the
-        //table. this is because i use this method when i update the status from out for delivery to completed
-        //of the order too.
-        if (this.items[x].id == oneUpdatedOrder.orderId) {
-          this.items.splice(x, 1);
+        if (
+          oneUpdatedOrder.status == "Out for Delivery" &&
+          oneUpdatedOrder.deliveryManId == this.$store.getters.userId
+        ) {
+          var itemLength = this.items.push({
+            id: oneUpdatedOrder.orderId,
+            refNo: oneUpdatedOrder.referenceNo,
+            date: new Date(
+              Date.parse(oneUpdatedOrder.createdAt)
+            ).toLocaleString(),
+            items: oneUpdatedOrder.orderItems,
+            address: this.getAddressOrHotelName(oneUpdatedOrder),
+            actions: ["Delivered"]
+          });
+
+          this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
         }
       });
     }
-
-    //if there are new orders, it will be pushed to the table instead of updating
-    //current records.
-    updatedOrders.forEach((oneUpdatedOrder, index) => {
-      if (
-        oneUpdatedOrder.status == "Out for Delivery" &&
-        oneUpdatedOrder.deliveryManId == this.$store.getters.userId
-      ) {
-        var itemLength = this.items.push({
-          id: oneUpdatedOrder.orderId,
-          refNo: oneUpdatedOrder.referenceNo,
-          date: new Date(
-            Date.parse(oneUpdatedOrder.createdAt)
-          ).toLocaleString(),
-          items: oneUpdatedOrder.orderItems,
-          address: this.getAddressOrHotelName(oneUpdatedOrder),
-          actions: ["Delivered"]
-        });
-
-        this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
-      }
-    });
   },
-
   async mounted() {
     //headerButtonClick[0] is when the first header button is clicked.
     //in this case, it is the Update Order Status button
@@ -336,7 +336,6 @@ export default {
 
     // Establish hub methods
     this.connection.on("OneOrder", orderId => {
-
       var orderIds = [orderId];
 
       this.getAndUpdateMultipleOrders(orderIds);
@@ -351,8 +350,7 @@ export default {
     // start the connection
     this.connection
       .start()
-      .then(() => {
-      })
+      .then(() => {})
       .catch(err => console.log(err));
   },
 

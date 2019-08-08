@@ -216,6 +216,9 @@ let router = new Router({
 router.beforeEach((to, from, next) => {
   localStorage.setItem("previousPathName", from.name);
 
+  console.log("To : " + to.path);
+  console.log("From : " + from.path);
+
   //if people try to go to the login page after they logged in,
   //they will be redirected to summaryoforders
   if (
@@ -233,7 +236,6 @@ router.beforeEach((to, from, next) => {
       });
   }
 
-
   //start of validation pages that needs authentication.
   //if user is authenticated, it will validate whether the page he is going is
   //allowed, or else it will just route him back to login page.
@@ -247,7 +249,6 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.needNewPassword)) {
       //if user needs to change password.
       if (!store.getters.changePassword && to.path != "/ChangePassword") {
-
         next({
           path: "/ChangePassword"
           //params: { nextUrl: to.fullPath }
