@@ -331,13 +331,11 @@ export default {
 
     //when user clicks on the image, the image will be downloded to his computer.
     onImageClick(thumbNailUrl) {
-      console.log(thumbNailUrl);
       var listOfThumbNailUrl = [];
       listOfThumbNailUrl.push(thumbNailUrl);
       this.$store
         .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
         .then(response => {
-          console.log(response);
           let index;
 
           var interval = setInterval(download, 300, response.imgUrls);
@@ -345,7 +343,6 @@ export default {
           //create a <a> element to download the image in a new tab.
           function download(urls) {
             var url = urls.pop();
-            console.log(url);
             var a = document.createElement("a");
             a.setAttribute("href", url);
             a.setAttribute("download", "");
@@ -372,7 +369,6 @@ export default {
         .dispatch(GET_ALL_DELIVERY_TYPES)
         .then(response => {
           this.deliveryTypes = response;
-          console.log(response);
         })
         .catch(error => {
           console.dir(error);
@@ -438,8 +434,6 @@ export default {
           this.$store
             .dispatch(GET_ALL_HOTELS)
             .then(response => {
-              console.log(response);
-              console.log(this.order);
               this.hotels = response;
               if (this.selectedDeliveryType == "Hotel") {
                 this.hotels.forEach(oneHotel => {
@@ -464,8 +458,6 @@ export default {
     },
 
     saveDetails() {
-      console.log(this.selectedHotel);
-
       if (this.selectedDeliveryType == "Hotel") {
         //jsonData is very similar to the order object.
         const jsonData = {
@@ -523,11 +515,9 @@ export default {
       }
     },
     updateOrder(jsonData) {
-      console.log(jsonData);
       this.$store
         .dispatch(UPDATE_ORDER, jsonData)
         .then(response => {
-          console.log(response);
           this.message("success", response.message);
         })
         .catch(error => {

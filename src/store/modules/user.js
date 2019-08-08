@@ -244,13 +244,10 @@ const mutations = {
     state.changePassword = true;
   },
   [SIGN_IN_SUCCESS]: (state, resp) => {
-    console.log("sign in success: " + resp);
-    console.log("changepassword: " + resp.user.changePassword);
     state.changePassword = resp.user.changePassword;
     state.userId = resp.user.userId;
     state.userRole = resp.user.userRole;
     state.userName = resp.user.name;
-    console.log(resp.token);
     state.token = resp.token;
     state.status = "signed in";
     localStorage.setItem("changePassword", resp.user.changePassword);

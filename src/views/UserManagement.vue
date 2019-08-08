@@ -91,7 +91,6 @@ export default {
     this.$store
       .dispatch(GET_ALL_USERS)
       .then(response => {
-        console.log(response);
         this.items = response;
         let index;
         for (index = 0; index < this.items.length; index++) {

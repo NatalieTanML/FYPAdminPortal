@@ -24,7 +24,6 @@ const actions = {
       apiCall({ url: api_routes.hotel.get_all, method: "get" })
         .then(resp => {
           commit(GET_ALL_HOTELS);
-          console.log(resp);
           resolve(resp);
         })
         .catch(err => {

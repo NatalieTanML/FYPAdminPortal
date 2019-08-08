@@ -174,7 +174,6 @@ export default {
       this.$store
         .dispatch(GET_ONE_HOTEL, this.hotel.id)
         .then(response => {
-          console.log(response);
           this.hotel.name = response.hotelName;
           this.hotel.address = response.hotelAddress;
           this.hotel.postalCode = response.hotelPostalCode;

@@ -180,7 +180,6 @@ export default {
       .dispatch(GET_ALL_ROLES)
       .then(response => {
         this.roles = response;
-        console.log(this.roles);
       })
       .catch(error => {
         console.dir(error);

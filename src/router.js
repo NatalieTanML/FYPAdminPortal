@@ -214,22 +214,7 @@ let router = new Router({
 //reference : https://router.vuejs.org/guide/advanced/meta.html
 
 router.beforeEach((to, from, next) => {
-  console.log("token: " + store.getters.isAuthenticated);
-  console.log("token from ls: " + localStorage.getItem("token"));
-  console.log("hasloggedinbefore : " + localStorage.getItem("hasLoggedIn"));
-
-  // let resolved = router.resolve(to.path)
-  //  if(resolved.route.name != '404')
-  // console.log("resolve")
-
-  console.log("change password: " + store.getters.changePassword);
-
-  console.log("To : " + to.name);
-
-  console.log("From : " + from.name);
-
   localStorage.setItem("previousPathName", from.name);
-  console.log("previousPathName : " + localStorage.getItem("previousPathName"));
 
   //if people try to go to the login page after they logged in,
   //they will be redirected to summaryoforders
@@ -248,14 +233,6 @@ router.beforeEach((to, from, next) => {
       });
   }
 
-  // //if they are logged in already, and have changed their password,
-  // //they cant access the changepassword page again.
-  // else if(store.getters.isAuthenticated && to.path == '/ChangePassword' && store.getters.changePassword){
-  //   console.log("second if")
-  //   next({
-  //     path: '/SummaryOfOrders',
-  //   })
-  // }
 
   //start of validation pages that needs authentication.
   //if user is authenticated, it will validate whether the page he is going is
@@ -270,7 +247,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.needNewPassword)) {
       //if user needs to change password.
       if (!store.getters.changePassword && to.path != "/ChangePassword") {
-        console.log("have not changed password");
+
         next({
           path: "/ChangePassword"
           //params: { nextUrl: to.fullPath }

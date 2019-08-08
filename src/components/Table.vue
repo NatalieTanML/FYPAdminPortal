@@ -307,7 +307,6 @@ export default {
         this.totalRows = this.items.length;
         this.checkedCheckBox = [];
         this.checkAll = false;
-        console.log("watch itemsChange");
       },
       deep: true
     }
@@ -315,7 +314,6 @@ export default {
   methods: {
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
-      console.log("filtererd item : " + filteredItems);
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
@@ -346,9 +344,7 @@ export default {
           let index;
           for (index = 0; index < this.items.length; index++) {
             this.checkedCheckBox.forEach(checkedItemId => {
-              console.log(checkedItemId);
               if (this.items[index].id == checkedItemId) {
-                console.log(this.items[index]);
                 this.items[index].items.forEach(eachItemInOrder => {
                   listOfThumbNailUrl.push(eachItemInOrder.orderImageKey);
                 });
@@ -389,7 +385,6 @@ export default {
       //id is the row's item's id
     },
     onCheckBoxCheck(item) {
-      console.log(item);
       let index = 0;
 
       //reset the conditions so as to re-check the conditions down below.
@@ -418,13 +413,11 @@ export default {
       } else this.checkedCheckBox.push(item.id);
     },
     checkAllCheckBox() {
-      console.log(this.items);
       if (this.items.length > 0) {
         let index = 0;
         //count the no of rows and check all of them.
         let rowsPerPage = this.perPage;
         let shownItems = (this.currentPage - 1) * rowsPerPage;
-        // console.log(shownItems)
         //if the last page has less than 5 stuff.
         if (
           this.items.length - shownItems < rowsPerPage &&
@@ -451,13 +444,11 @@ export default {
         if (this.items[0].status == "Out for Delivery") {
           this.showDeliveryFailedButton = true;
         }
-        console.log(this.showHeaderButton);
+
 
         //if the first page has less than 5 stuff.
         if (this.currentPage == 1 && this.items.length < rowsPerPage)
           rowsPerPage = this.items.length;
-        // console.log(this.currentPage)
-        // console.log(rowsPerPage)
         if (!this.checkAll) this.checkAll = true;
         else this.checkAll = false;
         this.checkedCheckBox = [];

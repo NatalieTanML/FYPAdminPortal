@@ -168,13 +168,10 @@ export default {
             RecipientSignature: base64
           }
         };
-        console.log(jsonData);
 
         this.$store
           .dispatch(UPDATE_RECIPIENT, jsonData)
           .then(response => {
-            console.log(response);
-
             this.updateCurrentOrders(response.orders);
             this.message("success", response.message);
             this.recipientName = null;
@@ -190,7 +187,6 @@ export default {
   },
   //check whether the order is to be delivered to hotel or an address.
   getAddressOrHotelName(response) {
-    console.log("getaddressorhotel", response);
     var addressOrHotel = null;
 
     if (response.address.hotel.hotelName != null)
@@ -213,8 +209,6 @@ export default {
     this.$store
       .dispatch(GET_MULTIPLE_ORDERS, ids)
       .then(response => {
-        console.log("Get multiple orders : ", response);
-
         this.updateCurrentOrders(response);
       })
       .catch(error => {
@@ -225,7 +219,6 @@ export default {
 
   //update current orders if there is a change in database records.
   updateCurrentOrders(orders) {
-    console.log("updateCurrentOrders : ", orders);
     //update current items's statuses and actions
     let updatedOrders = orders;
     let x;
@@ -236,7 +229,6 @@ export default {
         //i will populate the table, or else i will take the item out from the
         //table. this is because i use this method when i update the status from out for delivery to completed
         //of the order too.
-        console.log("one updated order : ", oneUpdatedOrder);
         if (this.items[x].id == oneUpdatedOrder.orderId) {
           this.items.splice(x, 1);
         }
@@ -246,7 +238,6 @@ export default {
     //if there are new orders, it will be pushed to the table instead of updating
     //current records.
     updatedOrders.forEach((oneUpdatedOrder, index) => {
-      console.log(index + ". ", oneUpdatedOrder);
       if (
         oneUpdatedOrder.status == "Out for Delivery" &&
         oneUpdatedOrder.deliveryManId == this.$store.getters.userId
@@ -263,7 +254,6 @@ export default {
         });
 
         this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
-        console.log("one new updated item : ", this.items);
       }
     });
   },
@@ -301,7 +291,6 @@ export default {
     });
 
     eventBus.$on(this.actionButtonClick, itemId => {
-      console.log("item id " + itemId);
       this.ordertitle = "Order : " + itemId;
       this.orderIds.push(itemId);
       this.$bvModal.show("showSignatureDialog");
@@ -347,8 +336,6 @@ export default {
 
     // Establish hub methods
     this.connection.on("OneOrder", orderId => {
-      console.log("OneOrder called");
-      console.log("one order id : ", orderId);
 
       var orderIds = [orderId];
 
@@ -358,9 +345,6 @@ export default {
     });
 
     this.connection.on("MultipleOrders", orderIds => {
-      console.log("MultipleOrders called");
-      console.log("multiple order : ", orderIds);
-
       this.getAndUpdateMultipleOrders(orderIds);
     });
 
@@ -368,7 +352,6 @@ export default {
     this.connection
       .start()
       .then(() => {
-        console.log("Connection to hub started");
       })
       .catch(err => console.log(err));
   },

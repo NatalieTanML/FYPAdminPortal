@@ -104,7 +104,6 @@ export default {
       this.$store
         .dispatch(SIGN_IN, userStr)
         .then(response => {
-          console.log(response);
           if (!response.user.changePassword) {
             this.$router.replace({ name: "ChangePassword" });
           } else {

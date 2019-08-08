@@ -26,12 +26,10 @@ const getters = {
 
 const actions = {
   [ORDER_GET_REQUEST]: ({ commit }, orderId) => {
-    console.log("getOrder() called");
     return new Promise((resolve, reject) => {
       commit(ORDER_GET_REQUEST);
       apiCall({ url: api_routes.order.get + "/" + orderId, method: "get" })
         .then(resp => {
-          console.log("this is called");
           console.dir(resp);
           resolve(resp);
         })
@@ -47,7 +45,6 @@ const actions = {
       apiCall({ url: api_routes.order.get_all, method: "get" })
         .then(resp => {
           resolve(resp);
-          console.log(resp);
         })
         .catch(err => {
           reject(err);
@@ -56,7 +53,6 @@ const actions = {
   },
 
   [GET_MULTIPLE_ORDERS]: ({ commit }, jsonData) => {
-    console.log("jsondata : ", jsonData);
     return new Promise((resolve, reject) => {
       commit(GET_MULTIPLE_ORDERS);
       apiCall({
@@ -105,8 +101,6 @@ const actions = {
     });
   },
   [UPDATE_ORDER_STATUS]: ({ commit }, jsonData) => {
-    console.log("jsondata : ", jsonData);
-
     return new Promise((resolve, reject) => {
       apiCall({
         url: api_routes.order.update_order_status + "/" + jsonData.isSuccessful,
@@ -164,7 +158,6 @@ const actions = {
     });
   },
   [UPDATE_ORDER]: ({ commit }, jsonData) => {
-    console.log("jsonDAta in update order",jsonData)
     return new Promise((resolve, reject) => {
       apiCall({
         url: api_routes.order.updateOrder+"/"+jsonData.OrderId,
