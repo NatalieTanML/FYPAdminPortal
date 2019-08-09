@@ -59,6 +59,7 @@ export const apiCall = ({ url, method, ...args }) =>
         ...args
       })
         .then(resp => {
+          console.log(resp);
           resolve(resp.data);
         })
         .catch(error => {

@@ -31,14 +31,7 @@
                     </div>
 
                     <b-row>
-                      <b-col cols="12">
-                        <div class="form-group float-left">
-                          <div class="custom-control custom-checkbox small">
-                            <input type="checkbox" class="custom-control-input" id="customCheck" />
-                            <label class="custom-control-label" for="customCheck">Remember Me</label>
-                          </div>
-                        </div>
-                      </b-col>
+                   
 
                       <b-col>
                         <div>
