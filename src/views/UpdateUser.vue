@@ -78,7 +78,14 @@
                           label="Reset Password"
                           label-for="input-horizontal"
                         >
-                          <b-button v-b-modal.resetPassword variant="danger">Reset</b-button>
+                          <b-button
+                            v-b-modal.resetPassword
+                            variant="danger"
+                            :disabled="submitLoader"
+                          >
+                            <b-spinner small class="mr-2" v-if="submitLoader"></b-spinner>
+                            <span>Reset</span>
+                          </b-button>
                         </b-form-group>
 
                         <b-form-group
@@ -90,7 +97,14 @@
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                          <b-button v-on:click="saveUser()" variant="primary">Save</b-button>
+                          <b-button
+                            v-on:click="saveUser()"
+                            variant="primary"
+                            :disabled="submitLoader"
+                          >
+                            <b-spinner small class="mr-2" v-if="submitLoader"></b-spinner>
+                            <span>Save</span>
+                          </b-button>
                           <b-button
                             v-on:click="cancelButton()"
                             class="ml-2"
@@ -154,7 +168,8 @@ export default {
       isEnabled: null,
       checked: null,
       updatedRole: null,
-      userRoleId: null
+      userRoleId: null,
+      submitLoader: false
     };
   },
   validations: {
@@ -227,6 +242,7 @@ export default {
       this.$router.replace({ name: "UserManagement" });
     },
     saveUser() {
+      this.submitLoader = true;
       if (this.name == "") this.name = null;
 
       if (this.email == "") this.email = null;
@@ -256,17 +272,20 @@ export default {
             this.$router.replace({ name: "UserManagement" });
           })
           .catch(error => {
+            this.submitLoader = false;
             this.message("danger", error);
           });
       }
     },
     handleok() {
+      this.submitLoader = true;
       this.$store
         .dispatch(RESETUSERPASSWORD, this.userId)
         .then(response => {
           this.message("success", response.message);
         })
         .catch(error => {
+          this.submitLoader = false;
           console.dir(error);
           this.message("danger", error.response.data.message);
           //this.$router.replace({name:'SummaryOfOrders'});

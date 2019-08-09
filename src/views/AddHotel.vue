@@ -85,7 +85,7 @@
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                          <b-button v-on:click="addHotel" variant="primary">Add Hotel</b-button>
+                          <b-button v-on:click="addHotel" variant="primary">Save</b-button>
                           <b-button
                             class="ml-2"
                             v-on:click="cancelButton()"

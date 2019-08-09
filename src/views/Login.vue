@@ -111,9 +111,6 @@ export default {
           console.log(error);
           this.message("danger", error.response.data.message);
         });
-
-      // this.$store.dispatch(BYPASSLOGIN);
-      // this.$router.replace({ name: "SummaryOfOrders" });
     }
   }
 };
