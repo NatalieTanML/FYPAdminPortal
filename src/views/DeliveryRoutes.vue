@@ -289,7 +289,6 @@ export default {
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
-          console.log(response);
           var status;
           for (var i = 0; i < response.length; i++) {
             status = response[i].status;
@@ -305,7 +304,6 @@ export default {
               var region;
 
               if (response[i].addressId != null) {
-                console.log(response[i]);
                 postalcode = response[i].address.postalCode;
                 region = this.getRegionByPostalCode(
                   // response[i].address.postalCode
@@ -339,7 +337,6 @@ export default {
             }
           }
 
-          console.log(this.items);
         })
         .catch(error => {
           console.log(error);
@@ -375,7 +372,6 @@ export default {
       for (var i = 0; i < orders.length; i++) {
         idsToUpdate.push(orders[i]);
       }
-      console.log("idsToUpdate", idsToUpdate);
       for (var e = 0; e < idsToUpdate.length; e++) {
         let idToUpdate = idsToUpdate[e];
         for (var x = 0; x < this.items.length; x++) {
@@ -388,7 +384,6 @@ export default {
 
     //check whether the order is to be delivered to hotel or an address.
     getAddressOrHotelName(response) {
-      console.log("getaddressorhotel", response);
       var addressOrHotel = null;
 
       if (response.address.hotel.hotelName != null)
@@ -451,8 +446,6 @@ export default {
 
     // Establish hub methods
     this.connection.on("MultipleOrders", orders => {
-      console.log("MultipleOrders called");
-      console.log(orders);
       this.getAllOrders();
       this.highlightRows(orders);
     });
@@ -460,7 +453,6 @@ export default {
     this.connection
       .start()
       .then(() => {
-        console.log("Connection to hub started");
       })
       .catch(err => console.log(err));
   },

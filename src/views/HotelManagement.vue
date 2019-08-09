@@ -101,7 +101,6 @@ export default {
     this.$store
       .dispatch(GET_ALL_HOTELS)
       .then(response => {
-        console.log(response);
 
         for (var x = 0; x < response.length; x++) {
           this.items.push({

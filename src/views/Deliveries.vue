@@ -168,13 +168,10 @@ export default {
             RecipientSignature: base64
           }
         };
-        console.log(jsonData);
 
         this.$store
           .dispatch(UPDATE_RECIPIENT, jsonData)
           .then(response => {
-            console.log(response);
-
             this.updateCurrentOrders(response.orders);
             this.message("success", response.message);
             this.recipientName = null;
@@ -187,88 +184,80 @@ export default {
           });
       }
     },
-  
-  //check whether the order is to be delivered to hotel or an address.
-  getAddressOrHotelName(response) {
-    console.log("getaddressorhotel", response);
-    var addressOrHotel = null;
 
-    if (response.address.hotel.hotelName != null)
-      addressOrHotel = response.address.hotel.hotelName;
-    else
-      addressOrHotel =
-        response.address.addressLine1 + ", " + response.address.addressLine2;
+    //check whether the order is to be delivered to hotel or an address.
+    getAddressOrHotelName(response) {
+      var addressOrHotel = null;
 
-    if (
-      response.address.addressLine1 == null ||
-      response.address.addressLine1 == ""
-    )
-      addressOrHotel = "Self-Pick Up";
+      if (response.address.hotel.hotelName != null)
+        addressOrHotel = response.address.hotel.hotelName;
+      else
+        addressOrHotel =
+          response.address.addressLine1 + ", " + response.address.addressLine2;
 
-    return addressOrHotel;
-  },
+      if (
+        response.address.addressLine1 == null ||
+        response.address.addressLine1 == ""
+      )
+        addressOrHotel = "Self-Pick Up";
 
-  //when multiple orders are updated, this method will be used to update the table.
-  getAndUpdateMultipleOrders(ids) {
-    this.$store
-      .dispatch(GET_MULTIPLE_ORDERS, ids)
-      .then(response => {
-        console.log("Get multiple orders : ", response);
+      return addressOrHotel;
+    },
 
-        this.updateCurrentOrders(response);
-      })
-      .catch(error => {
-        console.dir(error);
-        this.message("danger", error);
-      });
-  },
+    //when multiple orders are updated, this method will be used to update the table.
+    getAndUpdateMultipleOrders(ids) {
+      this.$store
+        .dispatch(GET_MULTIPLE_ORDERS, ids)
+        .then(response => {
+          this.updateCurrentOrders(response);
+        })
+        .catch(error => {
+          console.dir(error);
+          this.message("danger", error);
+        });
+    },
 
-  //update current orders if there is a change in database records.
-  updateCurrentOrders(orders) {
-    console.log("updateCurrentOrders : ", orders);
-    //update current items's statuses and actions
-    let updatedOrders = orders;
-    let x;
+    //update current orders if there is a change in database records.
+    updateCurrentOrders(orders) {
+      //update current items's statuses and actions
+      let updatedOrders = orders;
+      let x;
 
-    for (x = 0; x < this.items.length; x++) {
+      for (x = 0; x < this.items.length; x++) {
+        updatedOrders.forEach((oneUpdatedOrder, index) => {
+          //if there are new records of orders that needs to be delivered,
+          //i will populate the table, or else i will take the item out from the
+          //table. this is because i use this method when i update the status from out for delivery to completed
+          //of the order too.
+          if (this.items[x].id == oneUpdatedOrder.orderId) {
+            this.items.splice(x, 1);
+          }
+        });
+      }
+
+      //if there are new orders, it will be pushed to the table instead of updating
+      //current records.
       updatedOrders.forEach((oneUpdatedOrder, index) => {
-        //if there are new records of orders that needs to be delivered,
-        //i will populate the table, or else i will take the item out from the
-        //table. this is because i use this method when i update the status from out for delivery to completed
-        //of the order too.
-        console.log("one updated order : ", oneUpdatedOrder);
-        if (this.items[x].id == oneUpdatedOrder.orderId) {
-          this.items.splice(x, 1);
+        if (
+          oneUpdatedOrder.status == "Out for Delivery" &&
+          oneUpdatedOrder.deliveryManId == this.$store.getters.userId
+        ) {
+          var itemLength = this.items.push({
+            id: oneUpdatedOrder.orderId,
+            refNo: oneUpdatedOrder.referenceNo,
+            date: new Date(
+              Date.parse(oneUpdatedOrder.createdAt)
+            ).toLocaleString(),
+            items: oneUpdatedOrder.orderItems,
+            address: this.getAddressOrHotelName(oneUpdatedOrder),
+            actions: ["Delivered"]
+          });
+
+          this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
         }
       });
     }
-
-    //if there are new orders, it will be pushed to the table instead of updating
-    //current records.
-    updatedOrders.forEach((oneUpdatedOrder, index) => {
-      console.log(index + ". ", oneUpdatedOrder);
-      if (
-        oneUpdatedOrder.status == "Out for Delivery" &&
-        oneUpdatedOrder.deliveryManId == this.$store.getters.userId
-      ) {
-        var itemLength = this.items.push({
-          id: oneUpdatedOrder.orderId,
-          refNo: oneUpdatedOrder.referenceNo,
-          date: new Date(
-            Date.parse(oneUpdatedOrder.createdAt)
-          ).toLocaleString(),
-          items: oneUpdatedOrder.orderItems,
-          address: this.getAddressOrHotelName(oneUpdatedOrder),
-          actions: ["Delivered"]
-        });
-
-        this.$set(this.items[itemLength - 1], "_rowVariant", "primary");
-        console.log("one new updated item : ", this.items);
-      }
-    });
   },
-  },
-
   async mounted() {
     //headerButtonClick[0] is when the first header button is clicked.
     //in this case, it is the Update Order Status button
@@ -302,7 +291,6 @@ export default {
     });
 
     eventBus.$on(this.actionButtonClick, itemId => {
-      console.log("item id " + itemId);
       this.ordertitle = "Order : " + itemId;
       this.orderIds.push(itemId);
       this.$bvModal.show("showSignatureDialog");
@@ -348,9 +336,6 @@ export default {
 
     // Establish hub methods
     this.connection.on("OneOrder", orderId => {
-      console.log("OneOrder called");
-      console.log("one order id : ", orderId);
-
       var orderIds = [orderId];
 
       this.getAndUpdateMultipleOrders(orderIds);
@@ -359,18 +344,13 @@ export default {
     });
 
     this.connection.on("MultipleOrders", orderIds => {
-      console.log("MultipleOrders called");
-      console.log("multiple order : ", orderIds);
-
       this.getAndUpdateMultipleOrders(orderIds);
     });
 
     // start the connection
     this.connection
       .start()
-      .then(() => {
-        console.log("Connection to hub started");
-      })
+      .then(() => {})
       .catch(err => console.log(err));
   },
 

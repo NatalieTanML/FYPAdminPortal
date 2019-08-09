@@ -163,7 +163,7 @@ export default {
       selectedTab: 0, // Currently selected tab
       arrayOfNumberOfRows: [], // Display the number of rows for each tab
       noOfTabs: 0,
-      tabs: [],
+      Tabs: [],
       sortItems: [] // products for each tab
     };
   },

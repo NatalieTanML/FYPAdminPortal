@@ -226,8 +226,6 @@ export default {
         //standardize the typesOfTabs
         //set up default tabs.
         let x = 1;
-        console.log(response);
-
         //typeoftabs are an aarray of strings that contains all the
         //status in the database.
         //first one being All.
@@ -252,14 +250,12 @@ export default {
       var showDeliveryModal = false;
 
       this.items.forEach(oneItem => {
-        console.log("headerbutton one item", oneItem);
         //if at least one item is Out For Delivery, i will prompt the modal dialog.
         orderIds.forEach(oneOrderId => {
           if (oneItem.id == oneOrderId) {
             if (oneItem.status == "Out for Delivery") {
               needsSignature = true;
             } else if (oneItem.status == "Printed") {
-              console.log(oneItem.deliveryManId);
               if (oneItem.deliveryManId == null) {
                 showDeliveryModal = true;
               }
@@ -334,23 +330,15 @@ export default {
 
     // Establish hub methods
     this.connection.on("OneOrder", orderId => {
-      console.log("OneOrder called");
-      console.log("one order id : ", orderId);
-
       var orderIds = [orderId];
-      console.log(orderIds);
       this.getAndUpdateMultipleOrders(orderIds);
     });
 
     this.connection.on("MultipleOrders", orderIds => {
-      console.log("MultipleOrders called");
-      console.log("multiple order id : ", orderIds);
       this.getAndUpdateMultipleOrders(orderIds);
     });
 
     this.connection.on("LowStock", optionIds => {
-      console.log("LowStock called");
-      console.log("lowstock items:", optionIds);
       this.notifyLowStock(optionIds);
     });
 
@@ -358,7 +346,6 @@ export default {
     this.connection
       .start()
       .then(() => {
-        console.log("Connection to hub started");
       })
       .catch(err => console.log(err));
   },
@@ -432,14 +419,12 @@ export default {
     },
 
     getAllOrders() {
-      console.log("getAllOrders called");
       this.items = [];
 
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
           var x = 0;
-          console.log(response);
           for (x; x < response.length; x++) {
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
             //item: response[x].orderItems[0].options[0].product.productName,
@@ -505,7 +490,6 @@ export default {
       //const {sortItems, items, noOfTabs, Tabs, selectedTab, typesOfTabs} = this
       //reason why i don't use const ^ is because when the data is displayed,
       //it will become read-only.
-      console.log("on tab change is called");
       this.sortItems = [];
       //change background color for the tab
 
@@ -523,7 +507,6 @@ export default {
       }
       //manipulate table data after changing tab color
       let sortBy = this.typesOfTabs[id];
-      console.log(sortBy);
       for (index = 0; index < this.items.length; index++) {
         if (sortBy === this.items[index].status)
           this.sortItems.push(this.items[index]);
@@ -617,7 +600,6 @@ export default {
     //not the whole table.
     updateCurrentOrders(orders) {
       //update current items's statuses and actions
-      console.log("updated orders : ", orders);
       let updatedOrders = orders;
       var itemsContainsUpdatedOrder = false;
       let x;
@@ -637,7 +619,6 @@ export default {
       //it will be pushed to the table instead, because the item does not exist.
       if (!itemsContainsUpdatedOrder) {
         updatedOrders.forEach((oneUpdatedOrder, index) => {
-          console.log("updated order(@)", oneUpdatedOrder);
           var itemLength = this.items.push({
             id: oneUpdatedOrder.orderId,
             refNo: oneUpdatedOrder.referenceNo,
@@ -660,16 +641,13 @@ export default {
     //is used to down the images, whenever the user click on the image itself
     //or when the user selects multiple items and click on the header button.
     downloadImages(listOfThumbNailUrl) {
-      console.log("downloadImages : " + listOfThumbNailUrl);
       this.$store
         .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
         .then(response => {
-          console.log(response);
           let index;
           var interval = setInterval(download, 300, response.imgUrls);
           function download(urls) {
             var url = urls.pop();
-            console.log(url);
             var a = document.createElement("a");
 
             a.setAttribute("href", url);
@@ -701,7 +679,6 @@ export default {
       for (var i = 0; i < optionIds.length; i++) {
         skus += " '" + optionIds[i] + "'";
       }
-      console.log("skus", skus);
       this.message("danger", "Low stock count for" + skus + "!");
     },
     //when items are out for delivery and admin tries to update the status
@@ -719,13 +696,11 @@ export default {
             RecipientSignature: base64
           }
         };
-        console.log(jsonData);
 
         this.$store
           .dispatch(UPDATE_RECIPIENT, jsonData)
           .then(response => {
             this.message("success", response.message);
-            console.log(response);
             this.updateCurrentOrders(response.orders);
             //reset the tabs.
             this.setUpTabs();

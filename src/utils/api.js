@@ -1,4 +1,5 @@
 import axios from "axios";
+import { USER_LOGOUT } from "@/store/actions/user";
 
 export const api_routes = {
   user: {
@@ -48,7 +49,6 @@ export const api_routes = {
 export const apiCall = ({ url, method, ...args }) =>
   new Promise((resolve, reject) => {
     let token = localStorage.getItem("token") || "";
-    console.log("api.js axios url: ", url + " method: " + method);
     if (token)
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 
@@ -60,6 +60,20 @@ export const apiCall = ({ url, method, ...args }) =>
       })
         .then(resp => {
           console.log(resp);
+          if (resp.status == "401") {
+            this.$store
+              .dispatch(USER_LOGOUT)
+              .then(response => {
+                this.message(
+                  "danger",
+                  "The session has expired. Please relog again."
+                );
+                this.$router.replace({ name: "Login" });
+              })
+              .catch(error => {
+                this.message("danger", error);
+              });
+          }
           resolve(resp.data);
         })
         .catch(error => {

@@ -215,20 +215,17 @@ export default {
     },
     //if admin clicks on the image, it will be downloaded to their computer.
     onImageClick(thumbNailUrl) {
-      console.log(thumbNailUrl);
       var listOfThumbNailUrl = [];
       listOfThumbNailUrl.push(thumbNailUrl);
       this.$store
         .dispatch(GET_PRESIGNED_URL, listOfThumbNailUrl)
         .then(response => {
-          console.log(response);
           let index;
 
           var interval = setInterval(download, 300, response.imgUrls);
 
           function download(urls) {
             var url = urls.pop();
-            console.log(url);
             var a = document.createElement("a");
             a.setAttribute("href", url);
             a.setAttribute("download", "");

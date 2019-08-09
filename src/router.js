@@ -32,7 +32,7 @@ Vue.use(Router);
 //I referred to an article on setting a default page when the app loads first time.
 //https://alligator.io/vuejs/intro-to-routing/
 let router = new Router({
-  mode: "history",
+  // mode: "history",
   routes: [
     {
       path: "/Login",
@@ -214,22 +214,10 @@ let router = new Router({
 //reference : https://router.vuejs.org/guide/advanced/meta.html
 
 router.beforeEach((to, from, next) => {
-  console.log("token: " + store.getters.isAuthenticated);
-  console.log("token from ls: " + localStorage.getItem("token"));
-  console.log("hasloggedinbefore : " + localStorage.getItem("hasLoggedIn"));
-
-  // let resolved = router.resolve(to.path)
-  //  if(resolved.route.name != '404')
-  // console.log("resolve")
-
-  console.log("change password: " + store.getters.changePassword);
-
-  console.log("To : " + to.name);
-
-  console.log("From : " + from.name);
-
   localStorage.setItem("previousPathName", from.name);
-  console.log("previousPathName : " + localStorage.getItem("previousPathName"));
+
+  console.log("To : " + to.path);
+  console.log("From : " + from.path);
 
   //if people try to go to the login page after they logged in,
   //they will be redirected to summaryoforders
@@ -248,15 +236,6 @@ router.beforeEach((to, from, next) => {
       });
   }
 
-  // //if they are logged in already, and have changed their password,
-  // //they cant access the changepassword page again.
-  // else if(store.getters.isAuthenticated && to.path == '/ChangePassword' && store.getters.changePassword){
-  //   console.log("second if")
-  //   next({
-  //     path: '/SummaryOfOrders',
-  //   })
-  // }
-
   //start of validation pages that needs authentication.
   //if user is authenticated, it will validate whether the page he is going is
   //allowed, or else it will just route him back to login page.
@@ -270,7 +249,6 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.needNewPassword)) {
       //if user needs to change password.
       if (!store.getters.changePassword && to.path != "/ChangePassword") {
-        console.log("have not changed password");
         next({
           path: "/ChangePassword"
           //params: { nextUrl: to.fullPath }
@@ -325,8 +303,12 @@ router.beforeEach((to, from, next) => {
 
   //if people try to access the updateuser page by typing in the url, it will just
   //redirect them to usermanagement
-  if (to.name == "UpdateUser" && localStorage.getItem("updateUserId") == "null")
+  if (
+    to.name == "UpdateUser" &&
+    localStorage.getItem("updateUserId") == "null"
+  ) {
     next({ path: "/UserManagement" });
+  }
 
   //if admin leaves the orderdetails page, orderdetails page will reset.
   if (to.name != "OrderDetails" && localStorage.getItem("viewOrderId") != null)
@@ -424,6 +406,17 @@ router.beforeEach((to, from, next) => {
       eventBus.$off(Deliveries.data().headerButtonClick[index]);
     }
     eventBus.$off(Deliveries.data().actionButtonClick);
+  }
+
+  if (from.name == "ResourceManagement") {
+    eventBus.$off(ResourceManagement.data().headerButtonClick[index]);
+    for (
+      index = 0;
+      index < ResourceManagement.data().actionButtonClick.length;
+      index++
+    ) {
+      eventBus.$off(ResourceManagement.data().actionButtonClick);
+    }
   }
 });
 

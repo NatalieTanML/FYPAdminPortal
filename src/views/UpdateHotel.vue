@@ -98,7 +98,6 @@
                     </b-col>
                   </b-row>
                 </b-container>
-
               </div>
             </div>
           </div>
@@ -174,7 +173,6 @@ export default {
       this.$store
         .dispatch(GET_ONE_HOTEL, this.hotel.id)
         .then(response => {
-          console.log(response);
           this.hotel.name = response.hotelName;
           this.hotel.address = response.hotelAddress;
           this.hotel.postalCode = response.hotelPostalCode;
@@ -215,6 +213,7 @@ export default {
           .dispatch(UPDATE_ONE_HOTEL, hotelStr)
           .then(response => {
             this.message("success", response.message);
+            this.$router.replace({ name: "HotelManagement" });
           })
           .catch(error => {
             this.message("danger", error);

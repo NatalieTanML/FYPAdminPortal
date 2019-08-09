@@ -120,7 +120,6 @@ export default {
     changePassword() {
       //if validate is true, it will start validating the inputs
       this.validate = true;
-      console.log(this.$v.newConfirmPassword.samePassword);
       if (this.oldPassword == "") this.oldPassword = null;
 
       if (this.newPassword == "") this.newPassword = null;
@@ -160,7 +159,6 @@ export default {
     //let the user go back to the previous page(where he/she was from.)
     goBack() {
       let previousPathName = localStorage.getItem("previousPathName");
-      console.log(previousPathName);
       if (store.getters.isAuthenticated && store.getters.changePassword)
         this.$router.replace({ name: previousPathName });
       else this.$router.replace({ name: "Login" });

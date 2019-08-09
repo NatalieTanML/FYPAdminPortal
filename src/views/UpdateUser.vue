@@ -190,18 +190,15 @@ export default {
       this.$store
         .dispatch(GET_ONE_USER, id)
         .then(response => {
-          console.log(response);
           this.name = response.name;
           this.selectedRole = response.roleName;
           this.email = response.email;
           this.isEnabled = response.isEnabled;
           this.userId = response.id;
-          console.log(response);
           //i have to use updatedRole because for some reason, there is a bug in doing a v-model in select,
           //so i did a @onchange instead, which uses updatedRole
           this.updatedRole = response.roleId;
           this.validate = true;
-          console.log(this.selectedRole);
         })
         .catch(error => {
           console.dir(error);
@@ -216,7 +213,6 @@ export default {
         .dispatch(GET_ALL_ROLES)
         .then(response => {
           this.roles = response;
-          console.log(this.roles);
         })
         .catch(error => {
           console.dir(error);
@@ -226,7 +222,6 @@ export default {
     },
     onSelectChange(event) {
       this.updatedRole = event.target.value;
-      console.log(this.updatedRole);
     },
     cancelButton() {
       this.$router.replace({ name: "UserManagement" });
@@ -242,7 +237,6 @@ export default {
         this.$v.email.email &&
         this.selectedRole != null
       ) {
-        console.log(this.updatedRole);
         let idInt = parseInt(this.updatedRole);
 
         const userStr = {
@@ -255,11 +249,11 @@ export default {
           },
           newPassword: null
         };
-        console.log(userStr);
         this.$store
           .dispatch(UPDATE_ONE_USER, userStr)
           .then(response => {
             this.message("success", response.message);
+            this.$router.replace({ name: "UserManagement" });
           })
           .catch(error => {
             this.message("danger", error);
