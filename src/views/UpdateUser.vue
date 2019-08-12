@@ -283,6 +283,7 @@ export default {
         .dispatch(RESETUSERPASSWORD, this.userId)
         .then(response => {
           this.message("success", response.message);
+          this.submitLoader = false;
         })
         .catch(error => {
           this.submitLoader = false;
