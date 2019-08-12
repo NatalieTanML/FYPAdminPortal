@@ -1335,18 +1335,16 @@ export default {
           if (varientDetail !== undefined) {
             let newCombination = varientResult.combination;
             let newAttributes = varientResult.attributes;
-            // Update specific attributes while retanining the attributeId
             varientResult = varientDetail;
 
             // Update the combination as well as the attributes that contains the type and value
             varientResult.combination = newCombination;
-            varientResult.type = newAttributes.type;
-            varientResult.values = newAttributes.values;
+            varientResult.attributes = newAttributes;
             varientResults[index] = varientResult;
           }
         });
 
-        // Loop through the old list (this.varientDetails, If can't be found in the new list)
+        // Loop through the old list (this.varientDetails), If can't be found in the new list
         // it means that the images were deleted
         this.varientDetails.forEach(vd => {
           // If combination is not found in the new list, it means that it is deleted
@@ -1597,9 +1595,6 @@ export default {
         this.$refs.editVarientModal.hide();
       });
     },
-
-    // close cancel when they click on the button, hidden when
-    // then you assign back
 
     // This method will be invoked when the cancel or x button is clicked on the varient modal dialog
     cancelEditVarientTableDialog() {
