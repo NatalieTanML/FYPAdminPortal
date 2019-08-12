@@ -63,7 +63,11 @@
                       @click.prevent="changePassword"
                       @keydown.enter.native.prevent="validate"
                       variant="primary"
-                    >Change Password</b-button>
+                      :disabled="spinner"
+                    >
+                      <span v-if="!spinner">Change Password</span>
+                      <b-spinner variant="light" class="mr-2" v-if="spinner"></b-spinner>
+                    </b-button>
                   </form>
                 </div>
               </div>
@@ -91,7 +95,8 @@ export default {
       newPassword: "",
       newConfirmPassword: "",
       newPasswordNotSame: false,
-      validate: false
+      validate: false,
+      spinner: false
     };
   },
   validations: {
@@ -143,14 +148,18 @@ export default {
             },
             newPassword: newPassword
           };
+
+          this.spinner = true;
           this.$store
             .dispatch(CHANGEOWNPASSWORD, userStr)
             .then(response => {
+              this.spinner = false;
               this.message("success", "Your password has been updated!");
               this.$router.replace({ name: "Login" });
               this.$store.dispatch(USER_LOGOUT);
             })
             .catch(error => {
+              this.spinner = false;
               this.message("danger", error.response.data.message);
             });
         }

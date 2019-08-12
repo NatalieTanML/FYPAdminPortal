@@ -24,6 +24,7 @@
               tableName="Delivery Routes"
               v-bind:fields="this.fields"
               v-bind:items="this.items"
+              v-bind:isBusy="this.isBusy"
             ></Table>
             <b-modal
               @ok="updateDeliveryman()"
@@ -73,6 +74,7 @@ export default {
   },
   data() {
     return {
+      isBusy: false,
       connection: null,
       actionButtonClick: "Assign One to Deliveryman",
 
@@ -286,9 +288,11 @@ export default {
     //get all orders to be displayed in the table.
     getAllOrders() {
       this.items = [];
+      this.isBusy = true;
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
+          this.isBusy = false;
           var status;
           for (var i = 0; i < response.length; i++) {
             status = response[i].status;
@@ -336,9 +340,9 @@ export default {
               });
             }
           }
-
         })
         .catch(error => {
+          this.isBusy = false;
           console.log(error);
         });
     },
@@ -351,15 +355,17 @@ export default {
             deliveryManId: this.allDeliverymen[i].id,
             orderIds: this.orderIds
           };
+          this.isBusy = true;
           this.$store
             .dispatch(UPDATE_DELIVERYMAN, deliveryDetails)
             .then(response => {
+              this.isBusy = false;
               this.message("success", response.message);
               this.orderIds = [];
               this.selected = null;
-              // this.getAllOrders();
             })
             .catch(error => {
+              this.isBusy = false;
               alert(error);
             });
         }
@@ -452,8 +458,7 @@ export default {
 
     this.connection
       .start()
-      .then(() => {
-      })
+      .then(() => {})
       .catch(err => console.log(err));
   },
 

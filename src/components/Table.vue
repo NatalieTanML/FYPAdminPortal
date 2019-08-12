@@ -40,7 +40,7 @@
                 headerbutton will appear.
                 
                 checkCheckBox is just an array that contains the item id that are selected.
-                 -->
+                -->
               </div>
             </b-col>
           </b-row>
@@ -53,6 +53,7 @@
             responsive
             :items="items"
             :fields="fields"
+            :busy="isBusy"
             :current-page="currentPage"
             :per-page="perPage"
             :filter="filter"
@@ -66,9 +67,10 @@
             :bordered="false"
             hover
           >
-            <!-- <template slot="name" slot-scope="row">
-        {{ row.value }} {{ row.value }}
-            </template>-->
+            <div slot="table-busy" class="text-center text-danger my-3">
+              <b-spinner class="align-middle"></b-spinner>
+              <strong class="ml-3">Loading...</strong>
+            </div>
 
             <!-- checks all the check box IF the enableCheckBox is true. -->
             <template v-if="enableCheckbox" slot="HEAD_checkbox">
@@ -107,7 +109,7 @@
 
                 <b-col cols="2">
                   <!-- the drop down at the right side of the row
-                  is only present in the orders table. -->
+                  is only present in the orders table.-->
                   <div v-if="tableName == 'Orders'">
                     <b-dropdown
                       v-if="userRole == 'Admin'"
@@ -139,7 +141,7 @@
               </b-row>
             </template>
 
-          <!-- you can manually control the slot.
+            <!-- you can manually control the slot.
           notice that in the orders table, there is this line of code:
            {
           key: "refNo",
@@ -148,14 +150,14 @@
         },
 
         the key is used here to control the columns
-           -->
+            -->
             <template slot="refNo" slot-scope="row">
               <div style="max-width:80px;">{{row.item.refNo}}</div>
             </template>
 
             <!-- if there are multiple items, i will do a for loop
            and it will display multiple items. 
-             -->
+            -->
             <template slot="items" slot-scope="row">
               <div
                 ref="itemdiv"
@@ -170,9 +172,8 @@
               </div>
             </template>
 
-
             <!-- images are shown in the orders table, and it has a on
-            click method which downloads the photo. -->
+            click method which downloads the photo.-->
             <template slot="images" slot-scope="row">
               <div
                 ref="imagediv"
@@ -282,7 +283,8 @@ export default {
     actionButtonClick: String,
     enableCheckbox: Boolean,
     tableName: String,
-    imageClick: String
+    imageClick: String,
+    isBusy: Boolean
   },
   mounted() {
     this.userRole = this.$store.getters.userRole;
@@ -290,12 +292,14 @@ export default {
   computed: {
     sortOptions() {
       // Create an options list from our fields
-      return this.fields.filter(f => f.sortable).map(f => {
-        return {
-          text: f.label,
-          value: f.key
-        };
-      });
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => {
+          return {
+            text: f.label,
+            value: f.key
+          };
+        });
     }
   },
   watch: {
@@ -444,7 +448,6 @@ export default {
         if (this.items[0].status == "Out for Delivery") {
           this.showDeliveryFailedButton = true;
         }
-
 
         //if the first page has less than 5 stuff.
         if (this.currentPage == 1 && this.items.length < rowsPerPage)

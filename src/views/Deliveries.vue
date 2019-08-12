@@ -23,6 +23,7 @@
             v-bind:fields="this.fields"
             v-bind:items="this.items"
             v-bind:sortBy="this.sortBy"
+              v-bind:isBusy="this.isBusy"
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -87,6 +88,7 @@ export default {
       ordertitle: null,
       orderIds: [],
       enableCheckbox: true,
+      isBusy: false,
 
       // headerbutton is the button at the top right of the table
       //headerbuttonclick will be used to determine which button was clicked.
@@ -206,12 +208,15 @@ export default {
 
     //when multiple orders are updated, this method will be used to update the table.
     getAndUpdateMultipleOrders(ids) {
+      this.isBusy = true;
       this.$store
         .dispatch(GET_MULTIPLE_ORDERS, ids)
         .then(response => {
+          this.isBusy = false;
           this.updateCurrentOrders(response);
         })
         .catch(error => {
+          this.isBusy = false;
           console.dir(error);
           this.message("danger", error);
         });

@@ -85,7 +85,16 @@
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                          <b-button v-on:click="addHotel" variant="primary">Save</b-button>
+                          <b-button
+                            type="submit"
+                            v-on:click="addHotel"
+                            variant="primary"
+                            :disabled="spinner"
+                          >
+                            <span v-if="!spinner">Save</span>
+                            <b-spinner variant="light" class="mr-2" v-if="spinner"></b-spinner>
+                          </b-button>
+
                           <b-button
                             class="ml-2"
                             v-on:click="cancelButton()"
@@ -132,7 +141,8 @@ export default {
         address: null,
         postalCode: null
       },
-      isEnabled: false
+      isEnabled: false,
+      spinner: false
     };
   },
 
@@ -182,13 +192,16 @@ export default {
           IsActive: this.isEnabled
         };
 
+        this.spinner = true;
         this.$store
           .dispatch(CREATE_HOTEL, hotelStr)
           .then(response => {
+            this.spinner = false;
             this.message("success", response.message);
             this.$router.replace({ name: "HotelManagement" });
           })
           .catch(error => {
+            this.spinner = false;
             console.dir(error);
             this.message("danger", error.response.data.message);
           });

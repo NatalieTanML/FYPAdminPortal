@@ -31,20 +31,19 @@
                     </div>
 
                     <b-row>
-                   
-
                       <b-col>
                         <div>
-                          <!-- <a v-on:click="validate" class="btn btn-primary btn-user btn-block">
-                            <span>Login</span>
-                          </a>-->
                           <b-button
                             type="submit"
                             @click.prevent="validate"
                             @keydown.enter.native.prevent="validate"
                             class="btn btn-primary btn-user btn-block"
                             variant="primary"
-                          >Login</b-button>
+                            :disabled="spinner"
+                          >
+                            <span v-if="!spinner">Login</span>
+                            <b-spinner variant="light" class="mr-2" v-if="spinner"></b-spinner>
+                          </b-button>
                         </div>
                       </b-col>
                     </b-row>
@@ -71,7 +70,8 @@ export default {
       newPassword: "",
       newConfirmPassword: "",
       newPasswordNotSame: false,
-      userid: null
+      userid: null,
+      spinner: false
     };
   },
 
@@ -94,9 +94,12 @@ export default {
         password: password
       };
 
+      this.spinner = true;
+
       this.$store
         .dispatch(SIGN_IN, userStr)
         .then(response => {
+          this.spinner = false;
           if (!response.user.changePassword) {
             this.$router.replace({ name: "ChangePassword" });
           } else {
@@ -107,6 +110,7 @@ export default {
           }
         })
         .catch(error => {
+          this.spinner = false;
           this.$store.dispatch(USER_LOGOUT);
           console.log(error);
           this.message("danger", error.response.data.message);
