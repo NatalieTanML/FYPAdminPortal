@@ -59,7 +59,7 @@
             </p>
           </div>
 
-          <p>{{productDetail.description}}</p>
+          <p class="product-description">{{productDetail.description}}</p>
 
           <div class="row">
             <div class="col-md-7 mb-3" v-if="productDetail.options.length > 0">
@@ -709,6 +709,9 @@ button:disabled:hover {
 #option-error-icon {
   margin-right: 10px;
   color: #000000;
+}
+.product-description {
+  white-space: pre-line;
 }
 </style>
 
