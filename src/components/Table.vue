@@ -464,7 +464,7 @@ export default {
     },
     //when a row is click in the orders table, it will redirect them to the orders details.
     myRowClickHandler(record, index) {
-      if (this.tableName == "Orders") {
+      if (this.tableName == "Orders" || this.tableName == "Deliveries") {
         //get orderid to show in the orderdetails
         localStorage.setItem("viewOrderId", record.id);
         this.$router.replace({

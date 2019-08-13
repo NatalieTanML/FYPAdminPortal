@@ -23,7 +23,7 @@
             v-bind:fields="this.fields"
             v-bind:items="this.items"
             v-bind:sortBy="this.sortBy"
-              v-bind:isBusy="this.isBusy"
+            v-bind:isBusy="this.isBusy"
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -201,7 +201,7 @@ export default {
         response.address.addressLine1 == null ||
         response.address.addressLine1 == ""
       )
-        addressOrHotel = "Self-Pick Up";
+        addressOrHotel = "Self Pick-up";
 
       return addressOrHotel;
     },
@@ -307,14 +307,16 @@ export default {
       .then(response => {
         let x;
         for (x = 0; x < response.length; x++) {
+          console.log(response[x]);
           //if order is out for delivery, only the assigned delivery man can see their own
           //deliveries. Admin can see the deliveries also.
           if (
-            (response[x].Address != "Self-Pick Up" &&
+            (response[x].deliveryType != "Self Pick-up" &&
               (response[x].status == "Out for Delivery" &&
                 response[x].deliveryManId == this.$store.getters.userId)) ||
             (this.$store.getters.userRole == "Admin" &&
-              response[x].status == "Out for Delivery")
+              response[x].status == "Out for Delivery" &&
+              response[x].deliveryType != "Self Pick-up")
           ) {
             var addressOrHotel = this.getAddressOrHotelName(response[x]);
 
