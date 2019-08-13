@@ -1,4 +1,5 @@
 import axios from "axios";
+import { USER_LOGOUT } from "@/store/actions/user";
 
 export const api_routes = {
   user: {
@@ -58,6 +59,21 @@ export const apiCall = ({ url, method, ...args }) =>
         ...args
       })
         .then(resp => {
+          console.log(resp);
+          if (resp.status == "401") {
+            this.$store
+              .dispatch(USER_LOGOUT)
+              .then(response => {
+                this.message(
+                  "danger",
+                  "The session has expired. Please relog again."
+                );
+                this.$router.replace({ name: "Login" });
+              })
+              .catch(error => {
+                this.message("danger", error);
+              });
+          }
           resolve(resp.data);
         })
         .catch(error => {

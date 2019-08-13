@@ -70,7 +70,10 @@
                         </b-form-group>
 
                         <b-form-group label-cols-sm="3" label-for="input-horizontal">
-                          <b-button v-on:click="addUser" variant="primary">Add User</b-button>
+                          <b-button v-on:click="addUser" variant="primary" :disabled="submitLoader">
+                            <b-spinner small class="mr-2" v-if="submitLoader"></b-spinner>
+                            <span>Add User</span>
+                          </b-button>
                           <b-button
                             v-on:click="cancelButton()"
                             class="ml-2"
@@ -117,7 +120,8 @@ export default {
       user: {
         email: "",
         username: ""
-      }
+      },
+      submitLoader: false
     };
   },
 
@@ -150,6 +154,7 @@ export default {
     },
     //add user when admin clicks on the add button.
     addUser() {
+      this.submitLoader = true;
       this.validate = true;
       if (this.user.username == "") this.user.username = null;
 
@@ -174,6 +179,7 @@ export default {
             this.$router.replace({ name: "UserManagement" });
           })
           .catch(error => {
+            this.submitLoader = false;
             console.dir(error);
             this.message("danger", error.response.data.message);
           });

@@ -20,12 +20,12 @@
                         type="password"
                         v-model="oldPassword"
                         class="form-control form-control-user"
-                        placeholder="Enter Your Old Password..."
+                        placeholder="Enter old password"
                       />
                       <div
                         class="error-message"
                         v-if="validate && !$v.oldPassword.required"
-                      >This Field Is Required</div>
+                      >This field is required</div>
                     </div>
 
                     <div class="form-group">
@@ -33,36 +33,41 @@
                         type="password"
                         v-model="newPassword"
                         class="form-control form-control-user"
-                        placeholder="Enter New Password..."
+                        placeholder="Enter new password"
                       />
                       <div
                         class="error-message"
                         v-if="validate && !$v.newPassword.required"
-                      >This Field Is Required</div>
+                      >This field is required</div>
                     </div>
                     <div class="form-group">
                       <input
                         type="password"
                         v-model="newConfirmPassword"
                         class="form-control form-control-user"
-                        placeholder="Confirm New Password..."
+                        placeholder="Confirm new password"
                       />
                       <div
                         class="error-message"
                         v-if="validate && !$v.newConfirmPassword.required"
-                      >This Field is Required.</div>
+                      >This field is required.</div>
                       <div
                         class="error-message"
                         v-else-if="validate && !$v.newConfirmPassword.samePassword"
-                      >New Passwords must be identical</div>
+                      >New passwords must be identical</div>
                     </div>
 
                     <b-button
+                      type="submit"
                       class="btn-user btn-block"
-                  
-                      v-on:click="changePassword"
+                      @click.prevent="changePassword"
+                      @keydown.enter.native.prevent="validate"
                       variant="primary"
-                    >Change Password</b-button>
+                      :disabled="spinner"
+                    >
+                      <span v-if="!spinner">Change Password</span>
+                      <b-spinner variant="light" class="mr-2" v-if="spinner"></b-spinner>
+                    </b-button>
                   </form>
                 </div>
               </div>
@@ -90,7 +95,8 @@ export default {
       newPassword: "",
       newConfirmPassword: "",
       newPasswordNotSame: false,
-      validate: false
+      validate: false,
+      spinner: false
     };
   },
   validations: {
@@ -142,14 +148,18 @@ export default {
             },
             newPassword: newPassword
           };
+
+          this.spinner = true;
           this.$store
             .dispatch(CHANGEOWNPASSWORD, userStr)
             .then(response => {
+              this.spinner = false;
               this.message("success", "Your password has been updated!");
               this.$router.replace({ name: "Login" });
               this.$store.dispatch(USER_LOGOUT);
             })
             .catch(error => {
+              this.spinner = false;
               this.message("danger", error.response.data.message);
             });
         }

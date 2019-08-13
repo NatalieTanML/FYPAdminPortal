@@ -45,6 +45,7 @@
             :imageClick="this.imageClick"
             :headerButton="this.headerButton"
             v-bind:sortBy="this.sortBy"
+            v-bind:isBusy="this.isBusy"
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -205,7 +206,8 @@ export default {
           key: "actions",
           label: "Actions"
         }
-      ]
+      ],
+      isBusy: false
     };
   },
 
@@ -239,6 +241,7 @@ export default {
         this.getAllOrders();
       })
       .catch(error => {
+        this.isBusy = false;
         console.dir(error);
         this.message("danger", error);
       });
@@ -345,8 +348,7 @@ export default {
     // start the connection
     this.connection
       .start()
-      .then(() => {
-      })
+      .then(() => {})
       .catch(err => console.log(err));
   },
 
@@ -420,10 +422,11 @@ export default {
 
     getAllOrders() {
       this.items = [];
-
+      this.isBusy = true;
       this.$store
         .dispatch(GET_ALL_ORDERS)
         .then(response => {
+          this.isBusy = false;
           var x = 0;
           for (x; x < response.length; x++) {
             //  this.Tabs[x] = {title: typesOfTabs[x], id : x, isDark: false}
@@ -455,6 +458,7 @@ export default {
           this.setUpTabs();
         })
         .catch(error => {
+          this.isBusy = false;
           console.dir(error);
           this.message("danger", error);
         });

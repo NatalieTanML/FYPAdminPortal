@@ -382,6 +382,7 @@ export default {
       this.$store
         .dispatch(ORDER_GET_REQUEST, orderId)
         .then(response => {
+          console.log(response)
           this.order = response;
           for (var a = 0; a < this.order.orderItems.length; a++) {
             var atr = 1;
@@ -418,10 +419,7 @@ export default {
               text: response.address.hotel.hotelAddress,
               value: response.address.hotelId
             };
-            //   this.selectedHotel.hotelAddress = response.address.hotel.hotelAddress
-            //   this.selectedHotel.hotelPostalCode = response.address.postalCode
-            //   this.selectedHotel.text = response.address.hotel.hotelAddress
-            //   this.selectedHotel.value = response.address.hotelId
+
             this.selectedHotel = selectedHotelObject;
           } else if (response.deliveryType == "Residential") {
             this.selectedDeliveryType = "Residential";

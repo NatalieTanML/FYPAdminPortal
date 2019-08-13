@@ -36,6 +36,7 @@
             v-bind:fields="this.fields"
             v-bind:items="this.sortItems"
             v-bind:tableName="this.tableName"
+            v-bind:isBusy="this.isBusy"
           ></Table>
           <b-modal
             id="manageQuantity"
@@ -164,7 +165,8 @@ export default {
       arrayOfNumberOfRows: [], // Display the number of rows for each tab
       noOfTabs: 0,
       Tabs: [],
-      sortItems: [] // products for each tab
+      sortItems: [], // products for each tab
+      isBusy: false
     };
   },
   validations: {
@@ -217,9 +219,12 @@ export default {
       }
     });
 
+    this.isBusy = true;
+
     this.$store
       .dispatch(GET_ALL_PRODUCTS)
       .then(response => {
+        this.isBusy = false;
         this.products = response;
         var x = 0;
         for (var i = 0; i < this.products.length; i++) {
@@ -311,6 +316,7 @@ export default {
         this.setUpTabs();
       })
       .catch(error => {
+        this.isBusy = false;
         alert(error);
       });
   },
@@ -459,9 +465,11 @@ export default {
     },
 
     refreshTable() {
+      this.isBusy = true;
       this.$store
         .dispatch(GET_ALL_PRODUCTS)
         .then(response => {
+          this.isBusy = false;
           this.products = response;
           var x = 0;
           for (var i = 0; i < this.products.length; i++) {
@@ -553,6 +561,7 @@ export default {
           this.setUpTabs();
         })
         .catch(error => {
+          this.isBusy = false;
           alert(error);
         });
     },

@@ -22,6 +22,7 @@
             :headerButton="headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
+            v-bind:isBusy="this.isBusy"
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -64,7 +65,8 @@ export default {
         { key: "createdBy", label: "Created By" },
         { key: "isEnabled", label: "Is Enabled" },
         { key: "actions", label: "Actions" }
-      ]
+      ],
+      isBusy: false
     };
   },
 
@@ -88,9 +90,12 @@ export default {
       this.$router.replace({ name: "UpdateUser" });
     });
 
+    this.isBusy = true;
+
     this.$store
       .dispatch(GET_ALL_USERS)
       .then(response => {
+        this.isBusy = false;
         this.items = response;
         let index;
         for (index = 0; index < this.items.length; index++) {
@@ -105,6 +110,7 @@ export default {
         }
       })
       .catch(error => {
+        this.isBusy = false;
         console.dir(error);
         this.message("danger", error);
       });

@@ -22,6 +22,7 @@
             :headerButton="headerButton"
             v-bind:fields="this.fields"
             v-bind:items="this.items"
+            v-bind:isBusy="this.isBusy"
           ></Table>
         </div>
         <!-- End of Main Content -->
@@ -69,7 +70,8 @@ export default {
         { key: "postalCode", label: "Hotel Postal Code" },
         { key: "isEnabled", label: "Is Enabled" },
         { key: "actions", label: "Actions" }
-      ]
+      ],
+      isBusy: false
     };
   },
 
@@ -97,11 +99,13 @@ export default {
       this.$router.replace({ name: "UpdateHotel" });
     });
 
+    this.isBusy = true;
+
     //get all hotels to be displayed in the table.
     this.$store
       .dispatch(GET_ALL_HOTELS)
       .then(response => {
-
+        this.isBusy = false;
         for (var x = 0; x < response.length; x++) {
           this.items.push({
             id: response[x].value,
@@ -114,6 +118,7 @@ export default {
         }
       })
       .catch(error => {
+        this.isBusy = false;
         console.dir(error);
         this.message("danger", error);
       });

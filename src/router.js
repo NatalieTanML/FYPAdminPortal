@@ -86,7 +86,6 @@ let router = new Router({
         needNewPassword: true
       }
     },
-
     {
       path: "/Deliveries",
       name: "Deliveries",
@@ -275,6 +274,7 @@ router.beforeEach((to, from, next) => {
           if (
             //these are the paths that the Delivery person can go to
             to.path == "/Deliveries" ||
+            to.path == "/OrderDetails" ||
             to.path == "/Login" ||
             to.path == "/ChangePassword"
           )

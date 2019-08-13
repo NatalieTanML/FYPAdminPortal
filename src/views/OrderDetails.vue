@@ -19,7 +19,7 @@
                   <h4>Order Details</h4>
                 </b-col>
                 <b-col>
-                  <div>
+                  <div v-if="this.$store.getters.userRole == 'Admin'">
                     <b-button variant="primary" class="float-right" @click="editOrder">Edit Order</b-button>
                   </div>
                 </b-col>
